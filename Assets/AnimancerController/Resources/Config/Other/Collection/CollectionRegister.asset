@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a02432966727384b82a32b8286e0b56, type: 3}
+  m_Name: CollectionRegister
+  m_EditorClassIdentifier: 
+  collectionInfoList:
+  - CollectionID: 1
+    Sprite: {fileID: 21300000, guid: 78540acf2be3289499193aa63706ae76, type: 3}
+    CollectionName: "\u6613\u62C9\u7F50\u62C9\u73AF\u6212\u6307 "
+    description: "\u4E00\u4E2A...\u6613\u62C9\u7F50\u62C9\u73AF\uFF1F\u8FD9\u4E5F\u7B97\u6212\u6307\uFF1F---\u6BEB\u65E0\u6536\u85CF\u4EF7\u503C"
+  - CollectionID: 2
+    Sprite: {fileID: 21300000, guid: a1fa2885d7aaa864581e92b910047834, type: 3}
+    CollectionName: "\u7F3A\u53E3\u7684\u751C\u751C\u5708\u6212\u6307 "
+    description: "\u5979\u5C31\u50CF\u6211\u7684\u751C\u751C\u5708~\u751C\u7F8E\u7684\u6C38\u6052\u5FAA\u73AF~\u6C38\u8FDC\u88AB\u56F0\u4F4F~---\u81F4\u547D\u7684\u8BF1\u60D1\u5473\u9053\uFF0C\u624B\u638C\u90FD\u8981\u957F\u51FA\u5634\u6765\u4E86"
+  - CollectionID: 3
+    Sprite: {fileID: 21300000, guid: ef27db9c97ec9c14894d3def4d1815d6, type: 3}
+    CollectionName: "\u91D1\u5C5E\u5F2F\u5934\u6212\u6307"
+    description: "\u5E26\u4E0A\u5B83\u5427\uFF01\u6CA1\u6709\u4EBA\u80FD\u62B5\u5FA1\u7684\u4E86\u5B83\u7684\u8BF1\u60D1\uFF01\u4F60\u5C06\u5F97\u5230\u7684\u662F\uFF01\u6C38\u8FDC\u65E0\u6CD5\u4F38\u76F4\u7684\u8BC5\u5492\uFF01---\u88C5\u4FEE\u65F6\u591A\u51FA\u6765\u7684\u96F6\u4EF6\uFF0C\u672A\u6210\u5E74\u5B69\u5B50\u7684\u6BD2\u54C1"

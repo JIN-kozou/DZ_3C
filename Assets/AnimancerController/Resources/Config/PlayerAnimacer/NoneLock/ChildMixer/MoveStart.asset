@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5a8877f26e7a6a43aaf06fade1a064a, type: 3}
+  m_Name: MoveStart
+  m_EditorClassIdentifier: 
+  _Transition:
+    rid: 4293258794048421892
+  references:
+    version: 2
+    RefIds:
+    - rid: 4293258794048421892
+      type: {class: MixerTransition2D, ns: Animancer, asm: Kybernetik.Animancer}
+      data:
+        _FadeDuration: 0.24
+        _Speed: 1
+        _Events:
+          _NormalizedTimes:
+          - 0.85
+          _Callbacks: []
+          _Names: []
+        _Animations:
+        - {fileID: 7400000, guid: 894fae5eda5b80d4293d6e625d01ec26, type: 2}
+        - {fileID: 7400000, guid: 1e16bbbb783ec5c45acaca9e4495badb, type: 2}
+        - {fileID: 7400000, guid: d7508c89b73bf1a47b7923b85ec460d1, type: 2}
+        - {fileID: 7400000, guid: e3f8bab6785fea245906b5aaabf98d11, type: 2}
+        - {fileID: 7400000, guid: fc6f137c96de6ea46b57b616d2eb675a, type: 2}
+        - {fileID: 7400000, guid: 5b5656904c8738a4690c7f9bd9534ace, type: 2}
+        - {fileID: 7400000, guid: f6fc52e00ab01d54c9a96eea32a41a21, type: 2}
+        - {fileID: 7400000, guid: b96d46a5d96474043b655b75a212915d, type: 2}
+        - {fileID: 7400000, guid: 0bf78838c61bf0f48a4e1f16b464c235, type: 2}
+        - {fileID: 7400000, guid: fb09c1f464317624e9db3dd0b70be2c8, type: 2}
+        - {fileID: 7400000, guid: cb4acd720476eeb45b99ba3a02d34deb, type: 2}
+        - {fileID: 7400000, guid: 0ad93d46fe0bd1b40a22dab73c658663, type: 2}
+        - {fileID: 7400000, guid: c1f70461d86b23646b3f0e9f66609964, type: 2}
+        - {fileID: 7400000, guid: 006c31257ea3fcd439f402b0c1d58350, type: 2}
+        - {fileID: 7400000, guid: c40d945c09ef05e4abf181b70a4a27de, type: 2}
+        - {fileID: 7400000, guid: 48072539cc59fda46bb8d928dd869161, type: 2}
+        _Speeds: []
+        _SynchronizeChildren: 
+        _Thresholds:
+        - {x: -180, y: 1}
+        - {x: -135, y: 1}
+        - {x: -90, y: 1}
+        - {x: -45, y: 1}
+        - {x: 0, y: 1}
+        - {x: 45, y: 1}
+        - {x: 90, y: 1}
+        - {x: 135, y: 1}
+        - {x: 180, y: 1}
+        - {x: 0, y: 2}
+        - {x: -90, y: 2}
+        - {x: -135, y: 2}
+        - {x: -180, y: 2}
+        - {x: 90, y: 2}
+        - {x: 135, y: 2}
+        - {x: 180, y: 2}
+        _DefaultParameter: {x: 0, y: 0}
+        _Type: 0
+        _ParameterNameX: {fileID: 0}
+        _ParameterNameY: {fileID: 0}

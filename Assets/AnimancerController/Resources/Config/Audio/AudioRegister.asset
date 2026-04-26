@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89cc64d817b36ec4ca1c35e36c475efc, type: 3}
+  m_Name: AudioRegister
+  m_EditorClassIdentifier: 
+  audioClipList:
+  - audioName: Jump
+    audioClip: {fileID: 8300000, guid: db0c7cc1f802f814e8228b6a1e687d15, type: 3}
+  - audioName: Run
+    audioClip: {fileID: 8300000, guid: c252a748c7cf7fa46a5eb29e03159e75, type: 3}
+  - audioName: Move
+    audioClip: {fileID: 8300000, guid: c6cbe5e8052c76b4b9bd5f865f5923e6, type: 3}
+  - audioName: SaveGamePoint
+    audioClip: {fileID: 8300000, guid: 1d493f8644831674ab2e2bb32f5e0875, type: 3}
+  - audioName: Ultimate
+    audioClip: {fileID: 8300000, guid: 41b3fc8439ede3d4fa71b4e5fb84b6cd, type: 3}
+  - audioName: Scale_1
+    audioClip: {fileID: 8300000, guid: d3df2358223ed7643a6106c9778ed930, type: 3}
+  - audioName: Scale_2
+    audioClip: {fileID: 8300000, guid: 3e25258eedb15964e8d6651c9982a7a6, type: 3}
+  - audioName: Scale_3
+    audioClip: {fileID: 8300000, guid: efccd1d29435eb04c866ec3c754a494f, type: 3}
+  - audioName: Scale_4
+    audioClip: {fileID: 8300000, guid: 15f7abd5e82aacb4ca3aa24d2a2d1dec, type: 3}
+  - audioName: Scale_5
+    audioClip: {fileID: 8300000, guid: 321644b98c7b1a1458736b54fb2b9541, type: 3}
+  - audioName: Scale_6
+    audioClip: {fileID: 8300000, guid: 6bb226f0f5d6b0e449d02351e20dfcf0, type: 3}
+  - audioName: Scale_7
+    audioClip: {fileID: 8300000, guid: 7b822449692f29f479697b3a59897694, type: 3}
+  - audioName: Scale_8
+    audioClip: {fileID: 8300000, guid: d8517ceb8d5c1f7438725a28bf158e76, type: 3}
+  - audioName: BreakFloor
+    audioClip: {fileID: 8300000, guid: e5ecd12b06b5ee549967cfcef8526ff0, type: 3}
+  - audioName: Button
+    audioClip: {fileID: 8300000, guid: 532e5fe9801d6e04792bd6c13adafb8f, type: 3}
+  - audioName: GetCollection
+    audioClip: {fileID: 8300000, guid: fabbfb32108af8047878b5fd3c852f30, type: 3}
+  - audioName: GameOver
+    audioClip: {fileID: 8300000, guid: d8d96493a36446e449dc89497e3f4975, type: 3}
