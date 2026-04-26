@@ -85,7 +85,9 @@ public class PlayerMovementState : StateBase
     {
        float walkSpeed = numericConfig != null ? numericConfig.walkSpeedParameter : 1f;
        float runSpeed = numericConfig != null ? numericConfig.runSpeedParameter : 2f;
-       return reusableData.speedValueParameter.TargetValue = inputServer.Shift ? runSpeed : walkSpeed;
+       float baseSpeed = inputServer.Shift ? runSpeed : walkSpeed;
+       float finalSpeed = (baseSpeed + reusableData.buffSnapshot.moveSpeedAdditive) * reusableData.buffSnapshot.moveSpeedMultiplier;
+       return reusableData.speedValueParameter.TargetValue = Mathf.Max(0f, finalSpeed);
     }
     protected float UpdateRotation(bool isUpdateRotationParameter = true, float rotationSmoothTime = 0.7f, bool isRotationCompensation = true, float rotationSize = 1.4f)
     {
@@ -205,7 +207,8 @@ public class PlayerMovementState : StateBase
             return;
         }
         float inAirMoveSpeed = numericConfig != null ? numericConfig.inAirMoveSpeed : 2f;
-        reusableData.horizontalSpeed = Mathf.Lerp(reusableData.horizontalSpeed, inputServer.Move != Vector2.zero ? inAirMoveSpeed : 0, 1 - Mathf.Exp(-8 * Time.deltaTime));
+        float finalInAirSpeed = (inAirMoveSpeed + reusableData.buffSnapshot.moveSpeedAdditive) * reusableData.buffSnapshot.moveSpeedMultiplier;
+        reusableData.horizontalSpeed = Mathf.Lerp(reusableData.horizontalSpeed, inputServer.Move != Vector2.zero ? Mathf.Max(0f, finalInAirSpeed) : 0, 1 - Mathf.Exp(-8 * Time.deltaTime));
         if (reusableData.lockValueParameter.TargetValue == 1)//索敌
         {
             //控制水平移动

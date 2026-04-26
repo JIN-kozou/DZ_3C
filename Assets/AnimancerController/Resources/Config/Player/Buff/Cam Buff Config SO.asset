@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a326ffbc37dd1374491e413196210a1a, type: 3}
+  m_Name: Cam Buff Config SO
+  m_EditorClassIdentifier: 
+  buffId: buff.cam
+  buffType: 3
+  duration: 1
+  maxStack: 1
+  stackRule: 1
+  isDispellable: 1
+  moveSpeedMultiplier: 0.5
+  moveSpeedAdditive: -0.2
+  tickInterval: 1
+  recoverValue: 0
+  recoverTargetType: 0
+  dizzyAmplitude: 0
+  dizzyFrequency: 10
+  dizzyFovOffset: -10
+  dizzyShakePitchAmplitude: 2
+  dizzyShakeYawAmplitude: 0.6
+  dizzyShakeRollAmplitude: 1
+  dizzyShakePitchOffset: 0
+  dizzyShakeYawOffset: 0
+  dizzyShakeRollOffset: 0
+  dizzyShakePitchFrequencyScale: 2
+  dizzyShakeYawFrequencyScale: 3
+  dizzyShakeRollFrequencyScale: 2
+  sourceType: 0

@@ -22,6 +22,7 @@ public class CameraController : MonoBehaviour
     private InputService inputService;
     private bool useOverrideDistance;
     private float overrideDistance;
+    private float externalDistanceOffset;
 
     private void Awake()
     {
@@ -61,6 +62,8 @@ public class CameraController : MonoBehaviour
             }
         }
         float targetDistance = useOverrideDistance ? overrideDistance : currentDistance;
+        targetDistance += externalDistanceOffset;
+        targetDistance = Mathf.Clamp(targetDistance, minDistance, maxDistance);
         virtualCamera.m_CameraDistance = Mathf.Lerp(virtualCamera.m_CameraDistance, targetDistance,Time.deltaTime* smoothness) ;
     }
 
@@ -74,5 +77,10 @@ public class CameraController : MonoBehaviour
     {
         useOverrideDistance = false;
     }
-  
+
+    public void SetExternalDistanceOffset(float distanceOffset)
+    {
+        externalDistanceOffset = distanceOffset;
+    }
+ 
 }

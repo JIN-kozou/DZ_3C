@@ -722,6 +722,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8582443651107977850}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f44f3849f93f0244e80cad9819f38cb4,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 341519274977227081}
   m_SourcePrefab: {fileID: 100100000, guid: f44f3849f93f0244e80cad9819f38cb4, type: 3}
 --- !u!4 &3609447820526188730 stripped
 Transform:
@@ -803,6 +807,10 @@ MonoBehaviour:
   groundRadius: 0.5
   moveSpeedMult: 2
   playerSO: {fileID: 11400000, guid: 99e2ea24fd0ddcb46a2bf3f325a404fc, type: 2}
+  maxHealth: 100
+  maxStamina: 100
+  initHealth: 100
+  initStamina: 100
 --- !u!114 &9154149627376371769
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -838,3 +846,19 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
+--- !u!114 &341519274977227081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4133324826678206976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d52d0606de084948bf71ca0ac14f7ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 7119484680310477835}
+  selfBuffs:
+  - {fileID: 11400000, guid: 6880c9ece3b29e74eb432d96a7c31abf, type: 2}
+  triggerKey: 16

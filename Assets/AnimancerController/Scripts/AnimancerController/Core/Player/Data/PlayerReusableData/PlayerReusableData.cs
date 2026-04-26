@@ -54,6 +54,9 @@ public class PlayerReusableData
     public Vector3 targetDir;
     public BindableProperty<float> targetAngle = new BindableProperty<float>();
     public BindableProperty<string> currentState = new BindableProperty<string>();
+    public BindableProperty<float> health = new BindableProperty<float>();
+    public BindableProperty<float> stamina = new BindableProperty<float>();
+    public PlayerBuffRuntimeSnapshot buffSnapshot = PlayerBuffRuntimeSnapshot.Default;
 
     //IdleState
     public ManualMixerState standIdleMixerState;
