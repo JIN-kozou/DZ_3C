@@ -16,10 +16,15 @@ public class PlayerNumericConfig
     public float groundRadius = 0.5f;
     [Min(0.1f)] public float groundProbeDistance = 1.5f;
     [Min(1)] public int groundNormalSmoothFrames = 3;
+    [Tooltip("从脚底地面探测球心（detectedOrigin）再向上偏移后发射向下射线取法线；相对“从角色中心向下”更不易误打到前方陡坡。")]
+    [Min(0.05f)] public float groundNormalRayStartHeight = 0.35f;
+    [Min(0.1f)] public float groundNormalRayDistance = 4f;
 
     [Header("Slope")]
     [Range(0f, 89f)] public float maxWalkableSlopeAngle = 45f;
     [Range(0f, 89f)] public float slideStartAngle = 52f;
+    [Tooltip("实际下滑阈值 = min(slideStartAngle, maxWalkableSlopeAngle + 本值)，避免可走坡与下滑阈值之间出现长时间“既不蹭上坡也不下滑”的真空带。")]
+    [Min(0f)] public float slideLeadPastWalkableDegrees = 2f;
     [Min(0f)] public float slideAcceleration = 16f;
     [Min(0f)] public float slideMaxSpeed = 8f;
     [Min(0f)] public float slideControlDamping = 4f;

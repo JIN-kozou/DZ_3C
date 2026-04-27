@@ -80,6 +80,6 @@ public class PlayerMoveLoopState : PlayerMovementState
         {
             return;
         }
-        playerStateMachine.ChangeState(playerStateMachine.moveEndState);
+        playerStateMachine.ChangeState(playerStateMachine.idleState);
     }
 }

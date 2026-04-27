@@ -14,13 +14,17 @@ public class CharacterBase : MonoBehaviour
     [SerializeField] private float groundDetectedOffset = -0.06f;
     [SerializeField] private float groundRadius = 1.2f;
     [SerializeField] private float groundProbeDistance = 1.5f;
+    [SerializeField] private float groundNormalRayStartHeight = 0.35f;
+    [SerializeField] private float groundNormalRayDistance = 4f;
     [SerializeField, Range(0f, 89f)] private float maxWalkableSlopeAngle = 45f;
     [SerializeField, Range(0f, 89f)] private float slideStartAngle = 52f;
+    [SerializeField] private float slideLeadPastWalkableDegrees = 2f;
     [SerializeField] private float slideAcceleration = 16f;
     [SerializeField] private float slideMaxSpeed = 8f;
     [SerializeField] private float slideControlDamping = 4f;
     private Vector3 detectedOrigin;
     private Vector3 smoothedGroundNormal = Vector3.up;
+    private Vector3 lastProbeGroundNormal = Vector3.up;
     private int groundNormalSmoothFrames = 3;
     private Vector3 slopeSlideVelocity;
     public BindableProperty<bool> isOnGround { set; get; } = new BindableProperty<bool>();
@@ -62,8 +66,11 @@ public class CharacterBase : MonoBehaviour
         groundRadius = config.groundRadius;
         groundProbeDistance = config.groundProbeDistance;
         groundNormalSmoothFrames = Mathf.Max(1, config.groundNormalSmoothFrames);
+        groundNormalRayStartHeight = config.groundNormalRayStartHeight;
+        groundNormalRayDistance = config.groundNormalRayDistance;
         maxWalkableSlopeAngle = config.maxWalkableSlopeAngle;
         slideStartAngle = config.slideStartAngle;
+        slideLeadPastWalkableDegrees = config.slideLeadPastWalkableDegrees;
         slideAcceleration = config.slideAcceleration;
         slideMaxSpeed = config.slideMaxSpeed;
         slideControlDamping = config.slideControlDamping;
@@ -91,20 +98,45 @@ public class CharacterBase : MonoBehaviour
     {
         detectedOrigin = transform.position - groundDetectedOffset * Vector3.up;
         var isHit = Physics.CheckSphere(detectedOrigin, groundRadius, whatIsGround, QueryTriggerInteraction.Ignore);
+        Vector3 bestNormal = Vector3.up;
+        bool haveGroundNormal = false;
         if (isHit && Physics.SphereCast(detectedOrigin, groundRadius * 0.8f, Vector3.down, out var hitInfo, groundProbeDistance, whatIsGround, QueryTriggerInteraction.Ignore))
         {
-            Vector3 hitNormal = hitInfo.normal.sqrMagnitude > 0f ? hitInfo.normal.normalized : Vector3.up;
-            float t = 1f / Mathf.Max(1, groundNormalSmoothFrames);
-            smoothedGroundNormal = Vector3.Slerp(smoothedGroundNormal, hitNormal, t);
-            SlopeAngle = Vector3.Angle(smoothedGroundNormal, Vector3.up);
+            bestNormal = hitInfo.normal.sqrMagnitude > 0f ? hitInfo.normal.normalized : Vector3.up;
+            haveGroundNormal = true;
+        }
+
+        // 从脚底探测点附近起算，避免角色尚未踏上斜坡时，从身体中心垂直向下误打到前方陡坡/竖直碰撞体。
+        Vector3 rayOrigin = detectedOrigin + Vector3.up * groundNormalRayStartHeight;
+        if (Physics.Raycast(rayOrigin, Vector3.down, out var rayHit, groundNormalRayDistance, whatIsGround, QueryTriggerInteraction.Ignore))
+        {
+            Vector3 rayNormal = rayHit.normal.sqrMagnitude > 0f ? rayHit.normal.normalized : Vector3.up;
+            if (!haveGroundNormal || Vector3.Angle(rayNormal, Vector3.up) > Vector3.Angle(bestNormal, Vector3.up))
+            {
+                bestNormal = rayNormal;
+            }
+            haveGroundNormal = true;
+        }
+
+        if (haveGroundNormal)
+        {
+            lastProbeGroundNormal = bestNormal;
+            float diff = Vector3.Angle(smoothedGroundNormal, bestNormal);
+            float t = Mathf.Clamp01((1f / Mathf.Max(1, groundNormalSmoothFrames)) + diff / 180f * 0.35f);
+            smoothedGroundNormal = Vector3.Slerp(smoothedGroundNormal, bestNormal, t);
+            SlopeAngle = Vector3.Angle(bestNormal, Vector3.up);
         }
         else
         {
             smoothedGroundNormal = Vector3.Slerp(smoothedGroundNormal, Vector3.up, 0.25f);
+            lastProbeGroundNormal = Vector3.Slerp(lastProbeGroundNormal, Vector3.up, 0.25f);
             SlopeAngle = 0f;
         }
-        isOnGround.Value = isHit && verticalSpeed < 0;
-        IsOnSteepSlope = isOnGround.Value && SlopeAngle > slideStartAngle;
+
+        bool controllerGrounded = controller != null && controller.isGrounded;
+        isOnGround.Value = (isHit || controllerGrounded) && verticalSpeed <= 0.05f;
+        float slideThreshold = Mathf.Min(slideStartAngle, maxWalkableSlopeAngle + Mathf.Max(0f, slideLeadPastWalkableDegrees));
+        IsOnSteepSlope = isOnGround.Value && SlopeAngle > slideThreshold;
         return isOnGround.Value;
     }
     private void CharacterGravity()
@@ -210,13 +242,14 @@ public class CharacterBase : MonoBehaviour
     #region 斜坡的处理
     private Vector3 SetDirOnSlop(Vector3 dir)
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out var hitInfo, groundProbeDistance + 0.2f))
+        if (Physics.Raycast(transform.position, Vector3.down, out var hitInfo, 1f))
         {
             if (Vector3.Dot(hitInfo.normal, Vector3.up) != 1)
             {
                 return Vector3.ProjectOnPlane(dir, hitInfo.normal);
             }
         }
+
         return dir;
     }
     #endregion
@@ -229,7 +262,8 @@ public class CharacterBase : MonoBehaviour
             return;
         }
 
-        Vector3 slideDirection = Vector3.ProjectOnPlane(Vector3.down, smoothedGroundNormal).normalized;
+        Vector3 slideNormal = lastProbeGroundNormal.sqrMagnitude > 0.0001f ? lastProbeGroundNormal.normalized : smoothedGroundNormal.normalized;
+        Vector3 slideDirection = Vector3.ProjectOnPlane(Vector3.down, slideNormal).normalized;
         if (slideDirection.sqrMagnitude <= 0.0001f)
         {
             slopeSlideVelocity = Vector3.zero;

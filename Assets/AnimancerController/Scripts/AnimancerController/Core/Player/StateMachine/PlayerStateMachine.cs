@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 /**************************************************************************
-作者: HuHu
-邮箱: 3112891874@qq.com
-功能: 有限状态机，缓存状态，驱动更新状态类
+潩潩: HuHu
+潩潩: 3112891874@qq.com
+潩潩: 潩潩??潩潩潩潩??潩潩潩潩潩??潩
 **************************************************************************/
 public class PlayerStateMachine : StateMachineBase
 {
-   //缓存状态
+   //潩潩??
     public Player player;
     public PlayerIdleState idleState;
     public PlayerMoveStartState moveStartState;
     public PlayerMoveLoopState moveLoopState;
-    public PlayerMoveEndState moveEndState;
     public PlayerJumpState jumpState;
     public PlayerClimbState climbState;
     public PlayerLedgeClimbState ledgeClimbState;
@@ -28,7 +27,6 @@ public class PlayerStateMachine : StateMachineBase
         idleState = new PlayerIdleState(this);
         moveStartState = new PlayerMoveStartState(this);
         moveLoopState = new PlayerMoveLoopState(this);
-        moveEndState = new PlayerMoveEndState(this);
         jumpState= new PlayerJumpState(this);
         climbState = new PlayerClimbState(this);
         ledgeClimbState = new PlayerLedgeClimbState(this);

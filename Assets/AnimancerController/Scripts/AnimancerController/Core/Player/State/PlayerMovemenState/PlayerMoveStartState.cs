@@ -89,7 +89,7 @@ public class PlayerMoveStartState : PlayerMovementState
         {
             return;
         }
-        playerStateMachine.ChangeState(playerStateMachine.moveEndState);
+        playerStateMachine.ChangeState(playerStateMachine.idleState);
     }
     public override void OnExit()
     {
