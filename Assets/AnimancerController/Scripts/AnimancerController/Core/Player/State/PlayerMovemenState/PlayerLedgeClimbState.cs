@@ -24,10 +24,13 @@ public class PlayerLedgeClimbState : PlayerMovementState
     float CCRadiusMult = 0.5f;
 
     Vector3 targetPoint;
-    float maxError = 0.08f;//高度最大误差值
+    float maxError => numericConfig != null ? numericConfig.wallProbeRadius : 0.08f;//高度最大误差值
+    float wallProbeDistance => numericConfig != null ? numericConfig.wallProbeDistance : 1f;
 
     CapsuleCollider capsuleCollider;
     Rigidbody rigidbody;
+    /// <summary>侧向/挂墙跳出时在 <see cref="HangJumpOut"/> 里置位，避免 <see cref="OnExit"/> 清掉刻意写入的惯性。</summary>
+    bool pendingHangWallJumpExit;
     public PlayerLedgeClimbState(PlayerStateMachine stateMachine) : base(stateMachine)
     {
         HangWallData = playerSO.playerMovementData.PlayerHangWallData;
@@ -61,6 +64,7 @@ public class PlayerLedgeClimbState : PlayerMovementState
         isHandingRotation.Value = false;
         isClimbUp =false;
         isHangOut =false;
+        pendingHangWallJumpExit = false;
 
         handHight = Mathf.Abs(HangWallData.hightAndForwardOffSet.x) + detectionOffset;
         targetPoint = reusableData.hit.point + Vector3.up * HangWallData.hightAndForwardOffSet.x+ reusableData.hit.normal * (HangWallData.hightAndForwardOffSet.y);
@@ -94,6 +98,14 @@ public class PlayerLedgeClimbState : PlayerMovementState
         player.disEnableGravity = false;
         player.controller.enabled = true;
         player.applyFullRootMotion = false;
+
+        player.ClearHorizontalVelocity();
+        player.ChangeVerticalSpeed(-2f);
+        if (!pendingHangWallJumpExit)
+        {
+            reusableData.currentInertialVelocity = Vector3.zero;
+        }
+        pendingHangWallJumpExit = false;
 
         capsuleCollider.enabled = false;
         //这里不得不将Rb移除，不然爬墙就会受到影响
@@ -190,6 +202,7 @@ public class PlayerLedgeClimbState : PlayerMovementState
 
     private void HangJumpOut()
     {
+        pendingHangWallJumpExit = true;
         isHangOut = true;
         player.controller.enabled = true;
         player.applyFullRootMotion = false;
@@ -256,14 +269,14 @@ public class PlayerLedgeClimbState : PlayerMovementState
             // 计算起始位置
             startDetectionPos = (player.transform.position + Vector3.up * handHight - player.transform.forward * 0.2f);
             // 发射射线检测地面
-            if (Physics.Raycast(startDetectionPos, player.transform.forward, out var ray, 1.0f, player.whatIsGround) )
+            if (Physics.Raycast(startDetectionPos, player.transform.forward, out var ray, wallProbeDistance, player.whatIsGround) )
             {
                 // 计算目标位置
                 //再发射一个射线来向上修正角色Y的实际高度：适应不同高度墙面、适应曲面墙面
-                if (Physics.Raycast(startDetectionPos + Vector3.up * maxError, player.transform.forward, out var hitInfo, 0.5f, player.whatIsGround)&&!isHandingRotation.Value)
+                if (Physics.Raycast(startDetectionPos + Vector3.up * maxError, player.transform.forward, out var hitInfo, wallProbeDistance * 0.5f, player.whatIsGround)&&!isHandingRotation.Value)
                 {
                     reusableData.hit = hitInfo;
-                    Debug.DrawLine(startDetectionPos + Vector3.up * maxError, startDetectionPos + Vector3.up * maxError + player.transform.forward * 1f, Color.blue, 0.05f);
+                    Debug.DrawLine(startDetectionPos + Vector3.up * maxError, startDetectionPos + Vector3.up * maxError + player.transform.forward * wallProbeDistance, Color.blue, 0.05f);
                 }
                 else
                 {
@@ -276,11 +289,11 @@ public class PlayerLedgeClimbState : PlayerMovementState
                     player.transform.position = Vector3.Lerp(player.transform.position, target, Time.deltaTime * 8f);
                 }
 
-                Debug.DrawLine(startDetectionPos, startDetectionPos + player.transform.forward * 1.0f, Color.red, 0.05f);
+                Debug.DrawLine(startDetectionPos, startDetectionPos + player.transform.forward * wallProbeDistance, Color.red, 0.05f);
             }
             else
             {
-                if (Physics.Raycast(startDetectionPos + Vector3.down * maxError, player.transform.forward, out var hitInfo, 0.5f, player.whatIsGround)&&!isHandingRotation.Value)
+                if (Physics.Raycast(startDetectionPos + Vector3.down * maxError, player.transform.forward, out var hitInfo, wallProbeDistance * 0.5f, player.whatIsGround)&&!isHandingRotation.Value)
                 {
                     reusableData.hit = hitInfo;
 
@@ -289,7 +302,7 @@ public class PlayerLedgeClimbState : PlayerMovementState
                     {
                         player.transform.position = Vector3.Lerp(player.transform.position, target, Time.deltaTime * 8);
 
-                        Debug.DrawLine(startDetectionPos + Vector3.down * maxError, startDetectionPos + Vector3.up * maxError + player.transform.forward * 0.8f, Color.blue, 0.05f);
+                        Debug.DrawLine(startDetectionPos + Vector3.down * maxError, startDetectionPos + Vector3.up * maxError + player.transform.forward * (wallProbeDistance * 0.8f), Color.blue, 0.05f);
                     }
                   
                 }
@@ -315,8 +328,8 @@ public class PlayerLedgeClimbState : PlayerMovementState
             //可能需要转向，检测转向位置是否可攀爬
             startDetectionPos += player.transform.forward*0.5f ;
             Vector3 detectionDir = reusableData.rotationValueParameter.CurrentValue >= 0 ? -player.transform.right : player.transform.right;
-            Debug.DrawLine(startDetectionPos,startDetectionPos + detectionDir *0.8f,Color.green,5f);
-            if (Physics.Raycast(startDetectionPos, detectionDir, out var hitInfo, 0.8f, player.whatIsGround))
+            Debug.DrawLine(startDetectionPos,startDetectionPos + detectionDir * (wallProbeDistance * 0.8f),Color.green,5f);
+            if (Physics.Raycast(startDetectionPos, detectionDir, out var hitInfo, wallProbeDistance * 0.8f, player.whatIsGround))
             {
                 reusableData.hit = hitInfo;
                 Vector3 target = reusableData.hit.point + (Vector3.up * HangWallData.hightAndForwardOffSet.x) + reusableData.hit.normal * (HangWallData.hightAndForwardOffSet.y);

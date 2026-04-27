@@ -129,6 +129,9 @@ public class PlayerClimbState : PlayerMovementState
         player.disEnableGravity = false;
         player.controller.enabled = true; 
         player.applyFullRootMotion = false;
+        player.ClearHorizontalVelocity();
+        reusableData.currentInertialVelocity = Vector3.zero;
+        player.ChangeVerticalSpeed(-2f);
     }
 
     private void OnClimbAnimationEnd()

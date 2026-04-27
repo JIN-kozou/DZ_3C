@@ -13,8 +13,14 @@ public class PlayerJumpState : PlayerMovementState
     {
         base.OnEnter();
         reusableData.currentInertialVelocity = GetInertialVelocity();
-        Debug.Log("惯性速度：" + reusableData.currentInertialVelocity / Time.deltaTime);
         reusableData.currentInertialVelocity.y = 0;
+        float inertiaSpeed = reusableData.currentInertialVelocity.magnitude / Mathf.Max(Time.deltaTime, 0.0001f);
+        float inertiaTriggerThreshold = numericConfig != null ? numericConfig.jumpInertiaTriggerSpeedThreshold : 0f;
+        if (inertiaSpeed < inertiaTriggerThreshold)
+        {
+            reusableData.currentInertialVelocity = Vector3.zero;
+        }
+        Debug.Log("惯性速度：" + reusableData.currentInertialVelocity / Mathf.Max(Time.deltaTime, 0.0001f));
 
         float jumpHeight = numericConfig != null ? numericConfig.defaultJumpHeight : 0.8f;
         player.ChangeVerticalSpeed(ToolFunction.GetJumpInitVelocity(jumpHeight, player.gravity));

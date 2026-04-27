@@ -21,24 +21,33 @@ public class PlayerMoveEndState : PlayerMovementState
 
     private void CheckLeftOrRightFoot()
     {
-        //判断是左脚还是右脚
+        // 非 Humanoid Avatar 不能调用 GetBoneTransform，降级为按角度选停步动画。
+        if (player.animator == null || !player.animator.isHuman)
+        {
+            PlayFallbackMoveEnd();
+            return;
+        }
+
         Transform leftFoot = player.animator.GetBoneTransform(HumanBodyBones.LeftFoot);
         Transform rightFoot = player.animator.GetBoneTransform(HumanBodyBones.RightFoot);
+        if (leftFoot == null || rightFoot == null)
+        {
+            PlayFallbackMoveEnd();
+            return;
+        }
 
         Vector3 leftFootLocalPos = player.transform.InverseTransformPoint(leftFoot.position);
         Vector3 rightFootLocalPos = player.transform.InverseTransformPoint(rightFoot.position);
-        
-        if (leftFootLocalPos.z > rightFootLocalPos.z)
-        {
-            Debug.Log("左腿在前");
-            animancer.Play(moveEndData.moveEnd_L).Events(player).OnEnd = OnStateDefaultEnd;
-        }
-        else
-        {
-            Debug.Log("右腿在前");
-            animancer.Play(moveEndData.moveEnd_R).Events(player).OnEnd = OnStateDefaultEnd;
-        }
-      
+        bool isLeftFootForward = leftFootLocalPos.z > rightFootLocalPos.z;
+        var targetClip = isLeftFootForward ? moveEndData.moveEnd_L : moveEndData.moveEnd_R;
+        animancer.Play(targetClip).Events(player).OnEnd = OnStateDefaultEnd;
+    }
+
+    private void PlayFallbackMoveEnd()
+    {
+        // 没有脚骨信息时，按当前转向参数做可重复的左右停步选择。
+        var targetClip = angle >= 0f ? moveEndData.moveEnd_R : moveEndData.moveEnd_L;
+        animancer.Play(targetClip).Events(player).OnEnd = OnStateDefaultEnd;
     }
 
     protected override void AddEventListening()

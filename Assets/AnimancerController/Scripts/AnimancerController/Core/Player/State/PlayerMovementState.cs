@@ -8,6 +8,9 @@ public class PlayerMovementState : StateBase
     protected PlayerStateMachine playerStateMachine;
     protected PlayerSO playerSO;
     protected PlayerNumericConfig numericConfig;
+    protected float stateSwitchCooldown => numericConfig != null ? numericConfig.stateSwitchCooldown : 0.1f;
+    private float lastFallSwitchTime = -10f;
+    private float lastLandSwitchTime = -10f;
     //属性变量
     public PlayerMovementState(PlayerStateMachine stateMachine) : base(stateMachine.player)
     {
@@ -168,6 +171,11 @@ public class PlayerMovementState : StateBase
     }
     protected void OnEnterFall()
     {
+        if (Time.time - lastFallSwitchTime < stateSwitchCooldown)
+        {
+            return;
+        }
+        lastFallSwitchTime = Time.time;
         playerStateMachine.ChangeState(playerStateMachine.fallLoopState);
     }
     protected void OnMoveStart(InputAction.CallbackContext context)
@@ -185,6 +193,11 @@ public class PlayerMovementState : StateBase
     {
         if (onGround)
         {
+            if (Time.time - lastLandSwitchTime < stateSwitchCooldown)
+            {
+                return;
+            }
+            lastLandSwitchTime = Time.time;
             playerStateMachine.ChangeState(playerStateMachine.landState);
         }
     }

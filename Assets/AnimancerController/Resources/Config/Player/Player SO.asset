@@ -410,15 +410,16 @@ MonoBehaviour:
       defaultJumpHeight: 0.8
       outPlaceJumpHeight: 0.8
       platformerJumpHeight: 15
-      climbDetectionAngle: 15
-      climbDetectionDistance: 1
-      vaultMaxDistance: 0.45
-      canClimbMaxHeight: 3.2
-      canClimbMinHeight: 0.3
+      jumpInertiaTriggerSpeedThreshold: 0.8
+      climbDetectionAngle: 45
+      climbDetectionDistance: 0.5
+      vaultMaxDistance: 0
+      canClimbMaxHeight: 8
+      canClimbMinHeight: 0.5
       climbDetectionSamplingCount: 30
       lowClimbMaxHeight: 0.35
-      lowMediumClimbMaxHeight: 1
-      mediumClimbMaxHeight: 1.7
+      lowMediumClimbMaxHeight: 0.5
+      mediumClimbMaxHeight: 1
       mediumHighClimbMinHeight: 2
       mediumHighClimbMaxHeight: 2.5
       ledgeProbeMinY: 0

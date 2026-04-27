@@ -13,7 +13,16 @@ public class CharacterBase : MonoBehaviour
     [SerializeField] public LayerMask whatIsGround;
     [SerializeField] private float groundDetectedOffset = -0.06f;
     [SerializeField] private float groundRadius = 1.2f;
+    [SerializeField] private float groundProbeDistance = 1.5f;
+    [SerializeField, Range(0f, 89f)] private float maxWalkableSlopeAngle = 45f;
+    [SerializeField, Range(0f, 89f)] private float slideStartAngle = 52f;
+    [SerializeField] private float slideAcceleration = 16f;
+    [SerializeField] private float slideMaxSpeed = 8f;
+    [SerializeField] private float slideControlDamping = 4f;
     private Vector3 detectedOrigin;
+    private Vector3 smoothedGroundNormal = Vector3.up;
+    private int groundNormalSmoothFrames = 3;
+    private Vector3 slopeSlideVelocity;
     public BindableProperty<bool> isOnGround { set; get; } = new BindableProperty<bool>();
     //角色垂直速度
     public float verticalSpeed { get; set; }
@@ -31,6 +40,9 @@ public class CharacterBase : MonoBehaviour
     public bool ignoreRootMotionY { get; set; } = false;//忽视根运动的Y量
     public bool disEnableGravity { get; set; } = false;//是否禁用程序重力
     public bool ignoreRotationRootMotion { get; set; } = false;//是否忽略根运动的转向
+    public Vector3 GroundNormal => smoothedGroundNormal;
+    public float SlopeAngle { get; private set; }
+    public bool IsOnSteepSlope { get; private set; }
     protected virtual void Awake()
     {
         animator = GetComponent<Animator>();
@@ -48,6 +60,17 @@ public class CharacterBase : MonoBehaviour
         velocityLimit = config.velocityLimit;
         groundDetectedOffset = config.groundDetectedOffset;
         groundRadius = config.groundRadius;
+        groundProbeDistance = config.groundProbeDistance;
+        groundNormalSmoothFrames = Mathf.Max(1, config.groundNormalSmoothFrames);
+        maxWalkableSlopeAngle = config.maxWalkableSlopeAngle;
+        slideStartAngle = config.slideStartAngle;
+        slideAcceleration = config.slideAcceleration;
+        slideMaxSpeed = config.slideMaxSpeed;
+        slideControlDamping = config.slideControlDamping;
+        if (controller != null)
+        {
+            controller.slopeLimit = maxWalkableSlopeAngle;
+        }
         moveSpeedMult = config.moveSpeedMultiplier;
     }
     protected virtual void Update()
@@ -68,7 +91,20 @@ public class CharacterBase : MonoBehaviour
     {
         detectedOrigin = transform.position - groundDetectedOffset * Vector3.up;
         var isHit = Physics.CheckSphere(detectedOrigin, groundRadius, whatIsGround, QueryTriggerInteraction.Ignore);
+        if (isHit && Physics.SphereCast(detectedOrigin, groundRadius * 0.8f, Vector3.down, out var hitInfo, groundProbeDistance, whatIsGround, QueryTriggerInteraction.Ignore))
+        {
+            Vector3 hitNormal = hitInfo.normal.sqrMagnitude > 0f ? hitInfo.normal.normalized : Vector3.up;
+            float t = 1f / Mathf.Max(1, groundNormalSmoothFrames);
+            smoothedGroundNormal = Vector3.Slerp(smoothedGroundNormal, hitNormal, t);
+            SlopeAngle = Vector3.Angle(smoothedGroundNormal, Vector3.up);
+        }
+        else
+        {
+            smoothedGroundNormal = Vector3.Slerp(smoothedGroundNormal, Vector3.up, 0.25f);
+            SlopeAngle = 0f;
+        }
         isOnGround.Value = isHit && verticalSpeed < 0;
+        IsOnSteepSlope = isOnGround.Value && SlopeAngle > slideStartAngle;
         return isOnGround.Value;
     }
     private void CharacterGravity()
@@ -80,11 +116,13 @@ public class CharacterBase : MonoBehaviour
         if (isOnGround.Value)
         {
             verticalSpeed = -2;
+            UpdateSlopeSlideVelocity();
         }
         else
         {
             verticalSpeed += Time.deltaTime * gravity;
             verticalSpeed = Mathf.Clamp(verticalSpeed, velocityLimit.x, velocityLimit.y);
+            slopeSlideVelocity = Vector3.Lerp(slopeSlideVelocity, Vector3.zero, 1 - Mathf.Exp(-slideControlDamping * Time.deltaTime));
         }
         verticalVelocity = new Vector3(0, verticalSpeed, 0);
     }
@@ -111,7 +149,7 @@ public class CharacterBase : MonoBehaviour
         }
         if (controller.enabled)
         {
-            controller.Move((verticalVelocity + horizontalVelocityInAir) * Time.deltaTime);
+            controller.Move((verticalVelocity + horizontalVelocityInAir + slopeSlideVelocity) * Time.deltaTime);
         }
 
     }
@@ -172,7 +210,7 @@ public class CharacterBase : MonoBehaviour
     #region 斜坡的处理
     private Vector3 SetDirOnSlop(Vector3 dir)
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out var hitInfo, 1))
+        if (Physics.Raycast(transform.position, Vector3.down, out var hitInfo, groundProbeDistance + 0.2f))
         {
             if (Vector3.Dot(hitInfo.normal, Vector3.up) != 1)
             {
@@ -182,6 +220,29 @@ public class CharacterBase : MonoBehaviour
         return dir;
     }
     #endregion
+
+    private void UpdateSlopeSlideVelocity()
+    {
+        if (!IsOnSteepSlope)
+        {
+            slopeSlideVelocity = Vector3.Lerp(slopeSlideVelocity, Vector3.zero, 1 - Mathf.Exp(-slideControlDamping * Time.deltaTime));
+            return;
+        }
+
+        Vector3 slideDirection = Vector3.ProjectOnPlane(Vector3.down, smoothedGroundNormal).normalized;
+        if (slideDirection.sqrMagnitude <= 0.0001f)
+        {
+            slopeSlideVelocity = Vector3.zero;
+            return;
+        }
+
+        slopeSlideVelocity += slideDirection * slideAcceleration * Time.deltaTime;
+        float maxSlideSpeed = Mathf.Max(0.01f, slideMaxSpeed);
+        if (slopeSlideVelocity.magnitude > maxSlideSpeed)
+        {
+            slopeSlideVelocity = slopeSlideVelocity.normalized * maxSlideSpeed;
+        }
+    }
 
     private void OnDrawGizmos()
     {

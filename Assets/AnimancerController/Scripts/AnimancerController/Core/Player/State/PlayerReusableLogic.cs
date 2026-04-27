@@ -142,11 +142,16 @@ public class PlayerReusableLogic
 
     #region 按跳跃时的逻辑
     float detectionAngle => numericConfig != null ? numericConfig.climbDetectionAngle : 45f;
-    float detectionDistance => numericConfig != null ? numericConfig.climbDetectionDistance : 1f;
+    float detectionDistance => numericConfig != null ? numericConfig.wallProbeDistance : 1f;
+    float wallProbeRadius => numericConfig != null ? numericConfig.wallProbeRadius : 0.2f;
     float vaultMaxDistance => numericConfig != null ? numericConfig.vaultMaxDistance : 0.45f;
     float canClimbMaxHight => numericConfig != null ? numericConfig.canClimbMaxHeight : 3.2f;
     float canClimbMinHeight => numericConfig != null ? numericConfig.canClimbMinHeight : 0.3f;
     int detectionSamplingCount => numericConfig != null ? numericConfig.climbDetectionSamplingCount : 30;
+    int climbConfirmFrames => numericConfig != null ? numericConfig.climbConfirmFrames : 2;
+    int ledgeConfirmFrames => numericConfig != null ? numericConfig.ledgeConfirmFrames : 2;
+    private int climbConfirmCounter;
+    private int ledgeConfirmCounter;
     /// <summary>
     /// 玩家按下跳跃键时
     /// </summary>
@@ -174,7 +179,7 @@ public class PlayerReusableLogic
         for (int i = 0; i <= detectionSamplingCount+1; i++)
         {
             Vector3 currentPos = startPos + Vector3.up * sampleQuantityPerUnit * i;
-            if (Physics.Raycast(currentPos, targetDir, out var hitInfo, detectionLength, player.whatIsGround, QueryTriggerInteraction.Ignore))
+            if (TryAcquireWallHit(currentPos, targetDir, detectionLength, out var hitInfo))
             {
                 currentHit = hitInfo;
                 h = currentPos;
@@ -245,11 +250,13 @@ public class PlayerReusableLogic
     {
         if (!reusableData.canCheckLedgeInAirAfterJump)
         {
+            ResetDetectionCounters();
             return;
         }
         Vector2 moveInput = player.InputService.Move;
         if (moveInput.y <= 0)
         {
+            ResetDetectionCounters();
             return;
         }
 
@@ -268,17 +275,29 @@ public class PlayerReusableLogic
         RaycastHit hit = GetWallHight(targetDir, ledgeProbeMinY, ledgeProbeMaxY, ledgeProbeDistance, ref vaultHeight, ref obstructHeight, ledgeProbeSamplingCount);
         if (hit.collider == null)
         {
+            ledgeConfirmCounter = 0;
             return;
         }
         float angle = Vector3.Angle(-targetDir.normalized, hit.normal);
         if (angle > detectionAngle)
         {
+            ledgeConfirmCounter = 0;
             return;
         }
         reusableData.hit = hit;
         if (obstructHeight > ledgeProbeMinY && obstructHeight < ledgeProbeMaxY)
         {
+            ledgeConfirmCounter++;
+            if (ledgeConfirmCounter < ledgeConfirmFrames)
+            {
+                return;
+            }
+            ledgeConfirmCounter = 0;
             player.StateMachine.ChangeState(player.StateMachine.ledgeClimbState);
+        }
+        else
+        {
+            ledgeConfirmCounter = 0;
         }
     }
 
@@ -289,12 +308,14 @@ public class PlayerReusableLogic
         RaycastHit hit = GetWallHight(targetDir, canClimbMinHeight, canClimbMaxHight, detectionDistance, ref vaultHeight, ref obstructHeight, detectionSamplingCount);
         if (hit.collider == null)
         {
+            climbConfirmCounter = 0;
             return false;
         }
 
         float angle = Vector3.Angle(-targetDir.normalized, hit.normal);
         if (angle > detectionAngle)
         {
+            climbConfirmCounter = 0;
             return false;
         }
 
@@ -307,6 +328,7 @@ public class PlayerReusableLogic
         // 中高障碍仍不进入攀爬，保留为普通跳跃处理。
         if (obstructHeight >= mediumHighMin && obstructHeight < mediumHighMax)
         {
+            climbConfirmCounter = 0;
             return false;
         }
 
@@ -316,6 +338,12 @@ public class PlayerReusableLogic
 
         if (obstructHeight >= lowMediumMax && obstructHeight < mediumMax)
         {
+            climbConfirmCounter++;
+            if (climbConfirmCounter < climbConfirmFrames)
+            {
+                return false;
+            }
+            climbConfirmCounter = 0;
             reusableData.ObstructHeight = ObstructHeight.medium;
             VaultOrClimb(vaultStartPos, hit);
             player.StateMachine.ChangeState(player.StateMachine.climbState);
@@ -324,6 +352,12 @@ public class PlayerReusableLogic
 
         if (obstructHeight >= lowMax && obstructHeight < lowMediumMax)
         {
+            climbConfirmCounter++;
+            if (climbConfirmCounter < climbConfirmFrames)
+            {
+                return false;
+            }
+            climbConfirmCounter = 0;
             reusableData.ObstructHeight = ObstructHeight.lowMedium;
             VaultOrClimb(vaultStartPos, hit);
             player.StateMachine.ChangeState(player.StateMachine.climbState);
@@ -332,12 +366,19 @@ public class PlayerReusableLogic
 
         if (obstructHeight < lowMax)
         {
+            climbConfirmCounter++;
+            if (climbConfirmCounter < climbConfirmFrames)
+            {
+                return false;
+            }
+            climbConfirmCounter = 0;
             reusableData.ObstructHeight = ObstructHeight.low;
             reusableData.ClimbType = ClimbType.Climb;
             player.StateMachine.ChangeState(player.StateMachine.climbState);
             return true;
         }
 
+        climbConfirmCounter = 0;
         return false;
     }
     #endregion
@@ -444,5 +485,27 @@ public class PlayerReusableLogic
         Color color = hit ? hitColor : missColor;
         Debug.DrawRay(origin, direction.normalized * length, color, ClimbDebugRayDuration);
 #endif
+    }
+
+    private bool TryAcquireWallHit(Vector3 origin, Vector3 direction, float distance, out RaycastHit hitInfo)
+    {
+        if (Physics.Raycast(origin, direction, out hitInfo, distance, player.whatIsGround, QueryTriggerInteraction.Ignore))
+        {
+            return true;
+        }
+
+        Vector3 castOrigin = origin - direction.normalized * wallProbeRadius;
+        if (Physics.SphereCast(castOrigin, wallProbeRadius, direction, out hitInfo, distance + wallProbeRadius, player.whatIsGround, QueryTriggerInteraction.Ignore))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void ResetDetectionCounters()
+    {
+        climbConfirmCounter = 0;
+        ledgeConfirmCounter = 0;
     }
 }

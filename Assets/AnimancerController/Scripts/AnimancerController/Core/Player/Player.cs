@@ -60,6 +60,10 @@ public class Player : CharacterBase
         BuffSystem = new PlayerBuffSystem(this);
         //����״̬��
         StateMachine = new PlayerStateMachine(this);
+        if (GetComponent<PlayerMotionDebugView>() == null)
+        {
+            gameObject.AddComponent<PlayerMotionDebugView>();
+        }
         //����Ĭ�Ͽ�ʼ״̬
         StateMachine.ChangeState(StateMachine.idleState);
     }
