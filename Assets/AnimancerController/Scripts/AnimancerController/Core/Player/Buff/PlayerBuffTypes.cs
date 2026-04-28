@@ -27,6 +27,7 @@ public enum RecoverTargetType
 {
     Health = 0,
     Stamina = 1,
+    ReverseSystem = 2,
 }
 
 public struct PlayerBuffSourceContext

@@ -1,5 +1,6 @@
 
 using Animancer;
+using DZ_3C.Reverse;
 using UnityEngine;
 /*************************************************
 ����: HuHu
@@ -28,6 +29,13 @@ public class Player : CharacterBase
     [SerializeField] private float initHealth = 100f;
     [SerializeField] private float initStamina = 100f;
     private float baseMoveSpeedMultiplier = 1f;
+
+    [Header("Reverse System (optional)")]
+    [SerializeField] private MonoBehaviour reverseRecoverTargetBehaviour;
+    private IReverseRecoverTarget reverseRecoverTarget;
+
+    public float MaxHealth => maxHealth;
+    public float MaxStamina => maxStamina;
 
     protected override void Awake()
     {
@@ -112,13 +120,32 @@ public class Player : CharacterBase
             return;
         }
 
-        if (recoverTargetType == RecoverTargetType.Health)
+        switch (recoverTargetType)
         {
-            ReusableData.health.Value = Mathf.Clamp(ReusableData.health.Value + recoverValue, 0f, maxHealth);
+            case RecoverTargetType.Health:
+                ReusableData.health.Value = Mathf.Clamp(ReusableData.health.Value + recoverValue, 0f, maxHealth);
+                break;
+            case RecoverTargetType.Stamina:
+                ReusableData.stamina.Value = Mathf.Clamp(ReusableData.stamina.Value + recoverValue, 0f, maxStamina);
+                break;
+            case RecoverTargetType.ReverseSystem:
+                EnsureReverseRecoverTarget();
+                reverseRecoverTarget?.RecoverFromInnermost(recoverValue);
+                break;
         }
-        else
+    }
+
+    private void EnsureReverseRecoverTarget()
+    {
+        if (reverseRecoverTarget != null)
         {
-            ReusableData.stamina.Value = Mathf.Clamp(ReusableData.stamina.Value + recoverValue, 0f, maxStamina);
+            return;
         }
+        if (reverseRecoverTargetBehaviour is IReverseRecoverTarget bound)
+        {
+            reverseRecoverTarget = bound;
+            return;
+        }
+        reverseRecoverTarget = GetComponent<IReverseRecoverTarget>();
     }
 }

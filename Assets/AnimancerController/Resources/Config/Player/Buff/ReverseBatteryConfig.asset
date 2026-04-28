@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a326ffbc37dd1374491e413196210a1a, type: 3}
+  m_Name: ReverseBatteryConfig
+  m_EditorClassIdentifier: 
+  buffId: buff.reverse.battery
+  buffType: 2
+  duration: 10
+  maxStack: 3
+  stackRule: 0
+  isDispellable: 1
+  moveSpeedMultiplier: 1
+  moveSpeedAdditive: 0
+  tickInterval: 1
+  recoverValue: 5
+  recoverTargetType: 2
+  dizzyAmplitude: 0
+  dizzyFrequency: 0
+  dizzyFovOffset: 0
+  dizzyShakePitchAmplitude: 0
+  dizzyShakeYawAmplitude: 0
+  dizzyShakeRollAmplitude: 0
+  dizzyShakePitchOffset: 0
+  dizzyShakeYawOffset: 0
+  dizzyShakeRollOffset: 0
+  dizzyShakePitchFrequencyScale: 1
+  dizzyShakeYawFrequencyScale: 1
+  dizzyShakeRollFrequencyScale: 1
+  sourceType: 3
