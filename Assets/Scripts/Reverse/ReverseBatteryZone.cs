@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace DZ_3C.Reverse
@@ -25,6 +26,9 @@ namespace DZ_3C.Reverse
                  "关掉则任由 buff 自然过期。")]
         [SerializeField] private bool removeBuffOnExit = true;
 
+        // 记录当前已在本区域内并已申请过 buff 的玩家，避免 OnTriggerStay 重复申请。
+        private readonly HashSet<int> appliedPlayerIds = new HashSet<int>();
+
         private void Reset()
         {
             var col = GetComponent<Collider>();
@@ -36,7 +40,17 @@ namespace DZ_3C.Reverse
             if (batteryBuffConfig == null) return;
             Player player = ResolvePlayer(other);
             if (player == null) return;
-            player.ApplyBuff(batteryBuffConfig, new PlayerBuffSourceContext(sourceType, gameObject));
+            TryApplyBuff(player);
+        }
+
+        private void OnTriggerStay(Collider other)
+        {
+            // 兜底：某些初始化/物理时序下，角色初始已在触发器内时可能不会立刻触发 Enter。
+            // 用 Stay 保证"进入范围就开始恢复"语义，即便角色没有额外位移。
+            if (batteryBuffConfig == null) return;
+            Player player = ResolvePlayer(other);
+            if (player == null) return;
+            TryApplyBuff(player);
         }
 
         private void OnTriggerExit(Collider other)
@@ -45,7 +59,17 @@ namespace DZ_3C.Reverse
             if (batteryBuffConfig == null) return;
             Player player = ResolvePlayer(other);
             if (player == null) return;
+            appliedPlayerIds.Remove(player.GetInstanceID());
             player.BuffSystem?.RemoveBuff(batteryBuffConfig.BuffId);
+        }
+
+        private void TryApplyBuff(Player player)
+        {
+            if (player == null || batteryBuffConfig == null) return;
+            int id = player.GetInstanceID();
+            if (appliedPlayerIds.Contains(id)) return;
+            player.ApplyBuff(batteryBuffConfig, new PlayerBuffSourceContext(sourceType, gameObject));
+            appliedPlayerIds.Add(id);
         }
 
         private static Player ResolvePlayer(Collider other)

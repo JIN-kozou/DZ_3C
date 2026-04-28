@@ -177,7 +177,21 @@ public class PlayerBuffSystem
             return;
         }
 
-        if (instance.config.TickInterval <= 0f || Mathf.Approximately(instance.config.RecoverValue, 0f))
+        if (Mathf.Approximately(instance.config.RecoverValue, 0f))
+        {
+            return;
+        }
+
+        if (instance.config.UseContinuousRegeneration)
+        {
+            float interval = Mathf.Max(0.0001f, instance.config.TickInterval);
+            float recoverPerSecond = instance.config.RecoverValue / interval;
+            float recoverValue = recoverPerSecond * deltaTime * instance.stackCount;
+            player.RecoverResource(instance.config.RecoverTargetType, recoverValue);
+            return;
+        }
+
+        if (instance.config.TickInterval <= 0f)
         {
             return;
         }

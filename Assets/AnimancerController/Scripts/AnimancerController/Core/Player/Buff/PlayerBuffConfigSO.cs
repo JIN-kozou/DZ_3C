@@ -19,6 +19,7 @@ public class PlayerBuffConfigSO : ScriptableObject
     [SerializeField, Min(0f)] private float tickInterval = 1f;
     [SerializeField] private float recoverValue = 0f;
     [SerializeField] private RecoverTargetType recoverTargetType = RecoverTargetType.Health;
+    [SerializeField] private bool useContinuousRegeneration = false;
 
     [Header("Camera Dizzy")]
     [SerializeField, Min(0f)] private float dizzyAmplitude = 0f;
@@ -49,6 +50,7 @@ public class PlayerBuffConfigSO : ScriptableObject
     public float TickInterval => tickInterval;
     public float RecoverValue => recoverValue;
     public RecoverTargetType RecoverTargetType => recoverTargetType;
+    public bool UseContinuousRegeneration => useContinuousRegeneration;
     public float DizzyAmplitude => dizzyAmplitude;
     public float DizzyFrequency => dizzyFrequency;
     public float DizzyFovOffset => dizzyFovOffset;
