@@ -61,6 +61,12 @@ namespace DZ_3C.Reverse
         [Tooltip("每个部署到场景的阵列固定视野半径（米）。固定值，不随阵列剩余能量变化。默认 5。")]
         [Min(0f)] public float arrayViewRadius = 5f;
 
+        [Tooltip("玩家视野半径从旧值过渡到新值所需时间（秒）。0 表示瞬间切换。")]
+        [Min(0f)] public float viewRadiusTransitionDuration = 0.25f;
+
+        [Tooltip("玩家视野半径过渡曲线。X=归一化时间(0~1)，Y=归一化插值(0~1)。")]
+        public AnimationCurve viewRadiusTransitionCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
         // ---------- 输入键位 ----------
 
         [Header("Input Keys (键位)")]
