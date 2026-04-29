@@ -5,7 +5,7 @@ using UnityEngine;
 public class ShaderPosition : MonoBehaviour
 {
     public float radius = 1f;
-
+    public Vector3 offset;
     private static readonly List<ShaderPosition> instances = new List<ShaderPosition>();
     private static MaterialPropertyBlock block;
 
@@ -43,7 +43,7 @@ public class ShaderPosition : MonoBehaviour
             {
                 if (i < instances.Count && instances[i] != null)
                 {
-                    Vector3 pos = instances[i].transform.position;
+                    Vector3 pos = instances[i].transform.position + instances[i].offset;
                     block.SetVector("_Position" + i, pos);
                     block.SetFloat("_Radius" + i, instances[i].radius);
                 }
