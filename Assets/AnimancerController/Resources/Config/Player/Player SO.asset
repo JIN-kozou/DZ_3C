@@ -168,124 +168,6 @@ MonoBehaviour:
           _Names: []
         _Clip: {fileID: 0}
         _NormalizedStartTime: NaN
-    <PlayerHangWallData>k__BackingField:
-      hightAndForwardOffSet: {x: -1.35, y: 0.19}
-      hang_wall_idle_down:
-        _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes: []
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 7400000, guid: c1a532ed8acb9df44a6d4d5ca3ef5495, type: 2}
-        _NormalizedStartTime: NaN
-      hang_wall_idle_up:
-        _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes: []
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 7400000, guid: c1a532ed8acb9df44a6d4d5ca3ef5495, type: 2}
-        _NormalizedStartTime: NaN
-      hang_wall_idle_frond:
-        _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes: []
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 7400000, guid: 85bbd875a5207fb4c8b013458d5a3b54, type: 2}
-        _NormalizedStartTime: NaN
-      hang_wall_climb:
-        _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes: []
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 0}
-        _NormalizedStartTime: NaN
-      hang_wall_idle:
-        _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes: []
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 7400000, guid: 30e8dd3234cc04a41b8a057f74e60186, type: 2}
-        _NormalizedStartTime: NaN
-      hang_wall_idle_right_inertia:
-        _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes: []
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 7400000, guid: 54c7504eda2d54a43b7f815e7f7016a2, type: 2}
-        _NormalizedStartTime: NaN
-      hang_wall_idle_left_inertia:
-        _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes: []
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 7400000, guid: c4139b3a28a95264baf1adc5424daa2b, type: 2}
-        _NormalizedStartTime: NaN
-      hand_wallMove_Mixer: {fileID: 11400000, guid: f428a895456abc0459ec48a7061ba6a5,
-        type: 2}
-      hang_wall_climb_up:
-        _FadeDuration: 0.19166668
-        _Speed: 1
-        _Events:
-          _NormalizedTimes:
-          - 0.8358482
-          - 0.88660264
-          _Callbacks: []
-          _Names:
-          - {fileID: 11400000, guid: 546bdb412bbcf824496de50d0635d3fb, type: 2}
-        _Clip: {fileID: 7400000, guid: 16df6ac7ea6cce144a2d495779a5ab47, type: 2}
-        _NormalizedStartTime: NaN
-      hang_wall_idle_inertia_01:
-        _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes: []
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 7400000, guid: ea2c3adba7b4b5d4b828a420103f198f, type: 2}
-        _NormalizedStartTime: NaN
-      hang_wall_idle_jump_out_left:
-        _FadeDuration: 0.08000002
-        _Speed: 1
-        _Events:
-          _NormalizedTimes:
-          - 0.9
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 7400000, guid: a996433170e7e8f4891b76ea5df51582, type: 2}
-        _NormalizedStartTime: NaN
-      hang_wall_idle_jump_out_right:
-        _FadeDuration: 0.08000002
-        _Speed: 1
-        _Events:
-          _NormalizedTimes:
-          - 0.9
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 7400000, guid: fe9e0bde38b6b4245a677c54a4104b7a, type: 2}
-        _NormalizedStartTime: NaN
-      hang_wall_idle_jump_out_up:
-        _FadeDuration: 0.12666667
-        _Speed: 1
-        _Events:
-          _NormalizedTimes:
-          - 0.92
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 7400000, guid: 8557c28fef89e2e4eb55a433ae569b14, type: 2}
-        _NormalizedStartTime: NaN
     <PlayerJumpFallAndLandData>k__BackingField:
       <placeJumpStart>k__BackingField:
         _FadeDuration: 0.1
@@ -400,13 +282,13 @@ MonoBehaviour:
         _NormalizedStartTime: NaN
     <PlayerNumericConfig>k__BackingField:
       moveSpeedMultiplier: 1
-      walkSpeedParameter: 1.5
-      runSpeedParameter: 3
-      inAirMoveSpeed: 2
+      walkSpeedParameter: 2.5
+      runSpeedParameter: 5
+      inAirMoveSpeed: 20
       gravity: -12
       velocityLimit: {x: -20, y: 60}
       groundDetectedOffset: -0.06
-      groundRadius: 0.2
+      groundRadius: 0.1
       groundProbeDistance: 1.5
       groundNormalSmoothFrames: 3
       groundNormalRayStartHeight: 0.2
@@ -417,15 +299,18 @@ MonoBehaviour:
       slideAcceleration: 8
       slideMaxSpeed: 8
       slideControlDamping: 4
+      minGroundNormalY: 0.1
       defaultJumpHeight: 0.8
       outPlaceJumpHeight: 0.8
       platformerJumpHeight: 1
-      jumpInertiaTriggerSpeedThreshold: 0.8
-      climbDetectionAngle: 90
-      climbDetectionDistance: 0.3
+      jumpInertiaTriggerSpeedThreshold: 10
+      inAirSpeedCap: 20
+      inAirSpeedDecay: 0
+      inAirInputMaintainAcceleration: 8
+      climbDetectionAngle: 60
+      climbDetectionDistance: 0.2
       wallProbeRadius: 0.2
-      wallProbeDistance: 0.3
-      vaultMaxDistance: 0
+      wallProbeDistance: 0.2
       canClimbMaxHeight: 10
       canClimbMinHeight: 0.5
       climbDetectionSamplingCount: 30
@@ -435,11 +320,6 @@ MonoBehaviour:
       mediumClimbMaxHeight: 1.5
       mediumHighClimbMinHeight: 2
       mediumHighClimbMaxHeight: 2.5
-      ledgeProbeMinY: 0
-      ledgeProbeMaxY: 0
-      ledgeProbeDistance: 1.5
-      ledgeProbeSamplingCount: 12
-      ledgeConfirmFrames: 2
       stateSwitchCooldown: 0.1
   <playerParameterData>k__BackingField:
     <standValueParameter>k__BackingField: {fileID: 11400000, guid: 37d1b1f02016c7944bc41b1db63b957f,

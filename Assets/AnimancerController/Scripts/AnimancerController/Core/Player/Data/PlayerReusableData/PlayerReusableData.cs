@@ -72,24 +72,22 @@ public class PlayerReusableData
     public ClipTransition targetClimbClip;
     //跳跃
     public float horizontalSpeed;
+    public Vector3 inAirMoveDirection;
     //跳跃惯性
     public Vector3 currentInertialVelocity;
     public int cashIndex = 0;
     public readonly static int cashSize = 3;
     public Vector3[] cashVelocity = new Vector3[cashSize];
 
-    //HangWall
-    public float originalCCRadius;
+    //Climb
     public Vector3 vaultPos;
     public RaycastHit hit;
     //打断点检测事件
     public Action inputInterruptionCB { get; set; }
-    //检测墙的距离
-    public float checkWallDistance = 0.6f;
     //是否原地跳跃
     public bool isInPlaceJump;
-    //仅在明确按下跳跃后，才允许空中挂墙检测
-    public bool canCheckLedgeInAirAfterJump = false;
+    //仅在明确按下跳跃后，才允许空中攀爬检测
+    public bool canCheckClimbInAirAfterJump = false;
     //外力跳跃
     public float jumpExternalForce = 15;
 

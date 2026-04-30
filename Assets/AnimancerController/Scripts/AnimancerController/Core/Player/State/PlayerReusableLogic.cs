@@ -1,4 +1,4 @@
-﻿using Animancer;
+using Animancer;
 using System;
 using UnityEngine;
 /**************************************************************************
@@ -14,10 +14,6 @@ public class PlayerReusableLogic
     private static readonly Color ClimbScanMissColor = new Color(0.3f, 0.3f, 0.3f);
     private static readonly Color ClimbTopSurfaceHitColor = Color.blue;
     private static readonly Color ClimbTopSurfaceMissColor = new Color(0.3f, 0.3f, 0.8f);
-    private static readonly Color VaultForwardHitColor = Color.red;
-    private static readonly Color VaultForwardMissColor = Color.green;
-    private static readonly Color VaultDownHitColor = Color.magenta;
-    private static readonly Color VaultDownMissColor = Color.cyan;
 
     Player player { get; set; }
     PlayerReusableData reusableData;
@@ -144,14 +140,11 @@ public class PlayerReusableLogic
     float detectionAngle => numericConfig != null ? numericConfig.climbDetectionAngle : 45f;
     float detectionDistance => numericConfig != null ? numericConfig.wallProbeDistance : 1f;
     float wallProbeRadius => numericConfig != null ? numericConfig.wallProbeRadius : 0.2f;
-    float vaultMaxDistance => numericConfig != null ? numericConfig.vaultMaxDistance : 0.45f;
     float canClimbMaxHight => numericConfig != null ? numericConfig.canClimbMaxHeight : 3.2f;
     float canClimbMinHeight => numericConfig != null ? numericConfig.canClimbMinHeight : 0.3f;
     int detectionSamplingCount => numericConfig != null ? numericConfig.climbDetectionSamplingCount : 30;
     int climbConfirmFrames => numericConfig != null ? numericConfig.climbConfirmFrames : 2;
-    int ledgeConfirmFrames => numericConfig != null ? numericConfig.ledgeConfirmFrames : 2;
     private int climbConfirmCounter;
-    private int ledgeConfirmCounter;
     /// <summary>
     /// 玩家按下跳跃键时
     /// </summary>
@@ -220,43 +213,20 @@ public class PlayerReusableLogic
             return default;
         }
     }
-    private void VaultOrClimb(Vector3 VaultStart,RaycastHit wallHit)
-    {
-        if (Physics.Raycast(VaultStart, -wallHit.normal, vaultMaxDistance, player.whatIsGround, QueryTriggerInteraction.Ignore))
-        {
-            DrawRay(VaultStart, -wallHit.normal, vaultMaxDistance, true, VaultForwardHitColor, VaultForwardMissColor);
-            reusableData.ClimbType = ClimbType.Climb;
-        }
-        else
-        {
-            DrawRay(VaultStart, -wallHit.normal, vaultMaxDistance, false, VaultForwardHitColor, VaultForwardMissColor);
-            Vector3 vaultDetectionPos = VaultStart + (-wallHit.normal * vaultMaxDistance);
-            if (Physics.Raycast(vaultDetectionPos, Vector3.down, 0.25f, player.whatIsGround, QueryTriggerInteraction.Ignore))
-            {
-                DrawRay(vaultDetectionPos, Vector3.down, 0.25f, true, VaultDownHitColor, VaultDownMissColor);
-                reusableData.ClimbType = ClimbType.Climb;
-            }
-            else
-            {
-                DrawRay(vaultDetectionPos, Vector3.down, 0.25f, false, VaultDownHitColor, VaultDownMissColor);
-                reusableData.ClimbType = ClimbType.Vault;
-            }
-        }
-    }
     #endregion
 
     #region 在空中的检测
     public void InAirMoveCheck(Vector3 targetDir)
     {
-        if (!reusableData.canCheckLedgeInAirAfterJump)
+        if (!reusableData.canCheckClimbInAirAfterJump)
         {
-            ResetDetectionCounters();
+            climbConfirmCounter = 0;
             return;
         }
         Vector2 moveInput = player.InputService.Move;
         if (moveInput.y <= 0)
         {
-            ResetDetectionCounters();
+            climbConfirmCounter = 0;
             return;
         }
 
@@ -266,39 +236,6 @@ public class PlayerReusableLogic
             return;
         }
 
-        float vaultHeight = 0;
-        float obstructHeight = 0;
-        float ledgeProbeMinY = numericConfig != null ? numericConfig.ledgeProbeMinY : 1.35f;
-        float ledgeProbeMaxY = numericConfig != null ? numericConfig.ledgeProbeMaxY : 2.05f;
-        float ledgeProbeDistance = numericConfig != null ? numericConfig.ledgeProbeDistance : 1.5f;
-        int ledgeProbeSamplingCount = numericConfig != null ? numericConfig.ledgeProbeSamplingCount : 12;
-        RaycastHit hit = GetWallHight(targetDir, ledgeProbeMinY, ledgeProbeMaxY, ledgeProbeDistance, ref vaultHeight, ref obstructHeight, ledgeProbeSamplingCount);
-        if (hit.collider == null)
-        {
-            ledgeConfirmCounter = 0;
-            return;
-        }
-        float angle = Vector3.Angle(-targetDir.normalized, hit.normal);
-        if (angle > detectionAngle)
-        {
-            ledgeConfirmCounter = 0;
-            return;
-        }
-        reusableData.hit = hit;
-        if (obstructHeight > ledgeProbeMinY && obstructHeight < ledgeProbeMaxY)
-        {
-            ledgeConfirmCounter++;
-            if (ledgeConfirmCounter < ledgeConfirmFrames)
-            {
-                return;
-            }
-            ledgeConfirmCounter = 0;
-            player.StateMachine.ChangeState(player.StateMachine.ledgeClimbState);
-        }
-        else
-        {
-            ledgeConfirmCounter = 0;
-        }
     }
 
     private bool TryTriggerClimbInAir(Vector3 targetDir)
@@ -345,7 +282,7 @@ public class PlayerReusableLogic
             }
             climbConfirmCounter = 0;
             reusableData.ObstructHeight = ObstructHeight.medium;
-            VaultOrClimb(vaultStartPos, hit);
+            reusableData.ClimbType = ClimbType.Climb;
             player.StateMachine.ChangeState(player.StateMachine.climbState);
             return true;
         }
@@ -359,7 +296,7 @@ public class PlayerReusableLogic
             }
             climbConfirmCounter = 0;
             reusableData.ObstructHeight = ObstructHeight.lowMedium;
-            VaultOrClimb(vaultStartPos, hit);
+            reusableData.ClimbType = ClimbType.Climb;
             player.StateMachine.ChangeState(player.StateMachine.climbState);
             return true;
         }
@@ -503,9 +440,4 @@ public class PlayerReusableLogic
         return false;
     }
 
-    private void ResetDetectionCounters()
-    {
-        climbConfirmCounter = 0;
-        ledgeConfirmCounter = 0;
-    }
 }

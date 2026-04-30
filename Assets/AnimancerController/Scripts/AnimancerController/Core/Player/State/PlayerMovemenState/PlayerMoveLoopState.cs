@@ -31,14 +31,6 @@ public class PlayerMoveLoopState : PlayerMovementState
             UpdateRotation(true, 0.4f, true, 1.4f);
         }
         UpdateSpeed();
-        if (reusableData.speedValueParameter.CurrentValue <= 1)
-        {
-            reusableData.checkWallDistance = 0.6f;
-        }
-        else
-        {
-            reusableData.checkWallDistance = 0.4f*reusableData.speedValueParameter.CurrentValue;
-        }
          
     }
 

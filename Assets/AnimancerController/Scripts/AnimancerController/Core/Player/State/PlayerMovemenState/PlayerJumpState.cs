@@ -12,6 +12,13 @@ public class PlayerJumpState : PlayerMovementState
     public override void OnEnter()
     {
         base.OnEnter();
+        float dt = Mathf.Max(Time.deltaTime, 0.0001f);
+        Vector3 takeoffVelocity = player.AnimationVelocity;
+        takeoffVelocity.y = 0f;
+        float inAirSpeedCap = numericConfig != null ? numericConfig.inAirSpeedCap : 6f;
+        reusableData.horizontalSpeed = Mathf.Min(inAirSpeedCap, takeoffVelocity.magnitude / dt);
+        reusableData.inAirMoveDirection = takeoffVelocity.sqrMagnitude > 0.0001f ? takeoffVelocity.normalized : player.transform.forward;
+
         reusableData.currentInertialVelocity = GetInertialVelocity();
         reusableData.currentInertialVelocity.y = 0;
         float inertiaSpeed = reusableData.currentInertialVelocity.magnitude / Mathf.Max(Time.deltaTime, 0.0001f);

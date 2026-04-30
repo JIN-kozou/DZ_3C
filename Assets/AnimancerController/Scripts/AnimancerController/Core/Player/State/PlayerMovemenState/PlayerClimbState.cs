@@ -1,4 +1,4 @@
-﻿
+
 using Animancer;
 using System;
 using System.Collections.Generic;
@@ -158,64 +158,29 @@ public class PlayerClimbState : PlayerMovementState
     public ClipTransition GetClimbAnimation()
     {
         int index = (int)reusableData.ObstructHeight;
-        if (reusableData.ClimbType == ClimbType.Climb)
+        if (index >= climbData.climbs.Length)
         {
-            if (index >= climbData.climbs.Length)
-            {
-                return null;
-            }
-            if (index < 0)
-            {
-                return climbData.climbs[0];
-            }
-            ClipTransition target = climbData.climbs[index];
-            return target;
+            return null;
         }
-        else if (reusableData.ClimbType == ClimbType.Vault)
+        if (index < 0)
         {
-            index--;//最低情况的障碍物不翻
-            if (index < 0)
-            {
-                return climbData.vaults[0];
-            }
-            if (index >= climbData.vaults.Length)
-            {
-                return null;
-            }
-            ClipTransition target = climbData.vaults[index];
-            return target;
+            return climbData.climbs[0];
         }
-        return null;
+        ClipTransition target = climbData.climbs[index];
+        return target;
     }
     public PlayerClimbAnimationSettings GetClimbTimeSetting()
     {
         int index = (int)reusableData.ObstructHeight;
-        if (reusableData.ClimbType == ClimbType.Climb)
+        if (index >= climbData.climbSettings.Length)
         {
-            if (index >= climbData.climbSettings.Length)
-            {
-                return climbData.climbSettings[0];
-            }
-            PlayerClimbAnimationSettings targetSetting = climbData.climbSettings[index];
-            if (targetSetting ==null)
-            {
-                return climbData.climbSettings[0];
-            }
-            return targetSetting;
+            return climbData.climbSettings[0];
         }
-        else if(reusableData.ClimbType == ClimbType.Vault)
+        PlayerClimbAnimationSettings targetSetting = climbData.climbSettings[index];
+        if (targetSetting ==null)
         {
-            if (index >= climbData.vaults.Length)
-            {
-                return climbData.vaultSettings[0];
-            }
-            PlayerClimbAnimationSettings targetSetting = climbData.vaultSettings[index];
-            if (targetSetting == null)
-            {
-                return climbData.vaultSettings[0];
-            }
-            return targetSetting;
+            return climbData.climbSettings[0];
         }
-        return null;
+        return targetSetting;
     }
 }

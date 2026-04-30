@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator),typeof(CharacterController))]
@@ -22,6 +22,7 @@ public class CharacterBase : MonoBehaviour
     [SerializeField] private float slideAcceleration = 16f;
     [SerializeField] private float slideMaxSpeed = 8f;
     [SerializeField] private float slideControlDamping = 4f;
+    [SerializeField, Range(0f, 1f)] private float minGroundNormalY = 0.1f;
     private Vector3 detectedOrigin;
     private Vector3 smoothedGroundNormal = Vector3.up;
     private Vector3 lastProbeGroundNormal = Vector3.up;
@@ -74,6 +75,7 @@ public class CharacterBase : MonoBehaviour
         slideAcceleration = config.slideAcceleration;
         slideMaxSpeed = config.slideMaxSpeed;
         slideControlDamping = config.slideControlDamping;
+        minGroundNormalY = Mathf.Clamp01(config.minGroundNormalY);
         if (controller != null)
         {
             controller.slopeLimit = maxWalkableSlopeAngle;
@@ -134,7 +136,10 @@ public class CharacterBase : MonoBehaviour
         }
 
         bool controllerGrounded = controller != null && controller.isGrounded;
-        isOnGround.Value = (isHit || controllerGrounded) && verticalSpeed <= 0.05f;
+        bool overlapGroundedWithValidNormal = isHit && haveGroundNormal && bestNormal.y >= minGroundNormalY;
+        bool controllerGroundedWithValidNormal = controllerGrounded && (haveGroundNormal ? bestNormal.y >= minGroundNormalY : lastProbeGroundNormal.y >= minGroundNormalY);
+        // 只允许“脚底接触到地面(Overlap)或CC明确判定接地”触发落地；远距离向下射线仅用于法线采样，不参与接地判定。
+        isOnGround.Value = (overlapGroundedWithValidNormal || controllerGroundedWithValidNormal) && verticalSpeed <= 0.05f;
         float slideThreshold = Mathf.Min(slideStartAngle, maxWalkableSlopeAngle + Mathf.Max(0f, slideLeadPastWalkableDegrees));
         IsOnSteepSlope = isOnGround.Value && SlopeAngle > slideThreshold;
         return isOnGround.Value;
@@ -220,7 +225,13 @@ public class CharacterBase : MonoBehaviour
         if (controller.enabled == true)
         {
             animationVelocity = deltaDir;
-            controller.Move(deltaDir);
+            Vector3 stableMove = deltaDir;
+            // 轻微贴地，减少地面接缝/台阶边缘处的瞬时离地导致的卡脚。
+            if (isOnGround.Value && !disEnableGravity && verticalSpeed <= 0.05f)
+            {
+                stableMove += Vector3.down * 0.03f;
+            }
+            controller.Move(stableMove);
         }
       
     }
@@ -242,11 +253,37 @@ public class CharacterBase : MonoBehaviour
     #region 斜坡的处理
     private Vector3 SetDirOnSlop(Vector3 dir)
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out var hitInfo, 1f))
+        if (dir.sqrMagnitude <= 0.000001f)
         {
-            if (Vector3.Dot(hitInfo.normal, Vector3.up) != 1)
+            return dir;
+        }
+
+        // 优先使用地面检测阶段平滑后的法线，降低接缝处法线跳变导致的卡顿。
+        if (isOnGround.Value && smoothedGroundNormal.sqrMagnitude > 0.0001f)
+        {
+            float slopeAngle = Vector3.Angle(smoothedGroundNormal, Vector3.up);
+            if (slopeAngle > 0.1f && slopeAngle <= maxWalkableSlopeAngle + 2f)
             {
-                return Vector3.ProjectOnPlane(dir, hitInfo.normal);
+                Vector3 projected = Vector3.ProjectOnPlane(dir, smoothedGroundNormal);
+                if (projected.sqrMagnitude > 0.000001f)
+                {
+                    return projected;
+                }
+            }
+        }
+
+        // 兜底：脚底附近做球射线而不是角色中心单射线，提升不平整地形稳定性。
+        float probeRadius = controller != null ? Mathf.Max(0.05f, controller.radius * 0.35f) : 0.1f;
+        Vector3 probeOrigin = detectedOrigin + Vector3.up * 0.2f;
+        if (Physics.SphereCast(probeOrigin, probeRadius, Vector3.down, out var hitInfo, 0.9f, whatIsGround, QueryTriggerInteraction.Ignore))
+        {
+            if (Vector3.Dot(hitInfo.normal, Vector3.up) < 0.9999f)
+            {
+                Vector3 projected = Vector3.ProjectOnPlane(dir, hitInfo.normal);
+                if (projected.sqrMagnitude > 0.000001f)
+                {
+                    return projected;
+                }
             }
         }
 
@@ -259,6 +296,7 @@ public class CharacterBase : MonoBehaviour
         if (!IsOnSteepSlope)
         {
             slopeSlideVelocity = Vector3.Lerp(slopeSlideVelocity, Vector3.zero, 1 - Mathf.Exp(-slideControlDamping * Time.deltaTime));
+            slopeSlideVelocity.y = 0f;
             return;
         }
 
@@ -276,6 +314,7 @@ public class CharacterBase : MonoBehaviour
         {
             slopeSlideVelocity = slopeSlideVelocity.normalized * maxSlideSpeed;
         }
+        slopeSlideVelocity.y = 0f;
     }
 
     private void OnDrawGizmos()

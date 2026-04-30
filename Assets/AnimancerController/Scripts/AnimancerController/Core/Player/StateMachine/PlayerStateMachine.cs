@@ -3,20 +3,19 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 /**************************************************************************
-: HuHu
-: 3112891874@qq.com
-: ??????
+ÂÂÂÂ: HuHu
+ÂÂÂÂ: 3112891874@qq.com
+ÂÂÂÂ: ÂÂÂÂ??ÂÂÂÂÂÂÂÂ??ÂÂÂÂÂÂÂÂÂÂ??ÂÂ
 **************************************************************************/
 public class PlayerStateMachine : StateMachineBase
 {
-   //??
+   //ÂÂÂÂ??
     public Player player;
     public PlayerIdleState idleState;
     public PlayerMoveStartState moveStartState;
     public PlayerMoveLoopState moveLoopState;
     public PlayerJumpState jumpState;
     public PlayerClimbState climbState;
-    public PlayerLedgeClimbState ledgeClimbState;
     public PlayerMoveToWallState moveWallState;
     public PlayerFallLoopState fallLoopState;
     public PlayerPlatformerUpState platformerUpState;
@@ -29,7 +28,6 @@ public class PlayerStateMachine : StateMachineBase
         moveLoopState = new PlayerMoveLoopState(this);
         jumpState= new PlayerJumpState(this);
         climbState = new PlayerClimbState(this);
-        ledgeClimbState = new PlayerLedgeClimbState(this);
         moveWallState = new  PlayerMoveToWallState(this);
         fallLoopState = new PlayerFallLoopState(this);
         platformerUpState = new PlayerPlatformerUpState(this);

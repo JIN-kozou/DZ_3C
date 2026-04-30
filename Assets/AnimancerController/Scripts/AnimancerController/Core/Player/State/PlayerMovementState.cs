@@ -24,7 +24,7 @@ public class PlayerMovementState : StateBase
             !(this is PlayerFallLoopState) &&
             !(this is PlayerPlatformerUpState))
         {
-            reusableData.canCheckLedgeInAirAfterJump = false;
+            reusableData.canCheckClimbInAirAfterJump = false;
         }
         ForceLockOn();
         AddEventListening();
@@ -166,7 +166,7 @@ public class PlayerMovementState : StateBase
     
     protected void OnJumpStart(InputAction.CallbackContext context)
     {
-        reusableData.canCheckLedgeInAirAfterJump = true;
+        reusableData.canCheckClimbInAirAfterJump = true;
         reusableLogic.OnJump();
     }
     protected void OnEnterFall()
@@ -219,18 +219,41 @@ public class PlayerMovementState : StateBase
         {
             return;
         }
+        float dt = Mathf.Max(Time.deltaTime, 0.0001f);
+        float inAirSpeedCap = numericConfig != null ? numericConfig.inAirSpeedCap : 6f;
+        float inAirSpeedDecay = numericConfig != null ? numericConfig.inAirSpeedDecay : 3.5f;
+        float maintainAcceleration = numericConfig != null ? numericConfig.inAirInputMaintainAcceleration : 8f;
         float inAirMoveSpeed = numericConfig != null ? numericConfig.inAirMoveSpeed : 2f;
         float finalInAirSpeed = (inAirMoveSpeed + reusableData.buffSnapshot.moveSpeedAdditive) * reusableData.buffSnapshot.moveSpeedMultiplier;
-        reusableData.horizontalSpeed = Mathf.Lerp(reusableData.horizontalSpeed, inputServer.Move != Vector2.zero ? Mathf.Max(0f, finalInAirSpeed) : 0, 1 - Mathf.Exp(-8 * Time.deltaTime));
+        float cappedMaintainSpeed = Mathf.Min(inAirSpeedCap, Mathf.Max(0f, finalInAirSpeed));
+
+        // 入空后速度逐帧衰减；有输入时可把速度维持/回补到期望空中巡航速度。
+        reusableData.horizontalSpeed = Mathf.Max(0f, reusableData.horizontalSpeed - inAirSpeedDecay * dt);
+        if (inputServer.Move != Vector2.zero)
+        {
+            Vector3 inputDir = GetTargetDir();
+            if (inputDir.sqrMagnitude > 0.0001f)
+            {
+                reusableData.inAirMoveDirection = inputDir.normalized;
+            }
+            if (reusableData.horizontalSpeed < cappedMaintainSpeed)
+            {
+                reusableData.horizontalSpeed = Mathf.MoveTowards(reusableData.horizontalSpeed, cappedMaintainSpeed, maintainAcceleration * dt);
+            }
+        }
+        reusableData.horizontalSpeed = Mathf.Min(reusableData.horizontalSpeed, inAirSpeedCap);
+
+        Vector3 moveDirection = reusableData.inAirMoveDirection.sqrMagnitude > 0.0001f
+            ? reusableData.inAirMoveDirection
+            : player.transform.forward;
+        Vector3 airVelocity = moveDirection * reusableData.horizontalSpeed * reusableData.currentMidInAirMultiplier;
         if (reusableData.lockValueParameter.TargetValue == 1)//索敌
         {
-            //控制水平移动
-            player.AddHorizontalVelocityInAir(GetTargetDir() * reusableData.horizontalSpeed*reusableData.currentMidInAirMultiplier+reusableData.currentInertialVelocity/Time.deltaTime);
+            player.AddHorizontalVelocityInAir(airVelocity);
         }
         else
         {
-            //控制水平移动
-            player.AddHorizontalVelocityInAir(player.transform.forward * reusableData.horizontalSpeed*reusableData.currentMidInAirMultiplier +reusableData.currentInertialVelocity / Time.deltaTime);
+            player.AddHorizontalVelocityInAir(airVelocity);
         }
     }
     /// <summary>
