@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d6184f1ae411c84f9c97705046c7fd1, type: 3}
+  m_Name: AIConfig
+  m_EditorClassIdentifier: 
+  lockWindowSeconds: 1.5
+  hateLostSightClearSeconds: 5
+  hateAttackTaskMaxSeconds: 12
+  visionTickHz: 8
+  hearingTickHz: 8
+  distanceTickHz: 10
+  energyTickHz: 5
+  visionRadius: 10
+  visionAngle: 179
+  visionHeight: 0.1
+  visionThickness: 5
+  visionTargetMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  visionObstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  hearingDistance: 16
+  hearingThreshold: 0.1
+  hearingTargetMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  contactDistance: 1
+  contactTargetMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  energyDetectRadius: 20
+  energyFalloff: 1
+  energyMinForAvoid: 1
+  energyMaxForDash: 3
+  energyTargetMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  interfereEnergyThreshold: 100
+  interfereChanceWhenLowEnergy: 0.8
+  interfereChanceWhenNormalEnergy: 0.4
+  combatMethodRollInterval: 0.4
+  combatMethodMinHoldSeconds: 5
+  retreatSelectRadius: 10

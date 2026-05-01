@@ -1,0 +1,201 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef7114b125db9324185866d0eb051944, type: 3}
+  m_Name: MonsterStatConfig 1
+  m_EditorClassIdentifier: 
+  aerialMode: 1
+  moveSpeed: 2
+  turnSpeed: 720
+  turnSmoothTime: 0.2
+  arriveRadius: 2
+  startTurnWindowSeconds: 0.25
+  cruiseHeight: 2.2
+  ascendSpeed: 2
+  descendSpeed: 2
+  alertPatrolTargetHeight: 0.5
+  orbitVerticalAmplitude: 0.6
+  orbitVerticalSpeed: 1.2
+  hoverVerticalAmplitude: 0.3
+  hoverVerticalSpeed: 1
+  orbitRadius: 10
+  orbitAngularSpeed: 30
+  faceCenter: 1
+  interfereDuration: 5
+  orbitVerticalBurstChance: 0.35
+  orbitVerticalBurstDistance: 0.75
+  orbitVerticalBurstSpeed: 2.5
+  orbitVerticalBurstSpeedCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  orbitVerticalBurstCooldown: 0.45
+  dashDistance: 8
+  dashSpeedMultiplier: 3
+  dashAccelTime: 0.3
+  dashDecelTime: 0.3
+  dashSpeedCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.500857
+      value: 0.50128555
+      inSlope: 2.0109863
+      outSlope: 2.0109863
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.10680242
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  dashCooldown: 1
+  strafeDistance: 3
+  strafeSpeed: 3
+  strafeAccelTime: 0.1
+  strafeDecelTime: 0.2
+  strafeSpeedCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.5010388
+      value: 0.5015582
+      inSlope: 2.0962634
+      outSlope: 2.0962634
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.09354986
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  strafeCooldown: 1.5
+  strafeChance: 0.2
+  hoverRadius: 2
+  hoverSpeed: 1.5
+  energyAvoidDashTrigger: 3
+  alertDescendHoldSeconds: 0.8
+  patrolPauseSecondsMin: 0.3
+  patrolPauseSecondsMax: 1.2
+  checkpointOrbitDuration: 2
+  combatAttackDistance: 10
+  aoeRadius: 0.5
+  baseDamage: 10
+  attackInterval: 6
+  attackIntervalStrafeChance: 0.7
+  attackIntervalVerticalChance: 0.6
+  attackIntervalVerticalDistance: 0.8
+  attackIntervalVerticalSpeed: 2.5
+  attackIntervalManeuverCooldown: 0.25
+  postAttackBackoffSeconds: 3
+  postAttackBackoffSpeed: 1.5
+  attackTargetMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  usePhysicsAoeDamage: 1
+  buffId: 
+  playerNumericConfig:
+    moveSpeedMultiplier: 1
+    walkSpeedParameter: 1
+    runSpeedParameter: 2
+    inAirMoveSpeed: 2
+    gravity: -12
+    velocityLimit: {x: -20, y: 60}
+    groundDetectedOffset: -0.06
+    groundRadius: 0.5
+    groundProbeDistance: 1.5
+    groundNormalSmoothFrames: 3
+    groundNormalRayStartHeight: 0.35
+    groundNormalRayDistance: 4
+    maxWalkableSlopeAngle: 45
+    slideStartAngle: 52
+    slideLeadPastWalkableDegrees: 2
+    slideAcceleration: 16
+    slideMaxSpeed: 8
+    slideControlDamping: 4
+    minGroundNormalY: 0.1
+    defaultJumpHeight: 0.8
+    outPlaceJumpHeight: 0.8
+    platformerJumpHeight: 15
+    jumpInertiaTriggerSpeedThreshold: 0.2
+    inAirSpeedCap: 6
+    inAirSpeedDecay: 3.5
+    inAirInputMaintainAcceleration: 8
+    climbDetectionAngle: 45
+    climbDetectionDistance: 1
+    wallProbeRadius: 0.2
+    wallProbeDistance: 1
+    canClimbMaxHeight: 3.2
+    canClimbMinHeight: 0.3
+    climbDetectionSamplingCount: 30
+    climbConfirmFrames: 2
+    lowClimbMaxHeight: 0.35
+    lowMediumClimbMaxHeight: 1
+    mediumClimbMaxHeight: 1.7
+    mediumHighClimbMinHeight: 2
+    mediumHighClimbMaxHeight: 2.5
+    stateSwitchCooldown: 0.1
