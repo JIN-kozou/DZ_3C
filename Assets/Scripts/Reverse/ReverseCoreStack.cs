@@ -67,6 +67,14 @@ namespace DZ_3C.Reverse
         public float CurrentViewRadius => lastViewRadius;
         public bool IsInvincible => invincibleSecondsRemaining > 0f;
 
+        /// <summary>
+        /// 清除复活后的无敌时间。仅用于测试/调试（例如连续按 F9 验证死亡流程）。
+        /// </summary>
+        public void ClearRespawnInvincibility()
+        {
+            invincibleSecondsRemaining = 0f;
+        }
+
         public int FullCoreCount
         {
             get
@@ -324,6 +332,26 @@ namespace DZ_3C.Reverse
             isDying = false;
         }
 
+        /// <summary>
+        /// 与带 <see cref="CharacterController"/> 的角色兼容的瞬移：先禁用 CC 再写 <see cref="Transform.position"/>。
+        /// </summary>
+        private void TeleportToWorldPosition(Vector3 worldPosition)
+        {
+            var cc = GetComponent<CharacterController>();
+            if (cc != null)
+            {
+                cc.enabled = false;
+                transform.position = worldPosition;
+                cc.enabled = true;
+            }
+            else
+            {
+                transform.position = worldPosition;
+            }
+
+            Physics.SyncTransforms();
+        }
+
         private void TryRespawn()
         {
             if (registry == null || registry.DeployedCount == 0)
@@ -340,7 +368,8 @@ namespace DZ_3C.Reverse
             }
 
             // 放回阵列位置（不消耗阵列，不改变核心数量），核心列表槽位补满血、锚补满。
-            transform.position = target.transform.position;
+            // CharacterController 会覆盖直接改 transform.position；需短暂禁用再写位置。
+            TeleportToWorldPosition(target.transform.position);
             RefillExistingCoresAndAnchorToFull();
             invincibleSecondsRemaining = config != null ? config.respawnInvincibleSeconds : 1.5f;
             OnRespawned?.Invoke(target.transform.position);

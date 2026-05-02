@@ -5,7 +5,7 @@ namespace DZ_3C.Reverse
 {
     /// <summary>
     /// OnGUI 临时调试面板。显示锚 / 各核心血量、阵列槽位、视野半径。
-    /// 不是正式 HUD，仅用于第一版手感验收。
+    /// 面板锚点在屏幕<b>左下角</b>（screenAnchor.y 表示距底边偏移）；需挂在玩家上且存在 <see cref="ReverseCoreStack"/>。
     /// </summary>
     [DisallowMultipleComponent]
     public class ReverseDebugView : MonoBehaviour
@@ -34,12 +34,28 @@ namespace DZ_3C.Reverse
         {
             if (coreStack != null)
             {
-                coreStack.OnDeath += () => lastEvent = "Death";
-                coreStack.OnRespawned += pos => lastEvent = $"Respawn @ {pos:F1}";
-                coreStack.OnGameOver += () => lastEvent = "GameOver";
-                coreStack.OnViewRadiusChanged += r => lastEvent = $"View={r:F1}m";
+                coreStack.OnDeath += HandleDeath;
+                coreStack.OnRespawned += HandleRespawned;
+                coreStack.OnGameOver += HandleGameOver;
+                coreStack.OnViewRadiusChanged += HandleViewRadius;
             }
         }
+
+        private void OnDisable()
+        {
+            if (coreStack != null)
+            {
+                coreStack.OnDeath -= HandleDeath;
+                coreStack.OnRespawned -= HandleRespawned;
+                coreStack.OnGameOver -= HandleGameOver;
+                coreStack.OnViewRadiusChanged -= HandleViewRadius;
+            }
+        }
+
+        private void HandleDeath() => lastEvent = "Death";
+        private void HandleRespawned(Vector3 pos) => lastEvent = $"Respawn @ {pos:F1}";
+        private void HandleGameOver() => lastEvent = "GameOver";
+        private void HandleViewRadius(float r) => lastEvent = $"View={r:F1}m";
 
         private void OnGUI()
         {

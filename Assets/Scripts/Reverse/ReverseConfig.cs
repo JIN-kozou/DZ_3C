@@ -85,7 +85,7 @@ namespace DZ_3C.Reverse
         [Tooltip("锚血 <= 该阈值视为死亡触发复活流程。0 表示严格归零才死。")]
         [Min(0f)] public float deathThreshold = 0f;
 
-        [Tooltip("复活后玩家的核心血量是否补到满（默认 true）。配合\"现有核心数不变 + 全部补满\"。")]
+        [Tooltip("复活后身上的核心池是否也补满（默认 true，与设计文档 RefillExistingToFull 一致）。关闭则只补锚血，核心保持死亡前残血/空池。")]
         public bool refillCoresOnRespawn = true;
 
         [Tooltip("复活后阵列是否仍然保留在场景里（默认 true）。即便玩家死在某阵列上，那个阵列也不会消失。")]
