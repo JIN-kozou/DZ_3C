@@ -232,11 +232,11 @@ MonoBehaviour:
       runSpeedParameter: 5
       inAirMoveSpeed: 20
       standControllerRadius: 0.2
-      standControllerHeight: 1.2
-      standControllerCenter: {x: 0, y: 0.6, z: 0}
+      standControllerHeight: 1
+      standControllerCenter: {x: 0, y: 0.5, z: 0}
       crouchControllerRadius: 0.2
-      crouchControllerHeight: 0.8
-      crouchControllerCenter: {x: 0, y: 0.4, z: 0}
+      crouchControllerHeight: 0.6
+      crouchControllerCenter: {x: 0, y: 0.3, z: 0}
       gravity: -12
       velocityLimit: {x: -20, y: 60}
       groundDetectedOffset: -0.06
