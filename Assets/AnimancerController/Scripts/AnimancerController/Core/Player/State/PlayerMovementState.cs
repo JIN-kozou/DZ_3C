@@ -54,6 +54,50 @@ public class PlayerMovementState : StateBase
         }
         //处理打断委托
         reusableData.inputInterruptionCB?.Invoke();
+        TryApplyPendingStandWhenCrouchCeilingClears();
+        TryLowCeilingAutoCrouchOnGround();
+    }
+
+    /// <summary>仅在地面时尝试「头顶挡则自动下蹲」；跳跃/下落/攀爬等状态重写为 false。</summary>
+    protected virtual bool ShouldApplyLowCeilingAutoCrouchOnGround()
+    {
+        return player.isOnGround.Value;
+    }
+
+    /// <summary>
+    /// 头顶（自动下蹲射线）有障碍时拉成下蹲，并与松蹲被挡共用 <see cref="PlayerReusableData.pendingStandWhenCrouchCeilingClears"/>，
+    /// 由 <see cref="TryApplyPendingStandWhenCrouchCeilingClears"/> 在净空（站起射线）后站起，避免单独「净空起身」与自动蹲来回打架导致抽搐。
+    /// </summary>
+    private void TryLowCeilingAutoCrouchOnGround()
+    {
+        float autoRayLen = numericConfig != null ? numericConfig.lowCeilingAutoCrouchCheckRayLength : 1.2f;
+        if (autoRayLen <= 0f)
+        {
+            return;
+        }
+
+        if (!ShouldApplyLowCeilingAutoCrouchOnGround())
+        {
+            return;
+        }
+
+        if (reusableData.pendingCrouchAfterStandHolster)
+        {
+            return;
+        }
+
+        if (!HasCeilingObstacleForAutoCrouchOnGround())
+        {
+            return;
+        }
+
+        if (reusableData.standValueParameter.TargetValue < 0.99f)
+        {
+            return;
+        }
+
+        reusableData.pendingStandWhenCrouchCeilingClears = true;
+        reusableData.standValueParameter.TargetValue = 0;
     }
 
     private void UpdateLockValue()
@@ -77,12 +121,66 @@ public class PlayerMovementState : StateBase
 
     protected void OnCrouch(InputAction.CallbackContext context)
     {
+        reusableData.pendingStandWhenCrouchCeilingClears = false;
+        if (reusableData.armedModeActive)
+        {
+            reusableData.armedModeActive = false;
+            reusableData.resumeArmedAfterBreak = false;
+            reusableData.weaponSuppressedUntilStandFromCrouch = false;
+            reusableData.pendingCrouchAfterStandHolster = true;
+            reusableData.standValueParameter.TargetValue = 1;
+            return;
+        }
+
         reusableData.standValueParameter.TargetValue = 0;
     }
 
     protected void OnCrouchRelease(InputAction.CallbackContext context)
     {
+        if (reusableData.standValueParameter.CurrentValue >= 0.99f)
+        {
+            reusableData.pendingStandWhenCrouchCeilingClears = false;
+            reusableData.standValueParameter.TargetValue = 1;
+            return;
+        }
+
+        if (HasCeilingObstacleForStanceAndJump())
+        {
+            reusableData.pendingStandWhenCrouchCeilingClears = true;
+            return;
+        }
+        reusableData.pendingStandWhenCrouchCeilingClears = false;
         reusableData.standValueParameter.TargetValue = 1;
+    }
+
+    /// <summary>松蹲站起 / pending 净空站起 / 阻挡起跳。射线长度见 <see cref="PlayerNumericConfig.crouchStandCeilingCheckRayLength"/>。</summary>
+    private bool HasCeilingObstacleForStanceAndJump()
+    {
+        float rayLength = numericConfig != null ? numericConfig.crouchStandCeilingCheckRayLength : 1.2f;
+        return player.RaycastCeilingAboveCapsule(rayLength);
+    }
+
+    /// <summary>仅用于「地面自动下蹲」触发判定。射线长度见 <see cref="PlayerNumericConfig.lowCeilingAutoCrouchCheckRayLength"/>。</summary>
+    private bool HasCeilingObstacleForAutoCrouchOnGround()
+    {
+        float rayLength = numericConfig != null ? numericConfig.lowCeilingAutoCrouchCheckRayLength : 1.2f;
+        return player.RaycastCeilingAboveCapsule(rayLength);
+    }
+
+    private void TryApplyPendingStandWhenCrouchCeilingClears()
+    {
+        if (!reusableData.pendingStandWhenCrouchCeilingClears)
+        {
+            return;
+        }
+
+        if (HasCeilingObstacleForStanceAndJump())
+        {
+            return;
+        }
+
+        reusableData.standValueParameter.TargetValue = 1;
+        reusableData.pendingStandWhenCrouchCeilingClears = false;
     }
     protected float UpdateSpeed()
     {
@@ -166,6 +264,10 @@ public class PlayerMovementState : StateBase
     
     protected void OnJumpStart(InputAction.CallbackContext context)
     {
+        if (HasCeilingObstacleForStanceAndJump())
+        {
+            return;
+        }
         reusableData.canCheckClimbInAirAfterJump = true;
         reusableLogic.OnJump();
     }

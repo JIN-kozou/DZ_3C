@@ -242,6 +242,13 @@ public class PlayerReusableLogic
 
     private bool TryTriggerClimbInAir(Vector3 targetDir)
     {
+        float stanceCeilingRay = numericConfig != null ? numericConfig.crouchStandCeilingCheckRayLength : 1.2f;
+        if (stanceCeilingRay > 0f && player.RaycastCeilingAboveCapsule(stanceCeilingRay))
+        {
+            climbConfirmCounter = 0;
+            return false;
+        }
+
         float vaultHeight = 0;
         float obstructHeight = 0;
         RaycastHit hit = GetWallHight(targetDir, canClimbMinHeight, canClimbMaxHight, detectionDistance, ref vaultHeight, ref obstructHeight, detectionSamplingCount);
@@ -285,6 +292,11 @@ public class PlayerReusableLogic
             climbConfirmCounter = 0;
             reusableData.ObstructHeight = ObstructHeight.medium;
             reusableData.ClimbType = ClimbType.Climb;
+            if (player.ReusableData.currentState.Value == "PlayerArmedState" && player.ReusableData.armedModeActive)
+            {
+                player.ReusableData.resumeArmedAfterBreak = true;
+            }
+
             player.StateMachine.ChangeState(player.StateMachine.climbState);
             return true;
         }
@@ -299,6 +311,11 @@ public class PlayerReusableLogic
             climbConfirmCounter = 0;
             reusableData.ObstructHeight = ObstructHeight.lowMedium;
             reusableData.ClimbType = ClimbType.Climb;
+            if (player.ReusableData.currentState.Value == "PlayerArmedState" && player.ReusableData.armedModeActive)
+            {
+                player.ReusableData.resumeArmedAfterBreak = true;
+            }
+
             player.StateMachine.ChangeState(player.StateMachine.climbState);
             return true;
         }
@@ -313,6 +330,11 @@ public class PlayerReusableLogic
             climbConfirmCounter = 0;
             reusableData.ObstructHeight = ObstructHeight.low;
             reusableData.ClimbType = ClimbType.Climb;
+            if (player.ReusableData.currentState.Value == "PlayerArmedState" && player.ReusableData.armedModeActive)
+            {
+                player.ReusableData.resumeArmedAfterBreak = true;
+            }
+
             player.StateMachine.ChangeState(player.StateMachine.climbState);
             return true;
         }

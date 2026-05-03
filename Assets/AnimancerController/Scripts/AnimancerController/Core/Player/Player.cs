@@ -22,6 +22,7 @@ public class Player : CharacterBase
     public InputService InputService { get; private set; }
     public TimerService TimerService { get; private set; }
     public PlayerBuffSystem BuffSystem { get; private set; }
+    public PlayerWeaponRuntime WeaponRuntime { get; private set; }
 
     [Header("Player Resources")]
     [SerializeField, Min(1f)] private float maxHealth = 100f;
@@ -67,6 +68,12 @@ public class Player : CharacterBase
         ReusableLogic = new PlayerReusableLogic(this);
         BuffSystem = new PlayerBuffSystem(this);
         //����״̬��
+        WeaponRuntime = GetComponent<PlayerWeaponRuntime>();
+        if (WeaponRuntime == null)
+        {
+            WeaponRuntime = gameObject.AddComponent<PlayerWeaponRuntime>();
+        }
+
         StateMachine = new PlayerStateMachine(this);
         if (GetComponent<PlayerMotionDebugView>() == null)
         {
@@ -82,6 +89,63 @@ public class Player : CharacterBase
         BuffSystem?.Tick(Time.deltaTime);
         UpdateBuffDrivenValues();
         StateMachine?.OnUpdate();
+        WeaponRuntime?.Tick(Time.deltaTime);
+        TryApplyPendingCrouchAfterStandHolster();
+        TryResumeArmedAfterCrouchStand();
+    }
+
+    private void TryApplyPendingCrouchAfterStandHolster()
+    {
+        if (ReusableData == null || InputService == null || !ReusableData.pendingCrouchAfterStandHolster)
+        {
+            return;
+        }
+
+        if (ReusableData.armedModeActive)
+        {
+            ReusableData.pendingCrouchAfterStandHolster = false;
+            return;
+        }
+
+        if (!ReusableData.AllowsArmedWeaponActions())
+        {
+            return;
+        }
+
+        if (!InputService.CrouchHeld)
+        {
+            ReusableData.pendingCrouchAfterStandHolster = false;
+            return;
+        }
+
+        ReusableData.pendingStandWhenCrouchCeilingClears = false;
+        ReusableData.standValueParameter.TargetValue = 0;
+        ReusableData.pendingCrouchAfterStandHolster = false;
+    }
+
+    private void TryResumeArmedAfterCrouchStand()
+    {
+        if (ReusableData == null || StateMachine == null)
+        {
+            return;
+        }
+
+        if (!ReusableData.weaponSuppressedUntilStandFromCrouch)
+        {
+            return;
+        }
+
+        if (ReusableData.standValueParameter.CurrentValue < 0.99f)
+        {
+            return;
+        }
+
+        ReusableData.weaponSuppressedUntilStandFromCrouch = false;
+        if (ReusableData.resumeArmedAfterBreak && ReusableData.armedModeActive)
+        {
+            ReusableData.resumeArmedAfterBreak = false;
+            StateMachine.ChangeState(StateMachine.armedState);
+        }
     }
 
     private void LateUpdate()

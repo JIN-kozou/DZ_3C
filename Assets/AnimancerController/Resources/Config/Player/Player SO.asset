@@ -237,6 +237,8 @@ MonoBehaviour:
       crouchControllerRadius: 0.2
       crouchControllerHeight: 0.8
       crouchControllerCenter: {x: 0, y: 0.4, z: 0}
+      crouchStandCeilingCheckRayLength: 0.6
+      lowCeilingAutoCrouchCheckRayLength: 0.3
       gravity: -12
       velocityLimit: {x: -20, y: 60}
       groundDetectedOffset: -0.06

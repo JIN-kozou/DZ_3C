@@ -9,6 +9,11 @@ public class PlayerOutPlaceJumpState : PlayerMovementState
         jumpFallAndLandData = playerSO.playerMovementData.PlayerJumpFallAndLandData;
     }
 
+    protected override bool ShouldApplyLowCeilingAutoCrouchOnGround()
+    {
+        return false;
+    }
+
     public override void OnEnter()
     {
         base.OnEnter();

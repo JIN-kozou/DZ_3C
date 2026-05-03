@@ -1,4 +1,4 @@
-﻿/*************************************************
+/*************************************************
 作者: HuHu
 邮箱: 3112891874@qq.com
 功能: 着陆状态
@@ -30,11 +30,11 @@ public class PlayerLandState : PlayerMovementState
             }
             state = animancer.Play(playerSO.playerMovementData.PlayerJumpFallAndLandData.placeJumpLand[index]);
             state.Events(player).SetCallback(playerSO.playerParameterData.moveInterruptEvent, OnInputInterruption);
-            state.Events(player).OnEnd = OnStateDefaultEnd;
+            state.Events(player).OnEnd = OnLandAnimationEnd;
         }
         else
         {
-            OnStateDefaultEnd();
+            OnLandAnimationEnd();
         }
     }
 
@@ -46,6 +46,7 @@ public class PlayerLandState : PlayerMovementState
         inputServer.inputMap.Player.Crouch.started += OnCrouch;
         inputServer.inputMap.Player.Crouch.canceled += OnCrouchRelease;
         player.isOnGround.ValueChanged += OnCheckFall;
+        inputServer.inputMap.Player.ToggleWeapon.started += OnToggleWeapon;
     }
 
     protected override void RemoveEventListening()
@@ -56,7 +57,33 @@ public class PlayerLandState : PlayerMovementState
         inputServer.inputMap.Player.Crouch.started -= OnCrouch;
         inputServer.inputMap.Player.Crouch.canceled -= OnCrouchRelease;
         player.isOnGround.ValueChanged -= OnCheckFall;
+        inputServer.inputMap.Player.ToggleWeapon.started -= OnToggleWeapon;
         reusableData.inputInterruptionCB = null;
+    }
+
+    private void OnToggleWeapon(InputAction.CallbackContext context)
+    {
+        if (!reusableData.AllowsArmedWeaponActions())
+        {
+            return;
+        }
+
+        reusableData.armedModeActive = true;
+        reusableData.resumeArmedAfterBreak = false;
+        reusableData.weaponSuppressedUntilStandFromCrouch = false;
+        reusableData.pendingCrouchAfterStandHolster = false;
+        playerStateMachine.ChangeState(playerStateMachine.armedState);
+    }
+
+    private void OnLandAnimationEnd()
+    {
+        if (reusableData.armedModeActive && reusableData.AllowsArmedWeaponActions())
+        {
+            playerStateMachine.ChangeState(playerStateMachine.armedState);
+            return;
+        }
+
+        OnStateDefaultEnd();
     }
 
     public override void OnUpdate()
@@ -64,6 +91,12 @@ public class PlayerLandState : PlayerMovementState
         base.OnUpdate();
         if (player.isOnGround.Value && inputServer.Move != UnityEngine.Vector2.zero)
         {
+            if (reusableData.armedModeActive && reusableData.AllowsArmedWeaponActions())
+            {
+                playerStateMachine.ChangeState(playerStateMachine.armedState);
+                return;
+            }
+
             if (inputServer.Shift)
             {
                 playerStateMachine.ChangeState(playerStateMachine.moveLoopState);
