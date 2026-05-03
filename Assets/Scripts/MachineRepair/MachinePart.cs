@@ -82,6 +82,13 @@ namespace DZ_3C.MachineRepair
         internal void TryPickup(MachinePartInventory inv, RepairInteractionHub hub)
         {
             if (definition == null || inv == null) return;
+            if (!inv.CanAdd(definition, 1))
+            {
+                Debug.Log(
+                    $"[MachineRepair] Pickup blocked by carry limit: id={definition.Id}, displayName={definition.DisplayName}. " +
+                    $"Inventory: {MachinePartInventory.FormatSnapshotForDebug(inv.Snapshot())}");
+                return;
+            }
             inv.AddAndNotify(definition, 1);
             Debug.Log(
                 $"[MachineRepair] Picked up part: id={definition.Id}, displayName={definition.DisplayName}. " +

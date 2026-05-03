@@ -13,6 +13,18 @@ namespace DZ_3C.MachineRepair.Editor
         private const string PrefabTier1 = "Assets/Prefab/MachineRepair/MachinePart_Tier1.prefab";
         private const string PrefabKey = "Assets/Prefab/MachineRepair/MachinePart_Key.prefab";
         private const string PrefabTier2 = "Assets/Prefab/MachineRepair/MachinePart_Tier2.prefab";
+        private const string ExampleReceiverPresetPath = ResourcesDir + "/ReceiverPreset_Example.asset";
+        private const string ExampleCarryRulesPath = ResourcesDir + "/CarryRules_Example.asset";
+
+        [MenuItem("DZ_3C/Machine Repair/Create Example Receiver Preset")]
+        public static void MenuCreateExampleReceiverPreset()
+        {
+            EnsureMachineRepairResourcesFolders();
+            CreateOrUpdateExampleReceiverPreset();
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log($"[MachineRepair] Receiver preset saved to {ExampleReceiverPresetPath}");
+        }
 
         [MenuItem("DZ_3C/Machine Repair/Bake Triangle Mesh + Wire Part Prefabs")]
         public static void BakeTriangleMeshAndWirePartPrefabs()
@@ -27,20 +39,7 @@ namespace DZ_3C.MachineRepair.Editor
         [MenuItem("DZ_3C/Machine Repair/Create Definition Assets + Demo Prefab")]
         public static void CreateDefinitionsAndDemoPrefab()
         {
-            if (!AssetDatabase.IsValidFolder("Assets/Resources"))
-            {
-                AssetDatabase.CreateFolder("Assets", "Resources");
-            }
-
-            if (!AssetDatabase.IsValidFolder("Assets/Resources/Config"))
-            {
-                AssetDatabase.CreateFolder("Assets/Resources", "Config");
-            }
-
-            if (!AssetDatabase.IsValidFolder(ResourcesDir))
-            {
-                AssetDatabase.CreateFolder("Assets/Resources/Config", "MachineRepair");
-            }
+            EnsureMachineRepairResourcesFolders();
 
             CreateOrUpdateDefinition(
                 $"{ResourcesDir}/Tier1Material.asset",
@@ -81,9 +80,92 @@ namespace DZ_3C.MachineRepair.Editor
             EnsureTriangleMeshAsset();
             WireMachinePartPrefabs();
 
+            CreateOrUpdateExampleReceiverPreset();
+            CreateOrUpdateExampleCarryRules();
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Debug.Log("[MachineRepair] Created definition assets and demo prefab. Drag MachineRepair_DemoRoot into your scene.");
+        }
+
+        private static void EnsureMachineRepairResourcesFolders()
+        {
+            if (!AssetDatabase.IsValidFolder("Assets/Resources"))
+            {
+                AssetDatabase.CreateFolder("Assets", "Resources");
+            }
+
+            if (!AssetDatabase.IsValidFolder("Assets/Resources/Config"))
+            {
+                AssetDatabase.CreateFolder("Assets/Resources", "Config");
+            }
+
+            if (!AssetDatabase.IsValidFolder(ResourcesDir))
+            {
+                AssetDatabase.CreateFolder("Assets/Resources/Config", "MachineRepair");
+            }
+        }
+
+        private static void CreateOrUpdateExampleReceiverPreset()
+        {
+            MachinePartReceiverPreset preset =
+                AssetDatabase.LoadAssetAtPath<MachinePartReceiverPreset>(ExampleReceiverPresetPath);
+            if (preset == null)
+            {
+                preset = ScriptableObject.CreateInstance<MachinePartReceiverPreset>();
+                AssetDatabase.CreateAsset(preset, ExampleReceiverPresetPath);
+            }
+
+            SerializedObject so = new SerializedObject(preset);
+            so.FindProperty("presetName").stringValue = "Example Demo Needs";
+
+            SerializedProperty lines = so.FindProperty("lines");
+            lines.ClearArray();
+
+            void AddLine(string definitionAssetPath, int countRequired)
+            {
+                MachinePartDefinition def =
+                    AssetDatabase.LoadAssetAtPath<MachinePartDefinition>(definitionAssetPath);
+                if (def == null)
+                {
+                    Debug.LogWarning($"[MachineRepair] Receiver preset: definition missing at {definitionAssetPath}, skip line.");
+                    return;
+                }
+
+                int index = lines.arraySize;
+                lines.InsertArrayElementAtIndex(index);
+                SerializedProperty line = lines.GetArrayElementAtIndex(index);
+                line.FindPropertyRelative("part").objectReferenceValue = def;
+                line.FindPropertyRelative("countRequired").intValue = countRequired;
+            }
+
+            AddLine($"{ResourcesDir}/Tier1Material.asset", 1);
+            AddLine($"{ResourcesDir}/KeySpecial.asset", 1);
+            AddLine($"{ResourcesDir}/Tier2Material.asset", 1);
+
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(preset);
+        }
+
+        private static void CreateOrUpdateExampleCarryRules()
+        {
+            MachinePartCarryRules rules =
+                AssetDatabase.LoadAssetAtPath<MachinePartCarryRules>(ExampleCarryRulesPath);
+            if (rules == null)
+            {
+                rules = ScriptableObject.CreateInstance<MachinePartCarryRules>();
+                AssetDatabase.CreateAsset(rules, ExampleCarryRulesPath);
+            }
+
+            SerializedObject so = new SerializedObject(rules);
+            SerializedProperty limits = so.FindProperty("groupLimits");
+            limits.ClearArray();
+            limits.InsertArrayElementAtIndex(0);
+            SerializedProperty first = limits.GetArrayElementAtIndex(0);
+            first.FindPropertyRelative("groupId").stringValue = "generic_bulk";
+            first.FindPropertyRelative("maxTotalCountInGroup").intValue = 1;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(rules);
         }
 
         private static void EnsureTriangleMeshAsset()
@@ -179,6 +261,18 @@ namespace DZ_3C.MachineRepair.Editor
             so.FindProperty("displayName").stringValue = displayName;
             so.FindProperty("category").enumValueIndex = (int)category;
             so.FindProperty("visualShape").enumValueIndex = (int)shape;
+            SerializedProperty carryGroupProp = so.FindProperty("carryGroupId");
+            if (carryGroupProp != null)
+            {
+                carryGroupProp.stringValue =
+                    category == MachinePartCategory.StoryUnique ? string.Empty : "generic_bulk";
+            }
+
+            SerializedProperty perStackProp = so.FindProperty("perDefinitionMaxStack");
+            if (perStackProp != null)
+            {
+                perStackProp.intValue = -1;
+            }
             so.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(def);
         }

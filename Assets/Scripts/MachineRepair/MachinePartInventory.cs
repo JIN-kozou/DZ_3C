@@ -11,6 +11,9 @@ namespace DZ_3C.MachineRepair
     [DisallowMultipleComponent]
     public class MachinePartInventory : MonoBehaviour
     {
+        [Tooltip("可选：按 carryGroupId 配组内总数量上限。未指定时仅应用 Definition 自身上限。")]
+        [SerializeField] private MachinePartCarryRules carryRules;
+
         private readonly Dictionary<MachinePartDefinition, int> counts = new();
 
         public int GetCount(MachinePartDefinition definition)
@@ -24,6 +27,34 @@ namespace DZ_3C.MachineRepair
             if (definition == null || amount <= 0) return;
             counts.TryGetValue(definition, out int cur);
             counts[definition] = cur + amount;
+        }
+
+        /// <summary>
+        /// 拾取前校验：同时检查 Definition 单项上限与可选的携带组总上限。
+        /// </summary>
+        public bool CanAdd(MachinePartDefinition definition, int amount)
+        {
+            if (definition == null || amount <= 0) return false;
+
+            int current = GetCount(definition);
+            int perDefMax = definition.PerDefinitionMaxStack;
+            if (perDefMax >= 0 && current + amount > perDefMax) return false;
+
+            string groupId = definition.CarryGroupId;
+            if (string.IsNullOrWhiteSpace(groupId)) return true;
+            if (carryRules == null) return true;
+            if (!carryRules.TryGetGroupMax(groupId, out int groupMax)) return true;
+
+            int inGroupTotal = 0;
+            foreach (KeyValuePair<MachinePartDefinition, int> kv in counts)
+            {
+                MachinePartDefinition def = kv.Key;
+                if (def == null) continue;
+                if (!string.Equals(def.CarryGroupId, groupId, StringComparison.Ordinal)) continue;
+                inGroupTotal += kv.Value;
+            }
+
+            return inGroupTotal + amount <= groupMax;
         }
 
         /// <summary>尝试扣除最多 amount 个，返回实际扣除数量。</summary>

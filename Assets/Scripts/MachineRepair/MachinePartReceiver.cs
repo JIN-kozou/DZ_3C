@@ -17,13 +17,24 @@ namespace DZ_3C.MachineRepair
             [NonSerialized] public int delivered;
         }
 
+        [Header("Requirements")]
+        [Tooltip("若指定：运行时 Awake 从该预设填充下方需求列表（进入 Play 后以预设为准）；留空则完全使用 Inspector 中手动配置的需求。")]
+        [SerializeField] private MachinePartReceiverPreset requirementPreset;
+
         [SerializeField] private List<PartRequirement> requirements = new();
+
+        [Tooltip("勾选时：Awake 不调用 ApplyReceiverBox，不自动换 mesh/材质与根 Transform 缩放，完全使用 prefab 上的 MeshFilter / MeshRenderer / Transform。")]
+        [SerializeField] private bool usePrefabMesh = false;
 
         [SerializeField] private MeshFilter meshFilter;
         [SerializeField] private MeshRenderer meshRenderer;
         [SerializeField] private Vector3 receiverScale = new Vector3(4f, 0.35f, 2.5f);
 
         public IReadOnlyList<PartRequirement> Requirements => requirements;
+
+        /// <summary>挂接了预设 SO 时返回预设里的名称；否则为 null。</summary>
+        public string ReceiverPresetDisplayName =>
+            requirementPreset != null ? requirementPreset.PresetName : null;
 
         private void Reset()
         {
@@ -35,15 +46,33 @@ namespace DZ_3C.MachineRepair
 
         private void Awake()
         {
+            ApplyPresetIfAssigned();
+
             if (meshFilter == null) meshFilter = GetComponent<MeshFilter>();
             if (meshRenderer == null) meshRenderer = GetComponent<MeshRenderer>();
-            if (meshFilter != null && meshRenderer != null)
+            if (meshFilter != null && meshRenderer != null && !usePrefabMesh)
             {
                 RepairMeshUtility.ApplyReceiverBox(transform, meshFilter, meshRenderer, receiverScale);
             }
 
             var c = GetComponent<Collider>();
             if (c != null) c.isTrigger = true;
+        }
+
+        private void ApplyPresetIfAssigned()
+        {
+            if (requirementPreset == null) return;
+
+            requirements.Clear();
+            IReadOnlyList<MachinePartReceiverPreset.PresetLine> src = requirementPreset.Lines;
+            if (src == null) return;
+
+            foreach (MachinePartReceiverPreset.PresetLine line in src)
+            {
+                if (line == null || line.part == null) continue;
+                int count = line.countRequired < 1 ? 1 : line.countRequired;
+                requirements.Add(new PartRequirement { part = line.part, countRequired = count });
+            }
         }
 
         private void OnTriggerEnter(Collider other)
@@ -71,16 +100,21 @@ namespace DZ_3C.MachineRepair
         public bool TrySubmitAllFrom(MachinePartInventory inventory)
         {
             string receiverName = gameObject.name;
+            string presetLabel = ReceiverPresetDisplayName;
+            string logContext = string.IsNullOrEmpty(presetLabel)
+                ? receiverName
+                : $"{receiverName} (preset: {presetLabel})";
+
             if (inventory == null)
             {
-                Debug.Log($"[MachineRepair] Submit on '{receiverName}': inventory is null, skip.");
+                Debug.Log($"[MachineRepair] Submit on '{logContext}': inventory is null, skip.");
                 return false;
             }
 
             if (requirements == null || requirements.Count == 0)
             {
                 Debug.Log(
-                    $"[MachineRepair] Submit on '{receiverName}': no requirements configured. " +
+                    $"[MachineRepair] Submit on '{logContext}': no requirements configured. " +
                     $"Inventory: {MachinePartInventory.FormatSnapshotForDebug(inventory.Snapshot())}");
                 return false;
             }
@@ -103,7 +137,7 @@ namespace DZ_3C.MachineRepair
             }
 
             Debug.Log(
-                $"[MachineRepair] Submit on '{receiverName}'. DeliveredThisPress={any}. " +
+                $"[MachineRepair] Submit on '{logContext}'. DeliveredThisPress={any}. " +
                 $"Inventory: {MachinePartInventory.FormatSnapshotForDebug(inventory.Snapshot())}. " +
                 $"Receiver still needs: {FormatRemainingNeedsForDebug(requirements)}");
 
