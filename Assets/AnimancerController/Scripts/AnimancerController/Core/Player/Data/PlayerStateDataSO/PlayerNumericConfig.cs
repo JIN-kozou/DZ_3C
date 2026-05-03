@@ -9,6 +9,21 @@ public class PlayerNumericConfig
     public float runSpeedParameter = 2f;
     public float inAirMoveSpeed = 2f;
 
+    [Header("Character Controller — Stance")]
+    [Tooltip("站立时 CharacterController 半径。")]
+    [Min(0.01f)] public float standControllerRadius = 0.5f;
+    [Tooltip("站立时 CharacterController 高度。")]
+    [Min(0.01f)] public float standControllerHeight = 2f;
+    [Tooltip("站立时 CharacterController 中心（本地空间）。")]
+    public Vector3 standControllerCenter = new Vector3(0f, 1f, 0f);
+
+    [Tooltip("下蹲时 CharacterController 半径。")]
+    [Min(0.01f)] public float crouchControllerRadius = 0.5f;
+    [Tooltip("下蹲时 CharacterController 高度。")]
+    [Min(0.01f)] public float crouchControllerHeight = 1.2f;
+    [Tooltip("下蹲时 CharacterController 中心（本地空间）。")]
+    public Vector3 crouchControllerCenter = new Vector3(0f, 0.6f, 0f);
+
     [Header("Gravity & Ground")]
     public float gravity = -12f;
     public Vector2 velocityLimit = new Vector2(-20f, 60f);
@@ -39,21 +54,32 @@ public class PlayerNumericConfig
     [Min(0f)] public float inAirSpeedDecay = 3.5f;
     [Min(0f)] public float inAirInputMaintainAcceleration = 8f;
 
-    [Header("Climb Detection")]
+    [Header("Climb — Detection (空中前推输入时)")]
+    [Tooltip("墙面法线与“朝墙前进方向”(-targetDir)的最大夹角（度）。越大越宽容斜墙/转角；过小会很难触发攀爬。")]
     [Min(0f)] public float climbDetectionAngle = 45f;
-    [Min(0f)] public float climbDetectionDistance = 1f;
-    [Min(0f)] public float wallProbeRadius = 0.2f;
+    [Tooltip("水平朝墙探测的最大距离（米）。用于 GetWallHight 里 Raycast/SphereCast 的 forward 距离。")]
     [Min(0f)] public float wallProbeDistance = 1f;
+    [Tooltip("水平朝墙探测的球体半径（米）。用于 SphereCast 兜底，减少薄墙/边缘漏检。")]
+    [Min(0f)] public float wallProbeRadius = 0.2f;
+    [Tooltip("竖直扫描最高点（米，相对脚底）。与 canClimbMinHeight 一起决定空中攀爬扫描的竖直采样区间上界。")]
     [Min(0f)] public float canClimbMaxHeight = 3.2f;
+    [Tooltip("竖直扫描最低点（米，相对脚底）。与 canClimbMaxHeight 一起决定竖直采样区间下界。")]
     [Min(0f)] public float canClimbMinHeight = 0.3f;
+    [Tooltip("竖直方向采样段数。越大越精细但更耗；影响“翻越高度”估算的步进。")]
     [Min(1)] public int climbDetectionSamplingCount = 30;
+    [Tooltip("连续多少帧检测命中后才进入攀爬，用于防抖（避免缝/角抖动误触发）。")]
     [Min(1)] public int climbConfirmFrames = 2;
 
-    [Header("Climb Obstacle Height Ranges")]
+    [Header("Climb — Obstacle Height Bands (相对脚底 hit 高度)")]
+    [Tooltip("低于该高度差视为 low 档（对应 climbs[0] 与 climbSettings[0]）。")]
     [Min(0f)] public float lowClimbMaxHeight = 0.35f;
+    [Tooltip("lowMedium 档上界（不含等于 medium 上界时的分界逻辑由代码区间决定）。")]
     [Min(0f)] public float lowMediumClimbMaxHeight = 1f;
+    [Tooltip("medium 档上界。")]
     [Min(0f)] public float mediumClimbMaxHeight = 1.7f;
+    [Tooltip("mediumHigh 排除区间下界：落在此高度范围内会强制不进入攀爬（保留跳跃）。")]
     [Min(0f)] public float mediumHighClimbMinHeight = 2f;
+    [Tooltip("mediumHigh 排除区间上界。")]
     [Min(0f)] public float mediumHighClimbMaxHeight = 2.5f;
 
     [Header("State Transition")]

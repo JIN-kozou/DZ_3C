@@ -59,18 +59,6 @@ MonoBehaviour:
         _Clip: {fileID: 7400000, guid: 13f4277778fb44f4087d6b5e207265f0, type: 2}
         _NormalizedStartTime: NaN
     <PlayerClimbData>k__BackingField:
-      vaults:
-      - _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes:
-          - 0.45622486
-          - 1.0020545
-          _Callbacks: []
-          _Names:
-          - {fileID: 11400000, guid: 546bdb412bbcf824496de50d0635d3fb, type: 2}
-        _Clip: {fileID: 7400000, guid: 4fe43a0ae15a8af4db22d74abfc07f30, type: 2}
-        _NormalizedStartTime: 0
       climbs:
       - _FadeDuration: 0.25
         _Speed: 1
@@ -105,12 +93,6 @@ MonoBehaviour:
           - {fileID: 11400000, guid: 546bdb412bbcf824496de50d0635d3fb, type: 2}
         _Clip: {fileID: 7400000, guid: 7c36225855c99664f83befdf443c5725, type: 2}
         _NormalizedStartTime: 0
-      vaultSettings:
-      - startMatchTime: {x: 0, y: 0.15}
-        targetMatchTime: {x: 0.15, y: 0.25}
-        targetHeightOffSet: 0.05
-        startMatchDistanceOffset: -0.05
-        enableCCTimeOffset: 0
       climbSettings:
       - startMatchTime: {x: 0, y: 0.1}
         targetMatchTime: {x: 0.1, y: 0.29}
@@ -132,42 +114,6 @@ MonoBehaviour:
         targetHeightOffSet: -0.08
         startMatchDistanceOffset: 0.15
         enableCCTimeOffset: 0.1
-      outwardCorner_Left:
-        _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes: []
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 0}
-        _NormalizedStartTime: NaN
-      outwardCorner_Right:
-        _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes: []
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 0}
-        _NormalizedStartTime: NaN
-      inwardCorner_Left:
-        _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes: []
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 0}
-        _NormalizedStartTime: NaN
-      inwardCorner_right:
-        _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes: []
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 0}
-        _NormalizedStartTime: NaN
     <PlayerJumpFallAndLandData>k__BackingField:
       <placeJumpStart>k__BackingField:
         _FadeDuration: 0.1
@@ -285,6 +231,12 @@ MonoBehaviour:
       walkSpeedParameter: 2.5
       runSpeedParameter: 5
       inAirMoveSpeed: 20
+      standControllerRadius: 0.2
+      standControllerHeight: 1.2
+      standControllerCenter: {x: 0, y: 0.6, z: 0}
+      crouchControllerRadius: 0.2
+      crouchControllerHeight: 0.8
+      crouchControllerCenter: {x: 0, y: 0.4, z: 0}
       gravity: -12
       velocityLimit: {x: -20, y: 60}
       groundDetectedOffset: -0.06
@@ -308,9 +260,8 @@ MonoBehaviour:
       inAirSpeedDecay: 0
       inAirInputMaintainAcceleration: 8
       climbDetectionAngle: 60
-      climbDetectionDistance: 0.2
-      wallProbeRadius: 0.2
-      wallProbeDistance: 0.2
+      wallProbeDistance: 0.25
+      wallProbeRadius: 0.25
       canClimbMaxHeight: 10
       canClimbMinHeight: 0.5
       climbDetectionSamplingCount: 30

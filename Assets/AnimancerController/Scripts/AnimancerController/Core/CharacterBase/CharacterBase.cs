@@ -54,6 +54,20 @@ public class CharacterBase : MonoBehaviour
         controller = GetComponent<CharacterController>();
     }
 
+    /// <summary>
+    /// CharacterController 胶囊底部世界坐标 Y。攀爬/障碍高度等应相对“脚底”计算，而不是直接用 transform.position.y
+    /// （改 center/height 后两者不再一致）。
+    /// </summary>
+    public float GetCapsuleFootWorldY()
+    {
+        if (controller == null)
+        {
+            return transform.position.y;
+        }
+
+        return transform.position.y + controller.center.y - controller.height * 0.5f;
+    }
+
     public void ApplyNumericConfig(PlayerNumericConfig config)
     {
         if (config == null)

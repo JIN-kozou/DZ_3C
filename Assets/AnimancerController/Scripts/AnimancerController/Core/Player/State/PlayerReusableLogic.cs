@@ -166,7 +166,9 @@ public class PlayerReusableLogic
         RaycastHit currentHit = default;
         Vector3 h = Vector3.zero;
         bool anyHit = false;
-        Vector3 startPos = player.transform.position + Vector3.up * startDetectionHight;
+        float footY = player.GetCapsuleFootWorldY();
+        Vector3 planarOrigin = new Vector3(player.transform.position.x, footY, player.transform.position.z);
+        Vector3 startPos = planarOrigin + Vector3.up * startDetectionHight;
         float sampleQuantityPerUnit = (maxDetectionHight - startDetectionHight) / detectionSamplingCount;
 
         for (int i = 0; i <= detectionSamplingCount+1; i++)
@@ -188,7 +190,7 @@ public class PlayerReusableLogic
         {
             return default;
         }
-        obstructHeight = currentHit.point.y - player.transform.position.y;
+        obstructHeight = currentHit.point.y - footY;
         if (obstructHeight >= canClimbMaxHight)//认为检测点高于最高爬的高度
         {
            // this.Log("障碍物太高");
