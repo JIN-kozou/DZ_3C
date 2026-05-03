@@ -4,19 +4,9 @@ using UnityEngine;
 
 [Serializable]
 public class PlayerClimbData
-{    
-    //根据高度的不同填入合适的动画
-
-    //翻越动画
-    [field: SerializeField] public ClipTransition[] vaults;
-    //攀爬动画
+{
+    [Tooltip("按障碍高度分档选择的攀爬动画，与 climbSettings 一一对应。索引：0=low，1=lowMedium，2=medium。")]
     [field: SerializeField] public ClipTransition[] climbs;
-    //与上面的动画一一对应
-    public PlayerClimbAnimationSettings[] vaultSettings;
+    [Tooltip("与 climbs 同索引的攀爬匹配参数。")]
     public PlayerClimbAnimationSettings[] climbSettings;
-    //攀墙拐角
-    public ClipTransition outwardCorner_Left;
-    public ClipTransition outwardCorner_Right;
-    public ClipTransition inwardCorner_Left;
-    public ClipTransition inwardCorner_right;
 }

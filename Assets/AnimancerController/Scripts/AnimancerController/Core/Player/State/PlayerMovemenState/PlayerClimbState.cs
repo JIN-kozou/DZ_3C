@@ -29,6 +29,7 @@ public class PlayerClimbState : PlayerMovementState
             player.StateMachine.ChangeState(player.StateMachine.jumpState);
             return;
         }
+        float footWorldY = player.GetCapsuleFootWorldY();
         player.disEnableGravity = true;
         player.controller.enabled = false;
         player.applyFullRootMotion = true;
@@ -38,7 +39,7 @@ public class PlayerClimbState : PlayerMovementState
         animationSettings = GetClimbTimeSetting();
 
         targetMatchInfo_Y = new ClimbTargetMatchInfo(reusableData.vaultPos + Vector3.up * animationSettings.targetHeightOffSet);
-        targetMatchInfo_Start = new ClimbTargetMatchInfo(new Vector3(reusableData.hit.point.x, player.transform.position.y, reusableData.hit.point.z) + reusableData.hit.normal * (0.35f + animationSettings.startMatchDistanceOffset));
+        targetMatchInfo_Start = new ClimbTargetMatchInfo(new Vector3(reusableData.hit.point.x, footWorldY, reusableData.hit.point.z) + reusableData.hit.normal * (0.35f + animationSettings.startMatchDistanceOffset));
         base.OnEnter();
     }
     protected override void AddEventListening()
@@ -76,10 +77,6 @@ public class PlayerClimbState : PlayerMovementState
     }
     private void SetCancelClimb()
     {
-        if (reusableData.ClimbType != ClimbType.Climb)
-        {
-            return;
-        }
         if (reusableData.ObstructHeight == ObstructHeight.mediumHight)
         {
             animancerState.Events(player).Add(animancerEventList, new AnimancerEvent(0.15f,OnCancelClimb));

@@ -2,9 +2,14 @@
 [System.Serializable]
 public class PlayerClimbAnimationSettings
 {
+    [Tooltip("起始位置匹配区间（动画归一化时间 x~y）。")]
     public Vector2 startMatchTime;
+    [Tooltip("目标高度匹配区间（动画归一化时间 x~y），用于 Y 轴上台面/目标点对齐。")]
     public Vector2 targetMatchTime;
-    public float targetHeightOffSet;//目标高度的偏移量
-    public float startMatchDistanceOffset;//开始爬&翻越的距离的偏移量
-    public float enableCCTimeOffset;//开启CC组件相对于TargetMatchTime的偏移量，进入攀爬状态时会自动禁用
+    [Tooltip("目标匹配点的高度偏移（米），叠加在 vaultPos 上。")]
+    public float targetHeightOffSet;
+    [Tooltip("起始匹配时沿墙法线方向的额外偏移（米），叠加在基础 0.35m 上。")]
+    public float startMatchDistanceOffset;
+    [Tooltip("相对 targetMatchTime.y 再延后多少（归一化时间）恢复 CharacterController。")]
+    public float enableCCTimeOffset;
 }

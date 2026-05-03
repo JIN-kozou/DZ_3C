@@ -74,6 +74,7 @@ public class Player : CharacterBase
         }
         //����Ĭ�Ͽ�ʼ״̬
         StateMachine.ChangeState(StateMachine.idleState);
+        UpdateCharacterControllerStance();
     }
     protected override void Update()
     {
@@ -82,6 +83,46 @@ public class Player : CharacterBase
         UpdateBuffDrivenValues();
         StateMachine?.OnUpdate();
     }
+
+    private void LateUpdate()
+    {
+        UpdateCharacterControllerStance();
+    }
+
+    /// <summary>
+    /// 按站立/下蹲混合值（standValueParameter：1=站立，0=下蹲）插值更新 CharacterController 尺寸。
+    /// </summary>
+    private void UpdateCharacterControllerStance()
+    {
+        if (controller == null || ReusableData == null)
+        {
+            return;
+        }
+        if (!controller.enabled)
+        {
+            return;
+        }
+
+        var cfg = playerSO?.playerMovementData?.PlayerNumericConfig;
+        if (cfg == null)
+        {
+            return;
+        }
+
+        float standBlend = Mathf.Clamp01(ReusableData.standValueParameter.CurrentValue);
+        float radius = Mathf.Lerp(cfg.crouchControllerRadius, cfg.standControllerRadius, standBlend);
+        float height = Mathf.Lerp(cfg.crouchControllerHeight, cfg.standControllerHeight, standBlend);
+        Vector3 center = Vector3.Lerp(cfg.crouchControllerCenter, cfg.standControllerCenter, standBlend);
+
+        height = Mathf.Max(height, radius * 2f + 0.001f);
+        float maxRadius = height * 0.5f - 0.0005f;
+        radius = Mathf.Clamp(radius, 0.01f, maxRadius);
+
+        controller.radius = radius;
+        controller.height = height;
+        controller.center = center;
+    }
+
     protected override void OnAnimatorMove()
     {
         base.OnAnimatorMove();

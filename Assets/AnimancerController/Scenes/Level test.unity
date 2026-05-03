@@ -792,8 +792,43 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -1852818260849683694, guid: 05e040e71815f744c8139ba8188cc46e,
         type: 3}
-      propertyPath: m_AvoidObstacles
+      propertyPath: m_Damping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -1852818260849683694, guid: 05e040e71815f744c8139ba8188cc46e,
+        type: 3}
+      propertyPath: m_Strategy
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1852818260849683694, guid: 05e040e71815f744c8139ba8188cc46e,
+        type: 3}
+      propertyPath: m_CameraRadius
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1852818260849683694, guid: 05e040e71815f744c8139ba8188cc46e,
+        type: 3}
+      propertyPath: m_MaximumEffort
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -1852818260849683694, guid: 05e040e71815f744c8139ba8188cc46e,
+        type: 3}
+      propertyPath: m_SmoothingTime
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: -1852818260849683694, guid: 05e040e71815f744c8139ba8188cc46e,
+        type: 3}
+      propertyPath: m_AvoidObstacles
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -1852818260849683694, guid: 05e040e71815f744c8139ba8188cc46e,
+        type: 3}
+      propertyPath: m_DampingWhenOccluded
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -1852818260849683694, guid: 05e040e71815f744c8139ba8188cc46e,
+        type: 3}
+      propertyPath: m_MinimumDistanceFromTarget
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 267368430014363135, guid: 05e040e71815f744c8139ba8188cc46e,
         type: 3}
@@ -952,7 +987,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a37e0a64a40e83489c13cf30e27e12a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
+  player: {fileID: 1960038969}
   crouchFov: 60
   crouchDistance: 3
   changeSpeed: 5
@@ -1289,7 +1324,7 @@ Transform:
   m_GameObject: {fileID: 823185009}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.22773, y: 1.1400416, z: -1.4960027}
+  m_LocalPosition: {x: -1.2276297, y: 1.1400416, z: -1.4960027}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
