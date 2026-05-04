@@ -2,6 +2,7 @@
 using Animancer;
 using DZ_3C.Reverse;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 /*************************************************
 ����: HuHu
 ����: 3112891874@qq.com
@@ -23,6 +24,7 @@ public class Player : CharacterBase
     public TimerService TimerService { get; private set; }
     public PlayerBuffSystem BuffSystem { get; private set; }
     public PlayerWeaponRuntime WeaponRuntime { get; private set; }
+    public PlayerArmedPresentation ArmedPresentation { get; private set; }
 
     [Header("Player Resources")]
     [SerializeField, Min(1f)] private float maxHealth = 100f;
@@ -34,6 +36,10 @@ public class Player : CharacterBase
     [Header("Reverse System (optional)")]
     [SerializeField] private MonoBehaviour reverseRecoverTargetBehaviour;
     private IReverseRecoverTarget reverseRecoverTarget;
+
+    private bool _wasCrouchedForRigBuilders;
+    private RigBuilder[] _rigBuildersSnapshot;
+    private bool[] _rigBuildersEnabledSnapshot;
 
     public float MaxHealth => maxHealth;
     public float MaxStamina => maxStamina;
@@ -74,6 +80,19 @@ public class Player : CharacterBase
             WeaponRuntime = gameObject.AddComponent<PlayerWeaponRuntime>();
         }
 
+        if (GetComponent<PlayerArmedHandIkRig>() == null)
+        {
+            gameObject.AddComponent<PlayerArmedHandIkRig>();
+        }
+
+        ArmedPresentation = GetComponent<PlayerArmedPresentation>();
+        if (ArmedPresentation == null)
+        {
+            ArmedPresentation = gameObject.AddComponent<PlayerArmedPresentation>();
+        }
+
+        ArmedPresentation.Init(this);
+
         StateMachine = new PlayerStateMachine(this);
         if (GetComponent<PlayerMotionDebugView>() == null)
         {
@@ -85,13 +104,109 @@ public class Player : CharacterBase
     }
     protected override void Update()
     {
+        TryRestoreRigBuildersAfterCrouchExitBeforeStateMachine();
         base.Update();
         BuffSystem?.Tick(Time.deltaTime);
         UpdateBuffDrivenValues();
         StateMachine?.OnUpdate();
+        TryHolsterWeaponInputIfArmed();
+        TickArmedUpperBodyAdsIfNeeded();
         WeaponRuntime?.Tick(Time.deltaTime);
         TryApplyPendingCrouchAfterStandHolster();
         TryResumeArmedAfterCrouchStand();
+    }
+
+    /// <summary>
+    /// 收枪键（如键盘 3）在任意持枪 locomotion 状态下都应生效；此前仅在 <see cref="PlayerArmedState"/> 内轮询，ADS 在跑循环时退出后按 3 无效。
+    /// </summary>
+    private void TryHolsterWeaponInputIfArmed()
+    {
+        if (ReusableData == null ||
+            InputService == null ||
+            StateMachine == null ||
+            ArmedPresentation == null)
+        {
+            return;
+        }
+
+        if (!ReusableData.armedModeActive || !ReusableData.AllowsArmedWeaponActions())
+        {
+            return;
+        }
+
+        if (!InputService.HolsterWeaponWasPressedThisFrame)
+        {
+            return;
+        }
+
+        var cur = StateMachine.currentState;
+        if (cur == null)
+        {
+            return;
+        }
+
+        if (cur.GetType().Name.Contains("Climb"))
+        {
+            return;
+        }
+
+        if (ArmedPresentation.IsExiting)
+        {
+            return;
+        }
+
+        ArmedPresentation.BeginArmedExit(() =>
+        {
+            ReusableData.armedModeActive = false;
+            ReusableData.resumeArmedAfterBreak = false;
+            ReusableData.weaponSuppressedUntilStandFromCrouch = false;
+            ReusableData.pendingCrouchAfterStandHolster = false;
+            StateMachine.ChangeState(StateMachine.idleState);
+        });
+    }
+
+    /// <summary>
+    /// 持枪模式下 ADS 输入在跳跃/落地等非 <see cref="PlayerArmedState"/> 中仍生效；攀爬时关闭。
+    /// </summary>
+    private void TickArmedUpperBodyAdsIfNeeded()
+    {
+        if (ReusableData == null ||
+            ArmedPresentation == null ||
+            !ReusableData.armedModeActive ||
+            !ReusableData.AllowsArmedWeaponActions() ||
+            InputService == null ||
+            playerSO?.playerMovementData == null)
+        {
+            return;
+        }
+
+        var cur = StateMachine?.currentState;
+        if (cur == null)
+        {
+            return;
+        }
+
+        string stateName = cur.GetType().Name;
+        if (stateName.Contains("Climb"))
+        {
+            return;
+        }
+
+        var armedAnim = playerSO.playerMovementData.PlayerArmedAnimationData;
+        if (armedAnim == null || !armedAnim.HasAdsAnimationPack)
+        {
+            return;
+        }
+
+        float adsSpeedScale = playerSO.playerMovementData.PlayerNumericConfig != null
+            ? playerSO.playerMovementData.PlayerNumericConfig.adsEnterAnimationSpeedScale
+            : 1f;
+
+        ArmedPresentation.TickUpperBodyAds(
+            InputService.ADSHeld,
+            InputService.FireHeld,
+            InputService.FireWasPressedThisFrame,
+            adsSpeedScale);
     }
 
     private void TryApplyPendingCrouchAfterStandHolster()
@@ -151,6 +266,74 @@ public class Player : CharacterBase
     private void LateUpdate()
     {
         UpdateCharacterControllerStance();
+        ApplyRigBuildersDisabledWhileCrouched();
+    }
+
+    /// <summary>
+    /// 下蹲（stand 混合值 &lt; 0.99）时关闭角色身上所有 <see cref="RigBuilder"/>；站起恢复在进入下蹲当帧记录的 enabled 状态。
+    /// 恢复在 <see cref="Update"/> 最前执行，避免与当帧 <see cref="PlayerArmedPresentation.BeginArmedEnter"/> 等写 Rig 的逻辑打架。
+    /// </summary>
+    private void TryRestoreRigBuildersAfterCrouchExitBeforeStateMachine()
+    {
+        if (ReusableData == null)
+        {
+            return;
+        }
+
+        bool crouched = ReusableData.standValueParameter.CurrentValue < 0.99f;
+        if (!crouched && _wasCrouchedForRigBuilders)
+        {
+            if (_rigBuildersSnapshot != null && _rigBuildersEnabledSnapshot != null)
+            {
+                int n = Mathf.Min(_rigBuildersSnapshot.Length, _rigBuildersEnabledSnapshot.Length);
+                for (int i = 0; i < n; i++)
+                {
+                    RigBuilder rb = _rigBuildersSnapshot[i];
+                    if (rb != null)
+                    {
+                        rb.enabled = _rigBuildersEnabledSnapshot[i];
+                    }
+                }
+            }
+
+            _rigBuildersSnapshot = null;
+            _rigBuildersEnabledSnapshot = null;
+        }
+
+        _wasCrouchedForRigBuilders = crouched;
+    }
+
+    private void ApplyRigBuildersDisabledWhileCrouched()
+    {
+        if (ReusableData == null)
+        {
+            return;
+        }
+
+        if (ReusableData.standValueParameter.CurrentValue >= 0.99f)
+        {
+            return;
+        }
+
+        if (_rigBuildersSnapshot == null)
+        {
+            _rigBuildersSnapshot = GetComponentsInChildren<RigBuilder>(true);
+            _rigBuildersEnabledSnapshot = new bool[_rigBuildersSnapshot.Length];
+            for (int i = 0; i < _rigBuildersSnapshot.Length; i++)
+            {
+                RigBuilder rb = _rigBuildersSnapshot[i];
+                _rigBuildersEnabledSnapshot[i] = rb != null && rb.enabled;
+            }
+        }
+
+        for (int i = 0; i < _rigBuildersSnapshot.Length; i++)
+        {
+            RigBuilder rb = _rigBuildersSnapshot[i];
+            if (rb != null)
+            {
+                rb.enabled = false;
+            }
+        }
     }
 
     /// <summary>

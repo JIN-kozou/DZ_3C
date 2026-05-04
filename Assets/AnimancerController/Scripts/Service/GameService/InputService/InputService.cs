@@ -121,6 +121,9 @@ public class InputService : MonoSingleton<InputService>
 
     public bool FireHeld => inputMap != null && inputMap.Player.Fire.ReadValue<float>() > 0f;
 
+    public bool FireWasPressedThisFrame =>
+        inputMap != null && inputMap.Player.Fire.WasPressedThisFrame();
+
     public bool ADSHeld => inputMap != null && inputMap.Player.ADS.ReadValue<float>() > 0f;
 
     public bool CrouchHeld => inputMap != null && inputMap.Player.Crouch.ReadValue<float>() > 0f;

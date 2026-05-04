@@ -16,9 +16,7 @@ public class PlayerStateMachine : StateMachineBase
     public PlayerMoveLoopState moveLoopState;
     public PlayerJumpState jumpState;
     public PlayerClimbState climbState;
-    public PlayerMoveToWallState moveWallState;
     public PlayerFallLoopState fallLoopState;
-    public PlayerPlatformerUpState platformerUpState;
     public PlayerLandState landState;
     public PlayerArmedState armedState;
     public PlayerStateMachine(Player player)
@@ -29,9 +27,7 @@ public class PlayerStateMachine : StateMachineBase
         moveLoopState = new PlayerMoveLoopState(this);
         jumpState= new PlayerJumpState(this);
         climbState = new PlayerClimbState(this);
-        moveWallState = new  PlayerMoveToWallState(this);
         fallLoopState = new PlayerFallLoopState(this);
-        platformerUpState = new PlayerPlatformerUpState(this);
         landState= new PlayerLandState(this);
         armedState = new PlayerArmedState(this);
     }

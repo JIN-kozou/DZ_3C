@@ -8,10 +8,16 @@ public class PlayerIdleState : PlayerMovementState
     }
     public override void OnEnter()
     {
+        if (!reusableData.armedModeActive)
+        {
+            player.ArmedPresentation?.NotifyArmedStateForceQuit();
+        }
+
         base.OnEnter();
         reusableData.currentCrouchIdleIndex = -1;
         reusableData.currentStandIdleIndex = -1;
-        reusableLogic.InitIldeState();
+        float holsterLocomotionFade = reusableData.ConsumePendingHolsterExitToIdleLocomotionFade();
+        reusableLogic.InitIldeState(holsterLocomotionFade);
         reusableLogic.PlayNextState();
     }
     protected override void AddEventListening()

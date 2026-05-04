@@ -30,9 +30,19 @@ public class PlayerReusableLogic
         animator = player.animancer;
         reusableData = player.ReusableData;
     }
-    public void InitIldeState()
+    /// <param name="locomotionCrossFadeOverrideSeconds">收枪等流程切入 Idle 时 Layer0 淡入秒数；≤0 则使用默认 <c>Play(idle)</c>。</param>
+    public void InitIldeState(float locomotionCrossFadeOverrideSeconds = -1f)
     {
-        var state = animator.Play(playerMovementData.PlayerIdleData.idle);
+        var idleRef = playerMovementData.PlayerIdleData.idle;
+        AnimancerState state;
+        if (locomotionCrossFadeOverrideSeconds > 0f && idleRef != null && idleRef.IsValid)
+        {
+            state = animator.Play((ITransition)idleRef, locomotionCrossFadeOverrideSeconds);
+        }
+        else
+        {
+            state = animator.Play(idleRef);
+        }
         bool isUpdateIdleState =( reusableData.isLockIdle && reusableData.lockValueParameter.TargetValue == 0 )|| (!reusableData.isLockIdle && reusableData.lockValueParameter.TargetValue == 1);
         if (reusableData.standIdleMixerState == null|| isUpdateIdleState)
         {
@@ -292,7 +302,7 @@ public class PlayerReusableLogic
             climbConfirmCounter = 0;
             reusableData.ObstructHeight = ObstructHeight.medium;
             reusableData.ClimbType = ClimbType.Climb;
-            if (player.ReusableData.currentState.Value == "PlayerArmedState" && player.ReusableData.armedModeActive)
+            if (player.ReusableData.armedModeActive)
             {
                 player.ReusableData.resumeArmedAfterBreak = true;
             }
@@ -311,7 +321,7 @@ public class PlayerReusableLogic
             climbConfirmCounter = 0;
             reusableData.ObstructHeight = ObstructHeight.lowMedium;
             reusableData.ClimbType = ClimbType.Climb;
-            if (player.ReusableData.currentState.Value == "PlayerArmedState" && player.ReusableData.armedModeActive)
+            if (player.ReusableData.armedModeActive)
             {
                 player.ReusableData.resumeArmedAfterBreak = true;
             }
@@ -330,7 +340,7 @@ public class PlayerReusableLogic
             climbConfirmCounter = 0;
             reusableData.ObstructHeight = ObstructHeight.low;
             reusableData.ClimbType = ClimbType.Climb;
-            if (player.ReusableData.currentState.Value == "PlayerArmedState" && player.ReusableData.armedModeActive)
+            if (player.ReusableData.armedModeActive)
             {
                 player.ReusableData.resumeArmedAfterBreak = true;
             }

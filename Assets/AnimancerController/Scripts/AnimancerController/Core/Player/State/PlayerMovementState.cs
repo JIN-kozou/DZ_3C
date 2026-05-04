@@ -21,8 +21,7 @@ public class PlayerMovementState : StateBase
     public override void OnEnter()
     {
         if (!(this is PlayerJumpState) &&
-            !(this is PlayerFallLoopState) &&
-            !(this is PlayerPlatformerUpState))
+            !(this is PlayerFallLoopState))
         {
             reusableData.canCheckClimbInAirAfterJump = false;
         }
@@ -179,8 +178,32 @@ public class PlayerMovementState : StateBase
             return;
         }
 
+        float predictLen = numericConfig != null ? numericConfig.lowCeilingAutoCrouchPostStandPredictRayLength : 1.2f;
+        if (predictLen > 0f && WouldPredictedStandCapsuleTopHitCeiling(predictLen))
+        {
+            return;
+        }
+
         reusableData.standValueParameter.TargetValue = 1;
         reusableData.pendingStandWhenCrouchCeilingClears = false;
+    }
+
+    /// <summary>
+    /// 用配置的站立 CC 中心与高度推算胶囊顶（不改动当前 CC），用于预测站起后头顶是否仍挡。
+    /// </summary>
+    private bool WouldPredictedStandCapsuleTopHitCeiling(float rayLength)
+    {
+        if (numericConfig == null || rayLength <= 0f)
+        {
+            return false;
+        }
+
+        Transform t = player.transform;
+        Vector3 standCenterWorld = t.TransformPoint(numericConfig.standControllerCenter);
+        float topY = standCenterWorld.y + numericConfig.standControllerHeight * 0.5f - 0.02f;
+        Vector3 origin = new Vector3(standCenterWorld.x, topY, standCenterWorld.z);
+
+        return Physics.Raycast(origin, Vector3.up, rayLength, player.whatIsGround, QueryTriggerInteraction.Ignore);
     }
     protected float UpdateSpeed()
     {

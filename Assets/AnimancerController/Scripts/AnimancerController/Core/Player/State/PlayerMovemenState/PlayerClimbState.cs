@@ -35,6 +35,9 @@ public class PlayerClimbState : PlayerMovementState
             return;
         }
         float footWorldY = player.GetCapsuleFootWorldY();
+        player.ArmedPresentation?.NotifyArmedStateForceQuit();
+        reusableData.resumeArmedPresentationWithoutDraw =
+            reusableData.resumeArmedAfterBreak && reusableData.armedModeActive;
         player.disEnableGravity = true;
         player.controller.enabled = false;
         player.applyFullRootMotion = true;
@@ -175,6 +178,7 @@ public class PlayerClimbState : PlayerMovementState
             return true;
         }
 
+        reusableData.resumeArmedAfterBreak = false;
         return false;
     }
    

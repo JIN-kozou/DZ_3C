@@ -11,6 +11,11 @@ public class PlayerWeaponRuntime : MonoBehaviour
     [SerializeField, Tooltip("子弹从此 Transform 的世界坐标生成；飞行方向为相机「屏幕中心 + 后坐力/腰射散布」射线指向的远方。未指定时退化为相机射线起点前 0.5m。")]
     private Transform muzzleSocket;
 
+    [SerializeField, Tooltip("可选。双手 IK 的 Target 建议指向此 Transform（与枪口独立）；仅用于场景/Prefab 配置参考，逻辑仍由 Animation Rigging 约束上绑定。")]
+    private Transform gripSocket;
+
+    public Transform GripSocket => gripSocket;
+
     private Player _player;
     private int _ammo;
     private Collider[] _ownerColliders;
@@ -79,6 +84,8 @@ public class PlayerWeaponRuntime : MonoBehaviour
         }
 
         bool fireHeld = input.FireHeld;
+        bool firePressedThisFrame = input.FireWasPressedThisFrame;
+        bool wantFire = gunConfig.fullAuto ? fireHeld : firePressedThisFrame;
 
         if (!CanProcessWeapon(rd))
         {
@@ -94,6 +101,8 @@ public class PlayerWeaponRuntime : MonoBehaviour
 
         _adsHeld = input.ADSHeld;
 
+        bool presentationReady = _player.ArmedPresentation == null || _player.ArmedPresentation.IsUpperBodyReadyForWeapon;
+
         _timeSinceLastShot += deltaTime;
         if (_timeSinceLastShot > gunConfig.recoilRecoveryDelay)
         {
@@ -105,32 +114,55 @@ public class PlayerWeaponRuntime : MonoBehaviour
             }
         }
 
-        if (!fireHeld)
+        if (!wantFire)
+        {
+            SmoothRecoilVisual(deltaTime);
+            return;
+        }
+
+        if (!presentationReady)
         {
             SmoothRecoilVisual(deltaTime);
             return;
         }
 
         float interval = GetSecondsPerShot(gunConfig.fireRate);
-        int cap = Mathf.Max(1, gunConfig.maxShotsPerTick);
-        int firedThisTick = 0;
-        while (_ammo > 0 && Time.time >= _nextFireTime && firedThisTick < cap)
+        if (gunConfig.fullAuto)
         {
-            if (!TryFireOneShot())
+            int cap = Mathf.Max(1, gunConfig.maxShotsPerTick);
+            int firedThisTick = 0;
+            while (_ammo > 0 && Time.time >= _nextFireTime && firedThisTick < cap)
             {
-                break;
-            }
+                if (!TryFireOneShot())
+                {
+                    break;
+                }
 
-            firedThisTick++;
+                firedThisTick++;
 
-            // NegativeInfinity + interval is still -Infinity (IEEE754); RefillMagazine resets to -Infinity, which would drain the whole mag in one frame.
-            if (float.IsInfinity(_nextFireTime) || float.IsNaN(_nextFireTime))
-            {
-                _nextFireTime = Time.time + interval;
+                // NegativeInfinity + interval is still -Infinity (IEEE754); RefillMagazine resets to -Infinity, which would drain the whole mag in one frame.
+                if (float.IsInfinity(_nextFireTime) || float.IsNaN(_nextFireTime))
+                {
+                    _nextFireTime = Time.time + interval;
+                }
+                else
+                {
+                    _nextFireTime += interval;
+                }
             }
-            else
+        }
+        else if (_ammo > 0 && Time.time >= _nextFireTime && firePressedThisFrame)
+        {
+            if (TryFireOneShot())
             {
-                _nextFireTime += interval;
+                if (float.IsInfinity(_nextFireTime) || float.IsNaN(_nextFireTime))
+                {
+                    _nextFireTime = Time.time + interval;
+                }
+                else
+                {
+                    _nextFireTime += interval;
+                }
             }
         }
 

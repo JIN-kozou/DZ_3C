@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 10
   fireRate: 1
+  fullAuto: 0
   maxShotsPerTick: 1
   magazineSize: 10
   bulletPrefab: {fileID: 1729074314731889512, guid: 21d73a7e645db184cb508f0009ed154e,
@@ -21,10 +22,10 @@ MonoBehaviour:
   hipSpreadHalfSizeViewport: {x: 0.015, y: 0.015}
   adsFieldOfView: 45
   adsCameraDistance: 0.5
-  viewKickPitchDegRange: {x: -0.8, y: -0.2}
-  viewKickYawDegRange: {x: -0.15, y: 0.15}
-  viewKickRollDegRange: {x: -0.2, y: 0.2}
-  viewKickZOffsetRange: {x: -0.08, y: -0.02}
+  viewKickPitchDegRange: {x: -2, y: -1}
+  viewKickYawDegRange: {x: -0.5, y: 0.5}
+  viewKickRollDegRange: {x: -0.8, y: 0.8}
+  viewKickZOffsetRange: {x: -2, y: -1}
   viewKickRecoveryHalfLife: 0.06
   recoilPattern:
   - {x: 0.002, y: 0.011}
@@ -37,11 +38,11 @@ MonoBehaviour:
   - {x: -0.002, y: 0.015}
   - {x: -0.001, y: 0.006}
   - {x: -0.001, y: 0.006}
-  recoilPatternGlobalScale: 1.5
+  recoilPatternGlobalScale: 5
   recoilAimSmoothTime: 0.02
   recoilRecoveryDelay: 0.1
   recoilRecoveryInterval: 0.04
   recoilRecoveryStep: 0.35
   bulletMuzzleSpeed: 20
-  bulletGravityScale: 0.6
+  bulletGravityScale: 0.2
   bulletLifetime: 3

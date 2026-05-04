@@ -10,5 +10,6 @@ public class PlayerMovementData
     [field :SerializeField] public PlayerClimbData  PlayerClimbData { get; private set; }
     [field: SerializeField] public PlayerJumpFallAndLandData PlayerJumpFallAndLandData { get;private set; }
     [field: SerializeField] public PlayerNumericConfig PlayerNumericConfig { get; private set; } = new PlayerNumericConfig();
+    [field: SerializeField] public PlayerArmedAnimationData PlayerArmedAnimationData { get; private set; } = new PlayerArmedAnimationData();
 
 }
