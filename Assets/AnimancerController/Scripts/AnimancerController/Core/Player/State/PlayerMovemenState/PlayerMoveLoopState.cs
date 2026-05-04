@@ -42,6 +42,7 @@ public class PlayerMoveLoopState : PlayerMovementState
         inputServer.inputMap.Player.Crouch.started += OnCrouch;
         inputServer.inputMap.Player.Crouch.canceled += OnCrouchRelease;
         player.isOnGround.ValueChanged += OnCheckFall;
+        inputServer.inputMap.Player.ToggleWeapon.started += OnToggleWeapon;
     }
     protected override void RemoveEventListening()
     {
@@ -51,6 +52,21 @@ public class PlayerMoveLoopState : PlayerMovementState
         inputServer.inputMap.Player.Crouch.started -= OnCrouch;
         inputServer.inputMap.Player.Crouch.canceled -= OnCrouchRelease;
         player.isOnGround.ValueChanged -= OnCheckFall;
+        inputServer.inputMap.Player.ToggleWeapon.started -= OnToggleWeapon;
+    }
+
+    private void OnToggleWeapon(InputAction.CallbackContext context)
+    {
+        if (!reusableData.AllowsArmedWeaponActions())
+        {
+            return;
+        }
+
+        reusableData.armedModeActive = true;
+        reusableData.resumeArmedAfterBreak = false;
+        reusableData.weaponSuppressedUntilStandFromCrouch = false;
+        reusableData.pendingCrouchAfterStandHolster = false;
+        playerStateMachine.ChangeState(playerStateMachine.armedState);
     }
     public override void OnExit()
     {

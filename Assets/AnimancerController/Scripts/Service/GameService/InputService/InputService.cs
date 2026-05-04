@@ -1,10 +1,10 @@
 
-
 using UnityEngine;
+using UnityEngine.InputSystem;
 /**************************************************************************
-作者: HuHu
-邮箱: 3112891874@qq.com
-功能: 玩家输入控制类，基于InputSystem
+????: HuHu
+????: 3112891874@qq.com
+????: ????????????????InputSystem
 **************************************************************************/
 public class InputService : MonoSingleton<InputService>
 {
@@ -24,16 +24,16 @@ public class InputService : MonoSingleton<InputService>
     }
 
     /// <summary>
-    /// 封装走和跑以及PC和安卓的区别的移动量
+    /// ???????????PC????????????????
     /// </summary>
     public Vector2 GetMoveHorizontalValue
     {
         get
         {
-            //安卓
+            //???
 #if UNITY_ANDROID
                 return inputMap.Player.Move.ReadValue<Vector2>();
-            //非安卓
+            //????
 #elif !UNITY_ANDROID
             Vector2 dir = inputMap.Player.Move.ReadValue<Vector2>();
             bool isShift = inputMap.Player.Shift.ReadValue<float>()!=0;
@@ -53,7 +53,7 @@ public class InputService : MonoSingleton<InputService>
                 return Vector2.zero;
             }
 #else
-                return 0f; // 默认值
+                return 0f; // ????
 #endif
         }
     }
@@ -118,5 +118,17 @@ public class InputService : MonoSingleton<InputService>
         }
     }
     public Vector2 Scroll =>inputMap.Player.Scroll.ReadValue<Vector2>();
+
+    public bool FireHeld => inputMap != null && inputMap.Player.Fire.ReadValue<float>() > 0f;
+
+    public bool ADSHeld => inputMap != null && inputMap.Player.ADS.ReadValue<float>() > 0f;
+
+    public bool CrouchHeld => inputMap != null && inputMap.Player.Crouch.ReadValue<float>() > 0f;
+
+    public bool ToggleWeaponWasPressedThisFrame =>
+        inputMap != null && inputMap.Player.ToggleWeapon.WasPressedThisFrame();
+
+    public bool HolsterWeaponWasPressedThisFrame =>
+        inputMap != null && inputMap.Player.HolsterWeapon.WasPressedThisFrame();
 
 }

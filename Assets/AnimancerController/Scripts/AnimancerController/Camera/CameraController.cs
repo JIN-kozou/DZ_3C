@@ -23,6 +23,8 @@ public class CameraController : MonoBehaviour
     private bool useOverrideDistance;
     private float overrideDistance;
     private float externalDistanceOffset;
+    private bool _weaponDistanceActive;
+    private float _weaponDistance;
 
     private void Awake()
     {
@@ -61,7 +63,24 @@ public class CameraController : MonoBehaviour
                 return;
             }
         }
-        float targetDistance = useOverrideDistance ? overrideDistance : currentDistance;
+        float targetDistance;
+        if (_weaponDistanceActive && useOverrideDistance)
+        {
+            targetDistance = Mathf.Min(overrideDistance, _weaponDistance);
+        }
+        else if (_weaponDistanceActive)
+        {
+            targetDistance = _weaponDistance;
+        }
+        else if (useOverrideDistance)
+        {
+            targetDistance = overrideDistance;
+        }
+        else
+        {
+            targetDistance = currentDistance;
+        }
+
         targetDistance += externalDistanceOffset;
         targetDistance = Mathf.Clamp(targetDistance, minDistance, maxDistance);
         virtualCamera.m_CameraDistance = Mathf.Lerp(virtualCamera.m_CameraDistance, targetDistance,Time.deltaTime* smoothness) ;
@@ -82,5 +101,15 @@ public class CameraController : MonoBehaviour
     {
         externalDistanceOffset = distanceOffset;
     }
- 
+
+    public void SetWeaponDistanceOverride(float targetDistance)
+    {
+        _weaponDistanceActive = true;
+        _weaponDistance = targetDistance;
+    }
+
+    public void ClearWeaponDistanceOverride()
+    {
+        _weaponDistanceActive = false;
+    }
 }

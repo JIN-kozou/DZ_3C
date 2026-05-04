@@ -68,6 +68,25 @@ public class CharacterBase : MonoBehaviour
         return transform.position.y + controller.center.y - controller.height * 0.5f;
     }
 
+    /// <summary>
+    /// 从当前 CharacterController 胶囊顶略偏下沿世界向上打射线；用于头顶净空（起跳/站起/攀爬等）。
+    /// </summary>
+    /// <param name="rayLength">射线长度（米），≤0 时不检测并返回 false。</param>
+    public bool RaycastCeilingAboveCapsule(float rayLength)
+    {
+        if (controller == null || !controller.enabled || rayLength <= 0f)
+        {
+            return false;
+        }
+
+        Vector3 origin = new Vector3(
+            controller.bounds.center.x,
+            controller.bounds.max.y - 0.02f,
+            controller.bounds.center.z);
+
+        return Physics.Raycast(origin, Vector3.up, rayLength, whatIsGround, QueryTriggerInteraction.Ignore);
+    }
+
     public void ApplyNumericConfig(PlayerNumericConfig config)
     {
         if (config == null)

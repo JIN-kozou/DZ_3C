@@ -88,6 +88,17 @@ public class PlayerReusableData
     public bool isInPlaceJump;
     //仅在明确按下跳跃后，才允许空中攀爬检测
     public bool canCheckClimbInAirAfterJump = false;
+
+    /// <summary>切换键打开：允许武器 Tick；主动关枪为 false。</summary>
+    public bool armedModeActive;
+    /// <summary>自 PlayerArmedState 因攀爬/死亡/下蹲互斥被踢出时置 true，占用结束后回到持枪。</summary>
+    public bool resumeArmedAfterBreak;
+    /// <summary>自持枪因下蹲互斥退出后，站起前禁止武器 Tick（与 <see cref="AllowsArmedWeaponActions"/> 一起用于恢复持枪）。</summary>
+    public bool weaponSuppressedUntilStandFromCrouch;
+    /// <summary>松开蹲键或自动低矮探头下蹲时因头顶阻挡保持下蹲；头顶按站起射线净空后由状态机自动设回站立。</summary>
+    public bool pendingStandWhenCrouchCeilingClears;
+    /// <summary>持枪/ADS 时下蹲：已收枪并先站直，站直且蹲键仍按住时再自动下蹲。</summary>
+    public bool pendingCrouchAfterStandHolster;
     //外力跳跃
     public float jumpExternalForce = 15;
 
@@ -105,4 +116,9 @@ public class PlayerReusableData
         lock_Y_ValueParameter = new SmoothedFloatParameter(animancerComponent, playerSO.playerParameterData.Lock_Y_ValueParameter, 0.3f);
     }
 
+    /// <summary>持枪、射击、ADS 仅允许在「几乎完全站立」时生效，与下蹲姿态互斥。</summary>
+    public bool AllowsArmedWeaponActions(float standEpsilon = 0.99f)
+    {
+        return standValueParameter != null && standValueParameter.CurrentValue >= standEpsilon;
+    }
 }

@@ -20,6 +20,7 @@ public class PlayerStateMachine : StateMachineBase
     public PlayerFallLoopState fallLoopState;
     public PlayerPlatformerUpState platformerUpState;
     public PlayerLandState landState;
+    public PlayerArmedState armedState;
     public PlayerStateMachine(Player player)
     {
         this.player = player;
@@ -32,6 +33,7 @@ public class PlayerStateMachine : StateMachineBase
         fallLoopState = new PlayerFallLoopState(this);
         platformerUpState = new PlayerPlatformerUpState(this);
         landState= new PlayerLandState(this);
+        armedState = new PlayerArmedState(this);
     }
     public override void ChangeState(IState targetState)
     {

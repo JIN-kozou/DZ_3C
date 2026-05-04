@@ -21,6 +21,11 @@ public class PlayerClimbState : PlayerMovementState
         climbData = playerSO.playerMovementData.PlayerClimbData;
     }
 
+    protected override bool ShouldApplyLowCeilingAutoCrouchOnGround()
+    {
+        return false;
+    }
+
     public override void OnEnter()
     {
         var clip = GetClimbAnimation();
@@ -111,6 +116,11 @@ public class PlayerClimbState : PlayerMovementState
     {
         Debug.Log("完成取消攀爬");
         ResetCC();
+        if (TryResumeArmedAfterClimb())
+        {
+            return;
+        }
+
         playerStateMachine.ChangeState(playerStateMachine.idleState);
     }
 
@@ -136,6 +146,11 @@ public class PlayerClimbState : PlayerMovementState
         // Ensure movement systems are restored even if the timing event is missed.
         ResetCC();
 
+        if (TryResumeArmedAfterClimb())
+        {
+            return;
+        }
+
         if (inputServer.Move != Vector2.zero)
         {
             if (inputServer.Shift)
@@ -150,6 +165,17 @@ public class PlayerClimbState : PlayerMovementState
         }
 
         OnStateDefaultEnd();
+    }
+
+    private bool TryResumeArmedAfterClimb()
+    {
+        if (reusableData.resumeArmedAfterBreak && reusableData.armedModeActive)
+        {
+            playerStateMachine.ChangeState(playerStateMachine.armedState);
+            return true;
+        }
+
+        return false;
     }
    
     public ClipTransition GetClimbAnimation()

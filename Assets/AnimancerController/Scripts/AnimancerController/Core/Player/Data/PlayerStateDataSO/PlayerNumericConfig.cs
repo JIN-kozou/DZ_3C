@@ -24,6 +24,12 @@ public class PlayerNumericConfig
     [Tooltip("下蹲时 CharacterController 中心（本地空间）。")]
     public Vector3 crouchControllerCenter = new Vector3(0f, 0.6f, 0f);
 
+    [Header("Character — Ceiling Check")]
+    [Tooltip("从当前 CharacterController 胶囊顶部向上的射线长度（米），用于：松蹲站起 / pending 净空站起 / 阻挡起跳 / 阻挡空中触发攀爬。命中 whatIsGround 视为有顶。≤0 关闭该组头顶检测。")]
+    [Min(0f)] public float crouchStandCeilingCheckRayLength = 1.2f;
+    [Tooltip("从胶囊顶部向上的射线长度（米），仅用于「地面头顶有障碍时自动下蹲」触发；净空站起仍由 crouchStandCeilingCheckRayLength 与 pending 逻辑处理。≤0 关闭自动下蹲触发。")]
+    [Min(0f)] public float lowCeilingAutoCrouchCheckRayLength = 1.2f;
+
     [Header("Gravity & Ground")]
     public float gravity = -12f;
     public Vector2 velocityLimit = new Vector2(-20f, 60f);

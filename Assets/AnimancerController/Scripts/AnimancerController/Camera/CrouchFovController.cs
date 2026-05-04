@@ -25,6 +25,8 @@ public class CrouchFovController : MonoBehaviour
     private float _authoringRecomposerTilt;
     private float _authoringRecomposerPan;
     private float _authoringRecomposerDutch;
+    private PlayerWeaponRuntime _weaponRuntime;
+    private WeaponViewKickRig _weaponKick;
 
     private void Awake()
     {
@@ -60,6 +62,35 @@ public class CrouchFovController : MonoBehaviour
         {
             player = FindObjectOfType<Player>();
         }
+
+        _weaponKick = GetComponent<WeaponViewKickRig>();
+        if (_weaponKick == null)
+        {
+            _weaponKick = gameObject.AddComponent<WeaponViewKickRig>();
+        }
+
+        if (player != null)
+        {
+            ResolveWeaponRuntime();
+        }
+    }
+
+    private void ResolveWeaponRuntime()
+    {
+        if (player == null)
+        {
+            return;
+        }
+
+        if (_weaponRuntime == null)
+        {
+            _weaponRuntime = player.WeaponRuntime;
+        }
+
+        if (_weaponRuntime == null)
+        {
+            _weaponRuntime = player.GetComponent<PlayerWeaponRuntime>();
+        }
     }
 
     private void LateUpdate()
@@ -69,6 +100,8 @@ public class CrouchFovController : MonoBehaviour
             return;
         }
 
+        ResolveWeaponRuntime();
+
         // standValue: 1 = standing, 0 = crouching.
         float standValue = player.ReusableData.standValueParameter.CurrentValue;
         var buffSnapshot = player.ReusableData.buffSnapshot;
@@ -76,7 +109,12 @@ public class CrouchFovController : MonoBehaviour
         _dizzyTime += Time.deltaTime * Mathf.Max(0f, buffSnapshot.dizzyFrequency);
         float dizzyWave = Mathf.Sin(_dizzyTime) * buffSnapshot.dizzyAmplitude;
         float dizzyFovOffset = dizzyWave + buffSnapshot.dizzyFovOffset;
-        float targetFov = (isCrouching ? crouchFov : _standFov) + dizzyFovOffset;
+        float baseFov = isCrouching ? crouchFov : _standFov;
+        bool ads = _weaponRuntime != null && _weaponRuntime.IsAds && _weaponRuntime.GunConfig != null;
+        float targetFov = ads
+            ? _weaponRuntime.GunConfig.adsFieldOfView + dizzyFovOffset
+            : baseFov + dizzyFovOffset;
+
         float t = 1f - Mathf.Exp(-changeSpeed * Time.deltaTime);
 
         var lens = _virtualCamera.m_Lens;
@@ -88,15 +126,36 @@ public class CrouchFovController : MonoBehaviour
             float pitchShake = Mathf.Sin(_dizzyTime * buffSnapshot.dizzyShakePitchFrequencyScale + 0f) * buffSnapshot.dizzyShakePitchAmplitude;
             float yawShake = Mathf.Sin(_dizzyTime * buffSnapshot.dizzyShakeYawFrequencyScale + 2.1f) * buffSnapshot.dizzyShakeYawAmplitude;
             float rollShake = Mathf.Sin(_dizzyTime * buffSnapshot.dizzyShakeRollFrequencyScale + 4.2f) * buffSnapshot.dizzyShakeRollAmplitude;
-            _recomposer.m_Tilt = _authoringRecomposerTilt + pitchShake + buffSnapshot.dizzyShakePitchOffset;
-            _recomposer.m_Pan = _authoringRecomposerPan + yawShake + buffSnapshot.dizzyShakeYawOffset;
-            _recomposer.m_Dutch = _authoringRecomposerDutch + rollShake + buffSnapshot.dizzyShakeRollOffset;
+            float vpTilt = 0f;
+            float vpPan = 0f;
+            if (_weaponRuntime != null)
+            {
+                Vector2 vpAim = _weaponRuntime.AimViewportRecoilOffset;
+                if (vpAim.sqrMagnitude > 1e-14f)
+                {
+                    float aspect = Camera.main != null ? Camera.main.aspect : (16f / 9f);
+                    WeaponViewportRecoilMath.ViewportOffsetToTiltPanDegrees(
+                        vpAim,
+                        lens.FieldOfView,
+                        aspect,
+                        out vpTilt,
+                        out vpPan);
+                }
+            }
+
+            float wTilt = _weaponKick != null ? _weaponKick.TiltKick : 0f;
+            float wPan = _weaponKick != null ? _weaponKick.PanKick : 0f;
+            float wDutch = _weaponKick != null ? _weaponKick.DutchKick : 0f;
+            _recomposer.m_Tilt = _authoringRecomposerTilt + pitchShake + buffSnapshot.dizzyShakePitchOffset + vpTilt + wTilt;
+            _recomposer.m_Pan = _authoringRecomposerPan + yawShake + buffSnapshot.dizzyShakeYawOffset + vpPan + wPan;
+            _recomposer.m_Dutch = _authoringRecomposerDutch + rollShake + buffSnapshot.dizzyShakeRollOffset + wDutch;
         }
 
         if (_cameraController != null)
         {
             float dizzyDistanceOffset = dizzyWave * dizzyDistanceScale;
-            _cameraController.SetExternalDistanceOffset(dizzyDistanceOffset);
+            float weaponZ = _weaponKick != null ? _weaponKick.ForwardZKick : 0f;
+            _cameraController.SetExternalDistanceOffset(dizzyDistanceOffset + weaponZ);
             if (isCrouching)
             {
                 _cameraController.SetOverrideDistance(crouchDistance);
@@ -105,6 +164,17 @@ public class CrouchFovController : MonoBehaviour
             {
                 _cameraController.ClearOverrideDistance();
             }
+
+            if (ads)
+            {
+                _cameraController.SetWeaponDistanceOverride(_weaponRuntime.GunConfig.adsCameraDistance);
+            }
+            else
+            {
+                _cameraController.ClearWeaponDistanceOverride();
+            }
         }
+
+        _weaponKick?.StepDecay(Time.deltaTime);
     }
 }
