@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc6de92c225c2804790254865ce71994, type: 3}
+  m_Name: Sky Material
+  m_EditorClassIdentifier: 
+  _seed: 6
+  _gamma: 1.141
+  _isSunOn: 0
+  _isPlanetOn: 0
+  _isDebrisOn: 1
+  _orientation: {x: -1.75, y: -0, z: -0.58}
+  _farStarDensity: 0.21
+  _farStarTwinkle: 0.53
+  _midStarDensity: 0.1
+  _midStarTwinkle: 0.5
+  _nearStarDensity: 0
+  _nebulaColorOffset: {r: 0.75629663, g: 0.2640322, b: 0.9433962, a: 1}
+  _sixSidedSkyboxMaterial: {fileID: 2100000, guid: 1ce746eab45682a42bbeeea21e016bbc,
+    type: 2}
+  _backgroundCubemap: {fileID: 8900000, guid: 9073b6658d89b694786b555c3fddb2f9, type: 2}
+  _backgroundCubemapTint: {r: 0.09147178, g: 0.10183558, b: 0.15723258, a: 1}
+  _backgroundCubemapExposure: 4
+  _underlayBlend: 0.261
+  _sunSize: 1
+  _sunCoronaSpeed: 0.47
+  _sunDirection: {x: 0, y: 0, z: -1}
+  _sunTint: {r: 1, g: 0.7928287, b: 0, a: 1}
+  _planetSize: 0
+  _planetDirection: {x: 0, y: 0, z: 1}
+  _planetTint: {r: 1, g: 0.5205, b: 0.25098038, a: 1}
+  _planetAtmosphereTint: {r: 0, g: 0.8, b: 0.28685609, a: 1}
+  _planetAtmosphereThickness: 0.12
+  _planetBrightness: 0.79
+  _planetAngle: 0.7
+  _planetSpeed: 1
+  _shadowAngle: 0.3
+  _shadowDepth: 0.25
+  _meteorsTint: {r: 0.7236116, g: 0.9528302, b: 0.8518387, a: 1}
+  _meteorsBrightness: 0.7
+  _meteorsSpeed: 0.7
