@@ -239,6 +239,7 @@ MonoBehaviour:
       crouchControllerCenter: {x: 0, y: 0.4, z: 0}
       crouchStandCeilingCheckRayLength: 0.6
       lowCeilingAutoCrouchCheckRayLength: 0.3
+      lowCeilingAutoCrouchPostStandPredictRayLength: 0.3
       gravity: -12
       velocityLimit: {x: -20, y: 60}
       groundDetectedOffset: -0.06
@@ -274,6 +275,98 @@ MonoBehaviour:
       mediumHighClimbMinHeight: 2
       mediumHighClimbMaxHeight: 2.5
       stateSwitchCooldown: 0.1
+      adsEnterAnimationSpeedScale: 0.5
+    <PlayerArmedAnimationData>k__BackingField:
+      upperBodyMask: {fileID: 31900000, guid: 992aa01284d31924fb7ca35b407686ad, type: 2}
+      locomotionBodyMask: {fileID: 0}
+      draw:
+        _FadeDuration: 0.25
+        _Speed: 1
+        _Events:
+          _NormalizedTimes: []
+          _Callbacks: []
+          _Names: []
+        _Clip: {fileID: 7400000, guid: 96dc985119db63e4cb8f63ac5e42a8e3, type: 2}
+        _NormalizedStartTime: NaN
+      armedIdle:
+        _FadeDuration: 0.25
+        _Speed: 1
+        _Events:
+          _NormalizedTimes: []
+          _Callbacks: []
+          _Names: []
+        _Clip: {fileID: 7400000, guid: 9ee80aca7bb62054dbd52a31ed4e0815, type: 2}
+        _NormalizedStartTime: NaN
+      holster:
+        _FadeDuration: 0.25
+        _Speed: 1
+        _Events:
+          _NormalizedTimes: []
+          _Callbacks: []
+          _Names: []
+        _Clip: {fileID: 7400000, guid: db4fc9dd7c3c704459d45ebb8f82f471, type: 2}
+        _NormalizedStartTime: NaN
+      upperBodyLayerWeight: 1
+      drawFadeInSeconds: 0.2
+      drawToIdleFadeSeconds: 0.15
+      ikFadeInSeconds: 0.2
+      ikFadeOutSeconds: 0.12
+      holsterExitToIdleLocomotionFadeSeconds: 0.28
+      holsterToBareHandsLocomotionFadeSeconds: 0.35
+      layerFadeOutSeconds: 0.2
+      holsterFadeInSeconds: 0.12
+      holsterFadeOutSeconds: 0.18
+      drawWeaponModelVisibleAtFrame: 30
+      holsterWeaponModelHiddenAtFrame: 26
+      adsEnter:
+        _FadeDuration: 0.25
+        _Speed: 1
+        _Events:
+          _NormalizedTimes: []
+          _Callbacks: []
+          _Names: []
+        _Clip: {fileID: 7400000, guid: a8a396a05b731a745af3c334779eedac, type: 2}
+        _NormalizedStartTime: NaN
+      adsFire:
+        _FadeDuration: 0.25
+        _Speed: 1
+        _Events:
+          _NormalizedTimes: []
+          _Callbacks: []
+          _Names: []
+        _Clip: {fileID: 7400000, guid: 8c2b31d342be1ba4fb765130cc361156, type: 2}
+        _NormalizedStartTime: NaN
+      adsExit:
+        _FadeDuration: 0.25
+        _Speed: 1
+        _Events:
+          _NormalizedTimes: []
+          _Callbacks: []
+          _Names: []
+        _Clip: {fileID: 7400000, guid: 5f30ed77033bfe14cba3c983d1e1295d, type: 2}
+        _NormalizedStartTime: NaN
+      adsIdle:
+        _FadeDuration: 0.25
+        _Speed: 1
+        _Events:
+          _NormalizedTimes: []
+          _Callbacks: []
+          _Names: []
+        _Clip: {fileID: 7400000, guid: 7408d013422a142418295ae70254da6a, type: 2}
+        _NormalizedStartTime: NaN
+      adsHold:
+        _FadeDuration: 0.25
+        _Speed: 1
+        _Events:
+          _NormalizedTimes: []
+          _Callbacks: []
+          _Names: []
+        _Clip: {fileID: 7400000, guid: 7408d013422a142418295ae70254da6a, type: 2}
+        _NormalizedStartTime: NaN
+      adsEnterFadeSeconds: 0.12
+      adsExitFadeSeconds: 0.2
+      adsFireFadeSeconds: 1
+      adsIdleCrossFadeSeconds: 0.1
   <playerParameterData>k__BackingField:
     <standValueParameter>k__BackingField: {fileID: 11400000, guid: 37d1b1f02016c7944bc41b1db63b957f,
       type: 2}

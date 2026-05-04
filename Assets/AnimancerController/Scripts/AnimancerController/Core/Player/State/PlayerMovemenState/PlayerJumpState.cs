@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class PlayerJumpState : PlayerMovementState
 {
@@ -35,7 +35,17 @@ public class PlayerJumpState : PlayerMovementState
         Debug.Log("惯性速度：" + reusableData.currentInertialVelocity / Mathf.Max(Time.deltaTime, 0.0001f));
 
         float jumpHeight = numericConfig != null ? numericConfig.defaultJumpHeight : 0.8f;
+        if (numericConfig != null && reusableData.jumpExternalForce > jumpHeight + 0.01f)
+        {
+            jumpHeight = reusableData.jumpExternalForce;
+        }
+
         player.ChangeVerticalSpeed(ToolFunction.GetJumpInitVelocity(jumpHeight, player.gravity));
+
+        if (numericConfig != null)
+        {
+            reusableData.jumpExternalForce = numericConfig.platformerJumpHeight;
+        }
 
         //禁用动画y位移
         player.ignoreRootMotionY = false;    

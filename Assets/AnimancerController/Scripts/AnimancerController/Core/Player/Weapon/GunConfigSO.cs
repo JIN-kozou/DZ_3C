@@ -7,6 +7,8 @@ public class GunConfigSO : ScriptableObject
     public float damage = 10f;
     [Tooltip("每秒发射弹数（例如 8 = 每秒 8 发，间隔 0.125s）。不要填成「秒间隔」。")]
     [Min(0.01f)] public float fireRate = 8f;
+    [Tooltip("勾选：按住开火键按射速连发。不勾选：点射，每次按下左键只会在该次按压的首帧尝试一发（按住不放不会连发）。")]
+    public bool fullAuto = false;
     [Tooltip("单次 Update 内最多发射几发，防止卡帧/切窗后一次性补射过多；高射速全自动可适当调大。")]
     [Min(1)] public int maxShotsPerTick = 6;
     [Min(1)] public int magazineSize = 30;

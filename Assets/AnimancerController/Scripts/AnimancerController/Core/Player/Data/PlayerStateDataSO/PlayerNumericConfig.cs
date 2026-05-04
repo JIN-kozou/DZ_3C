@@ -29,6 +29,8 @@ public class PlayerNumericConfig
     [Min(0f)] public float crouchStandCeilingCheckRayLength = 1.2f;
     [Tooltip("从胶囊顶部向上的射线长度（米），仅用于「地面头顶有障碍时自动下蹲」触发；净空站起仍由 crouchStandCeilingCheckRayLength 与 pending 逻辑处理。≤0 关闭自动下蹲触发。")]
     [Min(0f)] public float lowCeilingAutoCrouchCheckRayLength = 1.2f;
+    [Tooltip("从「配置中站立胶囊顶」沿世界向上射线长度（米），仅在 pending 净空站起时：若站起后仍会命中该射线，则暂不站起，避免站起瞬间再被自动下蹲拉回导致抽搐。≤0 关闭该预测（仅按站起射线净空）。")]
+    [Min(0f)] public float lowCeilingAutoCrouchPostStandPredictRayLength = 1.2f;
 
     [Header("Gravity & Ground")]
     public float gravity = -12f;
@@ -90,4 +92,8 @@ public class PlayerNumericConfig
 
     [Header("State Transition")]
     [Min(0f)] public float stateSwitchCooldown = 0.1f;
+
+    [Header("Weapon / ADS (动画)")]
+    [Tooltip("开镜进入动画播放速度倍率；越大开镜动画越快（乘在持枪上半身 adsEnter 片段的播放速度上）。")]
+    [Min(0.05f)] public float adsEnterAnimationSpeedScale = 1f;
 }

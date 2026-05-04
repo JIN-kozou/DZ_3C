@@ -91,8 +91,24 @@ public class PlayerReusableData
 
     /// <summary>切换键打开：允许武器 Tick；主动关枪为 false。</summary>
     public bool armedModeActive;
+
+    /// <summary>
+    /// 离开 <see cref="PlayerArmedState"/> 时若仍为持枪模式（如起跳/空中/落地），下次再进持枪则跳过掏枪、仅同步 Layer/Mask（不覆盖 Layer0 当前片段）。
+    /// 收枪、攀爬打断或 <see cref="PlayerArmedPresentation"/> 强制复位时会清零。
+    /// </summary>
+    public bool resumeArmedPresentationWithoutDraw;
     /// <summary>自 PlayerArmedState 因攀爬/死亡/下蹲互斥被踢出时置 true，占用结束后回到持枪。</summary>
     public bool resumeArmedAfterBreak;
+
+    /// <summary>主动收枪动画结束后进入 Idle 时覆写 Layer0 淡入（秒）；&lt;0 表示不覆写。</summary>
+    public float pendingHolsterExitToIdleLocomotionFadeSeconds = -1f;
+
+    public float ConsumePendingHolsterExitToIdleLocomotionFade()
+    {
+        float v = pendingHolsterExitToIdleLocomotionFadeSeconds;
+        pendingHolsterExitToIdleLocomotionFadeSeconds = -1f;
+        return v;
+    }
     /// <summary>自持枪因下蹲互斥退出后，站起前禁止武器 Tick（与 <see cref="AllowsArmedWeaponActions"/> 一起用于恢复持枪）。</summary>
     public bool weaponSuppressedUntilStandFromCrouch;
     /// <summary>松开蹲键或自动低矮探头下蹲时因头顶阻挡保持下蹲；头顶按站起射线净空后由状态机自动设回站立。</summary>
