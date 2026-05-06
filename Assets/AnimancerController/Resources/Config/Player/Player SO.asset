@@ -275,7 +275,7 @@ MonoBehaviour:
       mediumHighClimbMinHeight: 2
       mediumHighClimbMaxHeight: 2.5
       stateSwitchCooldown: 0.1
-      adsEnterAnimationSpeedScale: 0.5
+      adsEnterAnimationSpeedScale: 2
     <PlayerArmedAnimationData>k__BackingField:
       upperBodyMask: {fileID: 31900000, guid: 992aa01284d31924fb7ca35b407686ad, type: 2}
       locomotionBodyMask: {fileID: 0}
@@ -307,15 +307,15 @@ MonoBehaviour:
         _Clip: {fileID: 7400000, guid: db4fc9dd7c3c704459d45ebb8f82f471, type: 2}
         _NormalizedStartTime: NaN
       upperBodyLayerWeight: 1
-      drawFadeInSeconds: 0.2
-      drawToIdleFadeSeconds: 0.15
-      ikFadeInSeconds: 0.2
-      ikFadeOutSeconds: 0.12
-      holsterExitToIdleLocomotionFadeSeconds: 0.28
-      holsterToBareHandsLocomotionFadeSeconds: 0.35
-      layerFadeOutSeconds: 0.2
-      holsterFadeInSeconds: 0.12
-      holsterFadeOutSeconds: 0.18
+      drawFadeInSeconds: 0.3
+      drawToIdleFadeSeconds: 0.3
+      ikFadeInSeconds: 0.3
+      ikFadeOutSeconds: 0.3
+      holsterExitToIdleLocomotionFadeSeconds: 0.3
+      holsterToBareHandsLocomotionFadeSeconds: 0.3
+      layerFadeOutSeconds: 0.3
+      holsterFadeInSeconds: 0.3
+      holsterFadeOutSeconds: 0.3
       drawWeaponModelVisibleAtFrame: 30
       holsterWeaponModelHiddenAtFrame: 26
       adsEnter:
@@ -363,10 +363,10 @@ MonoBehaviour:
           _Names: []
         _Clip: {fileID: 7400000, guid: 7408d013422a142418295ae70254da6a, type: 2}
         _NormalizedStartTime: NaN
-      adsEnterFadeSeconds: 0.12
+      adsEnterFadeSeconds: 0.2
       adsExitFadeSeconds: 0.2
-      adsFireFadeSeconds: 1
-      adsIdleCrossFadeSeconds: 0.1
+      adsFireFadeSeconds: 0.2
+      adsIdleCrossFadeSeconds: 0.2
   <playerParameterData>k__BackingField:
     <standValueParameter>k__BackingField: {fileID: 11400000, guid: 37d1b1f02016c7944bc41b1db63b957f,
       type: 2}

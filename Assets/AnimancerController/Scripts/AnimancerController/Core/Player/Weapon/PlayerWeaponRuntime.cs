@@ -32,6 +32,9 @@ public class PlayerWeaponRuntime : MonoBehaviour
     public bool IsAds => _adsHeld;
     public int CurrentAmmo => _ammo;
 
+    /// <summary>本帧 <see cref="Tick"/> 内 <see cref="TryFireOneShot"/> 成功次数；在 <see cref="Tick"/> 开头归零，供 ADS 开火动画等与真实击发对齐。</summary>
+    public int SuccessfulShotsLastTick { get; private set; }
+
     /// <summary>Smoothed viewport offset for camera (eases toward recoil target each frame).</summary>
     public Vector2 AimViewportRecoilOffset => _recoilScreenOffsetSmoothed;
 
@@ -69,6 +72,8 @@ public class PlayerWeaponRuntime : MonoBehaviour
 
     public void Tick(float deltaTime)
     {
+        SuccessfulShotsLastTick = 0;
+
         if (_player == null || _player.ReusableData == null || _player.InputService == null)
         {
             return;
@@ -99,9 +104,15 @@ public class PlayerWeaponRuntime : MonoBehaviour
             return;
         }
 
-        _adsHeld = input.ADSHeld;
+        bool adsFromInput = input.ADSHeld;
+        if (_player.ArmedPresentation != null && !_player.ArmedPresentation.IsAdsInputAllowed)
+        {
+            adsFromInput = false;
+        }
 
-        bool presentationReady = _player.ArmedPresentation == null || _player.ArmedPresentation.IsUpperBodyReadyForWeapon;
+        _adsHeld = adsFromInput;
+
+        bool presentationReady = _player.ArmedPresentation == null || _player.ArmedPresentation.IsWeaponFireAllowed;
 
         _timeSinceLastShot += deltaTime;
         if (_timeSinceLastShot > gunConfig.recoilRecoveryDelay)
@@ -138,6 +149,7 @@ public class PlayerWeaponRuntime : MonoBehaviour
                     break;
                 }
 
+                SuccessfulShotsLastTick++;
                 firedThisTick++;
 
                 // NegativeInfinity + interval is still -Infinity (IEEE754); RefillMagazine resets to -Infinity, which would drain the whole mag in one frame.
@@ -155,6 +167,7 @@ public class PlayerWeaponRuntime : MonoBehaviour
         {
             if (TryFireOneShot())
             {
+                SuccessfulShotsLastTick++;
                 if (float.IsInfinity(_nextFireTime) || float.IsNaN(_nextFireTime))
                 {
                     _nextFireTime = Time.time + interval;

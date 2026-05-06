@@ -1,14 +1,34 @@
+using Animancer;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
 /// <summary>
-/// 持枪双手 IK：在角色上挂 <see cref="RigBuilder"/> + 左右 <see cref="TwoBoneIKConstraint"/>，Target 指向武器 grip 等 Transform；运行时仅由 <see cref="PlayerArmedPresentation"/> 调节 weight 与 RigBuilder.enabled。
+/// 持枪双手 IK：在角色上挂 <see cref="RigBuilder"/> + 左右 <see cref="TwoBoneIKConstraint"/>，Target 指向武器 grip 等 Transform；运行时由 <see cref="PlayerArmedPresentation"/> 调节 IK weight，以及整包 RigBuilder 或单层 <see cref="Rig"/> 的开关。
+/// Layer2 换片时由 Presentation 调用 <see cref="NotifyLayer2OverlayPlayed"/>；Layer0/1 换片由本组件在 <see cref="LateUpdate"/> 内比对 <see cref="AnimancerLayer.CommandCount"/> 触发同一套脊柱 Rig 过渡稳定（Layer0 默认关闭以免 locomotion 频繁触发）。
 /// </summary>
 [DisallowMultipleComponent]
+[DefaultExecutionOrder(50)]
 public class PlayerArmedHandIkRig : MonoBehaviour
 {
-    [SerializeField, Tooltip("可选。禁用时整段 Rig 不写入 PlayableGraph，省一点开销。")]
+    [SerializeField, Tooltip("用于解析 RigBuilder；指定「仅单层」模式时也会用来保持 builder 开启。")]
     private RigBuilder rigBuilder;
+
+    [SerializeField, Tooltip(
+        "指定后：持枪 IK 开关只改该 Rig 的 weight（0/1），不再关掉整个 RigBuilder，这样 RigBuilder 里其它 Rig 层（例如第一层）可一直参与求解。" +
+        "请拖入「持枪双手 IK 所在」的那一个 Rig（常见为 Rig Builder 列表里的第二项对应的 Rig 组件）。")]
+    private Rig armedIkRigLayerOnly;
+
+    [SerializeField, Tooltip(
+        "可选。影响脊柱等上身的 Rig 层（如 Rig Builder 中的 Rig1）。Layer2 Play 后由 Presentation 调用 Notify；Layer0/1 换片由本脚本 LateUpdate 检测 CommandCount；勿与「仅持枪 Rig 层」拖成同一 Rig。")]
+    private Rig spineRigLayerForLayer2Transition;
+
+    [SerializeField, Tooltip("Notify 后脊柱 Rig.weight 用 SmoothDamp 回到 1 的近似时长（秒）。建议约 0.08～0.18。")]
+    [Min(0.001f)]
+    private float spineRigLayer2TransitionSmoothTime = 0.12f;
+
+    [SerializeField, Tooltip("Notify 当帧立即设成的脊柱 Rig.weight 起点。若全 0 仍抽，可试 0.2～0.4 保留部分约束。")]
+    [Range(0f, 1f)]
+    private float spineRigMinWeightOnLayer2Play = 0f;
 
     [SerializeField, Tooltip("左手 Two Bone IK（Target 建议绑武器 grip 子物体）。")]
     private TwoBoneIKConstraint leftHandIk;
@@ -16,8 +36,259 @@ public class PlayerArmedHandIkRig : MonoBehaviour
     [SerializeField, Tooltip("右手 Two Bone IK。")]
     private TwoBoneIKConstraint rightHandIk;
 
+    [SerializeField, Tooltip("使用「仅持枪 Rig 层」时，Rig.weight 在开关之间的平滑时间（秒）。0 表示立即切换。")]
+    [Min(0f)]
+    private float armedRigLayerBlendSeconds = 0.1f;
+
+    [SerializeField, Tooltip("持枪分层时：Animancer Layer0（常见为 locomotion）CommandCount 变化时触发脊柱 Rig 稳定。易与跑走频繁换片叠加，默认关；若 Layer0 换片仍抽再开。")]
+    private bool watchLayer0CommandForSpineStabilizer;
+
+    [SerializeField, Tooltip("持枪分层时：Animancer Layer1（腰射/ADS idle）CommandCount 变化时触发脊柱 Rig 稳定。")]
+    private bool watchLayer1CommandForSpineStabilizer = true;
+
+    private Player _player;
+    private int _lastLayer0CommandCount;
+    private int _lastLayer1CommandCount;
+    private bool _layer01CommandBaselineCaptured;
+
+    private float _armedRigLayerSmoothedWeight;
+    private float _armedRigLayerTargetWeight;
+    private bool _armedRigLayerWeightsInitialized;
+
+    private float _spineRigSmoothedWeight = 1f;
+    private float _spineRigSmoothVelocity;
+    private bool _spineRigRecoverActive;
+    private bool _loggedSpineSameAsArmedRig;
+
+    private void Awake()
+    {
+        _player = GetComponentInParent<Player>();
+    }
+
+    private void OnEnable()
+    {
+        ResetLayer01CommandCountBaseline();
+        if (armedIkRigLayerOnly != null)
+        {
+            armedIkRigLayerOnly.weight = 0f;
+            _armedRigLayerSmoothedWeight = 0f;
+            _armedRigLayerTargetWeight = 0f;
+            _armedRigLayerWeightsInitialized = true;
+        }
+
+        _spineRigRecoverActive = false;
+        _spineRigSmoothVelocity = 0f;
+        if (spineRigLayerForLayer2Transition != null)
+        {
+            _spineRigSmoothedWeight = spineRigLayerForLayer2Transition.weight;
+        }
+        else
+        {
+            _spineRigSmoothedWeight = 1f;
+        }
+    }
+
+    private void Update()
+    {
+        TickSpineRigLayer2Recover();
+    }
+
+    private void LateUpdate()
+    {
+        TickSpineStabilizerFromLayer01CommandCounts();
+
+        if (armedIkRigLayerOnly == null || armedRigLayerBlendSeconds <= 0.0001f)
+        {
+            return;
+        }
+
+        float step = Time.deltaTime / armedRigLayerBlendSeconds;
+        _armedRigLayerSmoothedWeight = Mathf.MoveTowards(_armedRigLayerSmoothedWeight, _armedRigLayerTargetWeight, step);
+        armedIkRigLayerOnly.weight = _armedRigLayerSmoothedWeight;
+    }
+
+    /// <summary>
+    /// 由 <see cref="PlayerArmedPresentation"/> 在每次 Animancer Layer2 <c>Play</c> 之后立即调用，使脊柱 Rig 与换片在同一帧内先于后续 Rig 求解被压低。
+    /// </summary>
+    public void NotifyLayer2OverlayPlayed()
+    {
+        TriggerSpineRigOverlayTransitionStabilizer();
+    }
+
+    private void TriggerSpineRigOverlayTransitionStabilizer()
+    {
+        if (!CanRunSpineLayer2Stabilizer())
+        {
+            return;
+        }
+
+        float w = Mathf.Clamp01(spineRigMinWeightOnLayer2Play);
+        _spineRigSmoothedWeight = w;
+        _spineRigSmoothVelocity = 0f;
+        spineRigLayerForLayer2Transition.weight = w;
+        _spineRigRecoverActive = true;
+    }
+
+    private void ResetLayer01CommandCountBaseline()
+    {
+        _layer01CommandBaselineCaptured = false;
+    }
+
+    private void TickSpineStabilizerFromLayer01CommandCounts()
+    {
+        if (!watchLayer0CommandForSpineStabilizer && !watchLayer1CommandForSpineStabilizer)
+        {
+            return;
+        }
+
+        if (_player == null ||
+            _player.ArmedPresentation == null ||
+            !_player.ArmedPresentation.IsLayeredArmedAnimancerActive)
+        {
+            ResetLayer01CommandCountBaseline();
+            return;
+        }
+
+        if (!CanRunSpineLayer2Stabilizer())
+        {
+            ResetLayer01CommandCountBaseline();
+            return;
+        }
+
+        AnimancerComponent anim = _player.animancer;
+        if (anim == null || anim.Layers.Count < 2)
+        {
+            return;
+        }
+
+        if (!_layer01CommandBaselineCaptured)
+        {
+            if (watchLayer0CommandForSpineStabilizer && anim.Layers.Count > 0)
+            {
+                _lastLayer0CommandCount = anim.Layers[0].CommandCount;
+            }
+
+            if (watchLayer1CommandForSpineStabilizer)
+            {
+                _lastLayer1CommandCount = anim.Layers[1].CommandCount;
+            }
+
+            _layer01CommandBaselineCaptured = true;
+            return;
+        }
+
+        bool changed = false;
+        if (watchLayer0CommandForSpineStabilizer && anim.Layers.Count > 0 &&
+            anim.Layers[0].CommandCount != _lastLayer0CommandCount)
+        {
+            changed = true;
+            _lastLayer0CommandCount = anim.Layers[0].CommandCount;
+        }
+
+        if (watchLayer1CommandForSpineStabilizer &&
+            anim.Layers[1].CommandCount != _lastLayer1CommandCount)
+        {
+            changed = true;
+            _lastLayer1CommandCount = anim.Layers[1].CommandCount;
+        }
+
+        if (changed)
+        {
+            TriggerSpineRigOverlayTransitionStabilizer();
+        }
+    }
+
+    private bool CanRunSpineLayer2Stabilizer()
+    {
+        if (spineRigLayerForLayer2Transition == null)
+        {
+            return false;
+        }
+
+        if (armedIkRigLayerOnly != null &&
+            ReferenceEquals(spineRigLayerForLayer2Transition, armedIkRigLayerOnly))
+        {
+            if (!_loggedSpineSameAsArmedRig)
+            {
+                _loggedSpineSameAsArmedRig = true;
+                Debug.LogWarning(
+                    $"{nameof(PlayerArmedHandIkRig)}：{nameof(spineRigLayerForLayer2Transition)} 与 {nameof(armedIkRigLayerOnly)} 为同一 Rig，已跳过 Layer2 过渡稳定逻辑。",
+                    this);
+            }
+
+            return false;
+        }
+
+        RigBuilder parentBuilder = spineRigLayerForLayer2Transition.GetComponentInParent<RigBuilder>();
+        return parentBuilder != null && parentBuilder.enabled;
+    }
+
+    private void TickSpineRigLayer2Recover()
+    {
+        if (!_spineRigRecoverActive || spineRigLayerForLayer2Transition == null)
+        {
+            return;
+        }
+
+        RigBuilder parentBuilder = spineRigLayerForLayer2Transition.GetComponentInParent<RigBuilder>();
+        if (parentBuilder == null || !parentBuilder.enabled)
+        {
+            return;
+        }
+
+        float t = Mathf.Max(0.001f, spineRigLayer2TransitionSmoothTime);
+        _spineRigSmoothedWeight = Mathf.SmoothDamp(
+            _spineRigSmoothedWeight,
+            1f,
+            ref _spineRigSmoothVelocity,
+            t,
+            Mathf.Infinity,
+            Time.deltaTime);
+        spineRigLayerForLayer2Transition.weight = _spineRigSmoothedWeight;
+        if (_spineRigSmoothedWeight >= 0.999f)
+        {
+            spineRigLayerForLayer2Transition.weight = 1f;
+            _spineRigSmoothedWeight = 1f;
+            _spineRigRecoverActive = false;
+            _spineRigSmoothVelocity = 0f;
+        }
+    }
+
+    /// <summary>
+    /// 若配置了 <see cref="armedIkRigLayerOnly"/>：保持 <see cref="RigBuilder"/> 开启，只把该层 <see cref="Rig.weight"/> 置 0 或 1。
+    /// 否则：与旧版一致，整包 <see cref="RigBuilder.enabled"/>。
+    /// </summary>
     public void SetRigBuilderEnabled(bool enabled)
     {
+        if (armedIkRigLayerOnly != null)
+        {
+            RigBuilder builder = rigBuilder;
+            if (builder == null)
+            {
+                builder = armedIkRigLayerOnly.GetComponentInParent<RigBuilder>();
+            }
+
+            if (builder != null)
+            {
+                builder.enabled = true;
+            }
+
+            if (!_armedRigLayerWeightsInitialized)
+            {
+                _armedRigLayerSmoothedWeight = armedIkRigLayerOnly.weight;
+                _armedRigLayerWeightsInitialized = true;
+            }
+
+            _armedRigLayerTargetWeight = enabled ? 1f : 0f;
+            if (armedRigLayerBlendSeconds <= 0.0001f)
+            {
+                _armedRigLayerSmoothedWeight = _armedRigLayerTargetWeight;
+                armedIkRigLayerOnly.weight = _armedRigLayerTargetWeight;
+            }
+
+            return;
+        }
+
         if (rigBuilder != null)
         {
             rigBuilder.enabled = enabled;

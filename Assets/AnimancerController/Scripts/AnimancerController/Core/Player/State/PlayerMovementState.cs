@@ -128,6 +128,8 @@ public class PlayerMovementState : StateBase
             reusableData.weaponSuppressedUntilStandFromCrouch = false;
             reusableData.pendingCrouchAfterStandHolster = true;
             reusableData.standValueParameter.TargetValue = 1;
+            reusableData.suppressCameraArmedLocalOffset = true;
+            reusableData.pendingCameraPitchArmedOffsetHardStrip = true;
             return;
         }
 

@@ -235,7 +235,7 @@ public class PlayerReusableLogic
             climbConfirmCounter = 0;
             return;
         }
-        Vector2 moveInput = player.InputService.Move;
+        Vector2 moveInput = player.InputService.MoveDiscrete;
         if (moveInput.y <= 0)
         {
             climbConfirmCounter = 0;

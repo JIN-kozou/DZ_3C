@@ -17,6 +17,7 @@ public class PlayerArmedState : PlayerMovementState
     public override void OnEnter()
     {
         base.OnEnter();
+        reusableData.suppressCameraArmedLocalOffset = false;
         reusableData.resumeArmedAfterBreak = false;
         reusableData.weaponSuppressedUntilStandFromCrouch = false;
         var armedAnim = playerSO.playerMovementData.PlayerArmedAnimationData;
@@ -75,11 +76,13 @@ public class PlayerArmedState : PlayerMovementState
 
     private void OnCrouchFromArmed(InputAction.CallbackContext context)
     {
-        if (player.ArmedPresentation != null && player.ArmedPresentation.IsExiting)
+        if (player.ArmedPresentation == null || !player.ArmedPresentation.IsHolsterInputAllowed)
         {
             return;
         }
 
+        reusableData.suppressCameraArmedLocalOffset = true;
+        reusableData.pendingCameraPitchArmedOffsetHardStrip = true;
         player.ArmedPresentation.BeginArmedExit(() =>
         {
             reusableData.pendingStandWhenCrouchCeilingClears = false;
@@ -97,7 +100,7 @@ public class PlayerArmedState : PlayerMovementState
     /// </summary>
     private void TryEnterLocomotionIfMoveAlreadyHeld()
     {
-        if (!player.isOnGround.Value || inputServer.Move == Vector2.zero)
+        if (!player.isOnGround.Value || inputServer.MoveDiscrete == Vector2.zero)
         {
             return;
         }
@@ -114,12 +117,12 @@ public class PlayerArmedState : PlayerMovementState
 
     private void OnCheckMoveEnd(InputAction.CallbackContext context)
     {
-        if (inputServer.Move != Vector2.zero)
+        if (inputServer.MoveDiscrete != Vector2.zero)
         {
             return;
         }
 
-        if (player.ArmedPresentation != null && player.ArmedPresentation.IsExiting)
+        if (player.ArmedPresentation == null || !player.ArmedPresentation.IsHolsterInputAllowed)
         {
             return;
         }

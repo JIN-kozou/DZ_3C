@@ -1,4 +1,4 @@
-﻿
+
 using Animancer;
 using System;
 using System.Collections.Generic;
@@ -91,6 +91,15 @@ public class PlayerReusableData
 
     /// <summary>切换键打开：允许武器 Tick；主动关枪为 false。</summary>
     public bool armedModeActive;
+
+    /// <summary>
+    /// 攀爬打断、非收枪键的下蹲收枪等：禁止 <see cref="CameraPitchYOffset"/> 合成持枪本地位移（避免逻辑上已退出持枪表现但 armed 仍为 true 时偏移被加回）。
+    /// 在 <see cref="armedModeActive"/> 变为 false 时由相机脚本清除；再进 <see cref="PlayerArmedState"/> 时由持枪态 OnEnter 清除。
+    /// </summary>
+    public bool suppressCameraArmedLocalOffset;
+
+    /// <summary>下一帧由 <see cref="CameraPitchYOffset"/> 消费：从 transform 去掉已叠加的持枪分量并清平滑状态。</summary>
+    public bool pendingCameraPitchArmedOffsetHardStrip;
 
     /// <summary>
     /// 离开 <see cref="PlayerArmedState"/> 时若仍为持枪模式（如起跳/空中/落地），下次再进持枪则跳过掏枪、仅同步 Layer/Mask（不覆盖 Layer0 当前片段）。

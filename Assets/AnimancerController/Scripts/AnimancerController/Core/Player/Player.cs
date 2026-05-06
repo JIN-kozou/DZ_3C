@@ -26,6 +26,10 @@ public class Player : CharacterBase
     public PlayerWeaponRuntime WeaponRuntime { get; private set; }
     public PlayerArmedPresentation ArmedPresentation { get; private set; }
 
+    /// <summary>收枪协程未结束时不可再进入持枪分层（掏枪）；各状态切 <see cref="PlayerStateMachine.armedState"/> 前应检查。</summary>
+    public bool CanBeginArmedPresentationNow() =>
+        ArmedPresentation == null || ArmedPresentation.CanBeginArmedPresentation;
+
     [Header("Player Resources")]
     [SerializeField, Min(1f)] private float maxHealth = 100f;
     [SerializeField, Min(1f)] private float maxStamina = 100f;
@@ -108,16 +112,31 @@ public class Player : CharacterBase
         base.Update();
         BuffSystem?.Tick(Time.deltaTime);
         UpdateBuffDrivenValues();
+        TickMoveInputSmoothing();
         StateMachine?.OnUpdate();
         TryHolsterWeaponInputIfArmed();
-        TickArmedUpperBodyAdsIfNeeded();
+        // 先结算武器 Tick（SuccessfulShotsLastTick），再播 ADS 开火动画，避免未射出子弹仍播开火。
         WeaponRuntime?.Tick(Time.deltaTime);
+        TickArmedUpperBodyAdsIfNeeded();
         TryApplyPendingCrouchAfterStandHolster();
         TryResumeArmedAfterCrouchStand();
     }
 
+    void TickMoveInputSmoothing()
+    {
+        if (InputService == null)
+        {
+            return;
+        }
+
+        var numeric = playerSO?.playerMovementData?.PlayerNumericConfig;
+        bool enable = numeric == null || numeric.keyboardMoveInputSmoothing;
+        float smoothTime = numeric != null ? numeric.keyboardMoveSmoothTime : 0.12f;
+        InputService.TickMoveSmoothing(Time.deltaTime, smoothTime, enable);
+    }
+
     /// <summary>
-    /// 收枪键（如键盘 3）在任意持枪 locomotion 状态下都应生效；此前仅在 <see cref="PlayerArmedState"/> 内轮询，ADS 在跑循环时退出后按 3 无效。
+    /// 收枪键（如键盘 3）：掏枪动画未结束前、收枪协程进行中均忽略。
     /// </summary>
     private void TryHolsterWeaponInputIfArmed()
     {
@@ -150,7 +169,7 @@ public class Player : CharacterBase
             return;
         }
 
-        if (ArmedPresentation.IsExiting)
+        if (!ArmedPresentation.IsHolsterInputAllowed)
         {
             return;
         }
@@ -202,8 +221,14 @@ public class Player : CharacterBase
             ? playerSO.playerMovementData.PlayerNumericConfig.adsEnterAnimationSpeedScale
             : 1f;
 
+        bool adsHeld = InputService.ADSHeld;
+        if (!ArmedPresentation.IsAdsInputAllowed)
+        {
+            adsHeld = false;
+        }
+
         ArmedPresentation.TickUpperBodyAds(
-            InputService.ADSHeld,
+            adsHeld,
             InputService.FireHeld,
             InputService.FireWasPressedThisFrame,
             adsSpeedScale);
@@ -258,6 +283,11 @@ public class Player : CharacterBase
         ReusableData.weaponSuppressedUntilStandFromCrouch = false;
         if (ReusableData.resumeArmedAfterBreak && ReusableData.armedModeActive)
         {
+            if (!CanBeginArmedPresentationNow())
+            {
+                return;
+            }
+
             ReusableData.resumeArmedAfterBreak = false;
             StateMachine.ChangeState(StateMachine.armedState);
         }

@@ -62,6 +62,11 @@ public class PlayerMoveLoopState : PlayerMovementState
             return;
         }
 
+        if (!player.CanBeginArmedPresentationNow())
+        {
+            return;
+        }
+
         reusableData.armedModeActive = true;
         reusableData.resumeArmedAfterBreak = false;
         reusableData.weaponSuppressedUntilStandFromCrouch = false;
@@ -84,7 +89,7 @@ public class PlayerMoveLoopState : PlayerMovementState
 
     private void OnCheckInput()
     {
-        if (inputServer.Move != UnityEngine.Vector2.zero)
+        if (inputServer.MoveDiscrete != UnityEngine.Vector2.zero)
         {
             return;
         }

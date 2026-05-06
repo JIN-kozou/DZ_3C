@@ -8,6 +8,10 @@ public class PlayerNumericConfig
     public float walkSpeedParameter = 1f;
     public float runSpeedParameter = 2f;
     public float inAirMoveSpeed = 2f;
+    [Tooltip("键鼠下对离散 WASD 做 SmoothDamp，使 Move 向量接近摇杆手感；状态机门控仍用 MoveDiscrete。")]
+    public bool keyboardMoveInputSmoothing = true;
+    [Tooltip("键鼠移动输入平滑时间（秒）；仅当 keyboardMoveInputSmoothing 且当前 Move 来自键盘时生效。")]
+    [Min(0.0001f)] public float keyboardMoveSmoothTime = 0.12f;
 
     [Header("Character Controller — Stance")]
     [Tooltip("站立时 CharacterController 半径。")]
