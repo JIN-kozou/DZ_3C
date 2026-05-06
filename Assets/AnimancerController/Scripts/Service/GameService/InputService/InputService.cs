@@ -9,6 +9,11 @@ using UnityEngine.InputSystem;
 public class InputService : MonoSingleton<InputService>
 {
     public InputMap inputMap;
+
+    Vector2 _moveSmoothed;
+    Vector2 _moveSmoothVelocity;
+    bool _moveSmoothPrimed;
+
     protected override void Awake()
     {
         base.Awake();
@@ -17,6 +22,9 @@ public class InputService : MonoSingleton<InputService>
             inputMap = new InputMap();
         }
         inputMap.Enable();
+        _moveSmoothed = Vector2.zero;
+        _moveSmoothVelocity = Vector2.zero;
+        _moveSmoothPrimed = false;
     }
     private void OnDestroy()
     {
@@ -91,36 +99,93 @@ public class InputService : MonoSingleton<InputService>
         }
     }
 
-    public Vector2 Move
+    /// <summary>
+    /// 当前帧离散移动意图（-1/0/1），用于状态机门控、松键判定等，无平滑记忆。
+    /// </summary>
+    public Vector2 MoveDiscrete
     {
         get
         {
-            Vector2 vector2 = inputMap.Player.Move.ReadValue<Vector2>();
-            if (vector2.x > 0)
+            if (inputMap == null)
             {
-                vector2.x = 1;
+                return Vector2.zero;
             }
-            else if (vector2.x < 0)
-            {
-                vector2.x = -1;
-            }
-            else
-            {
-                vector2.x = 0;
-            }
-            if (vector2.y > 0)
-            {
-                vector2.y = 1;
-            }
-            else if (vector2.y < 0)
-            {
-                vector2.y = -1;
-            }
-            else
-            {
-                vector2.y = 0;
-            }
-            return vector2;
+
+            return QuantizeMove(inputMap.Player.Move.ReadValue<Vector2>());
+        }
+    }
+
+    /// <summary>
+    /// 平滑后的移动向量（键鼠摇杆模拟）；用于朝向、锁敌混合、空中输入等连续量。
+    /// 在 <see cref="TickMoveSmoothing"/> 之前读取时，与 <see cref="MoveDiscrete"/> 相同。
+    /// </summary>
+    public Vector2 Move => _moveSmoothPrimed ? _moveSmoothed : MoveDiscrete;
+
+    static Vector2 QuantizeMove(Vector2 vector2)
+    {
+        if (vector2.x > 0)
+        {
+            vector2.x = 1;
+        }
+        else if (vector2.x < 0)
+        {
+            vector2.x = -1;
+        }
+        else
+        {
+            vector2.x = 0;
+        }
+
+        if (vector2.y > 0)
+        {
+            vector2.y = 1;
+        }
+        else if (vector2.y < 0)
+        {
+            vector2.y = -1;
+        }
+        else
+        {
+            vector2.y = 0;
+        }
+
+        return vector2;
+    }
+
+    /// <summary>
+    /// 每帧由 <see cref="Player"/> 在状态机更新前调用，刷新 <see cref="Move"/>。
+    /// </summary>
+    public void TickMoveSmoothing(float deltaTime, float smoothTime, bool applyKeyboardSmoothing)
+    {
+        if (inputMap == null)
+        {
+            return;
+        }
+
+        Vector2 discrete = QuantizeMove(inputMap.Player.Move.ReadValue<Vector2>());
+        if (!_moveSmoothPrimed)
+        {
+            _moveSmoothed = discrete;
+            _moveSmoothVelocity = Vector2.zero;
+            _moveSmoothPrimed = true;
+            return;
+        }
+
+        bool fromKeyboard = inputMap.Player.Move.activeControl?.device is Keyboard;
+        if (applyKeyboardSmoothing && fromKeyboard && smoothTime > 0.0001f)
+        {
+            _moveSmoothed = Vector2.SmoothDamp(
+                _moveSmoothed,
+                discrete,
+                ref _moveSmoothVelocity,
+                smoothTime,
+                Mathf.Infinity,
+                deltaTime);
+        }
+        else
+        {
+            _moveSmoothed = discrete;
+            _moveSmoothVelocity = Vector2.zero;
         }
     }
     public Vector2 Scroll =>inputMap.Player.Scroll.ReadValue<Vector2>();

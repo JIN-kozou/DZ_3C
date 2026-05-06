@@ -4,15 +4,18 @@ using Animancer;
 using UnityEngine;
 
 /// <summary>
-/// 持枪 Animancer 双层：Layer0 不强制改片，与进入持枪前相同（idle / moveStart / moveLoop 等由上一状态已播内容延续）；
-/// 可选 <see cref="PlayerArmedAnimationData.locomotionBodyMask"/> 仅约束 Layer0 骨骼范围；Layer1 用 <see cref="PlayerArmedAnimationData.upperBodyMask"/> 播掏枪 / 腰射 idle / 收枪 / ADS。
-/// 离开持枪分层时会恢复 Layer0 为默认全身 Mask，避免影响其它状态的移动动画。
+/// 持枪 Animancer 三层：Layer0 下半身 locomotion；Layer1 腰射 <see cref="PlayerArmedAnimationData.armedIdle"/> 与 ADS idle 互切，其淡化与 Layer2 的 adsEnter / adsExit 同起止；
+/// Layer2 覆盖式播放掏枪 / 收枪 / ADS enter·exit·fire。掏枪时 Layer1 即开始播腰射 idle，与 Layer2 掏枪叠加，减少单层抢同一 Mask 的抽搐。
 /// </summary>
 [DisallowMultipleComponent]
 public class PlayerArmedPresentation : MonoBehaviour
 {
     [SerializeField, Tooltip("可选。实现 IArmedWeaponModelVisibility 的组件；为空时在角色子层级中查找第一个实现者。")]
     private MonoBehaviour weaponModelVisibilityOptional;
+
+    [SerializeField, Tooltip("Layer2 覆盖层权重向目标值逼近的平滑时间（秒）。收枪协程内仍逐帧手写 Layer2 权重，此插值会暂停。")]
+    [Min(0.001f)]
+    private float overlayUpperWeightSmoothTime = 0.12f;
 
     private Player _player;
     private AnimancerComponent _animancer;
@@ -27,6 +30,11 @@ public class PlayerArmedPresentation : MonoBehaviour
     private bool _layeredArmedActive;
     private bool _simpleMoveLoopOnly;
     private Coroutine _exitRoutine;
+    /// <summary>
+    /// 在 <c>_exitRoutine = StartCoroutine(...)</c> 赋值前即为 true：协程首段跑到第一个 yield 的同一帧内 <see cref="_exitRoutine"/> 仍为 null，
+    /// 否则 <see cref="TickOverlayUpperWeightSmoothing"/> 会误判未在收枪而把 Layer2 权重继续向旧 goal 平滑。
+    /// </summary>
+    private bool _armedExitCoroutinePending;
     private AnimancerState _drawOrHolsterState;
 
     /// <summary>右手 IK 平滑权重（掏枪结束后由 0 拉到 1；收枪协程里拉回 0）。左手见 <see cref="ComputeLeftHandIkWeight"/>。</summary>
@@ -39,13 +47,86 @@ public class PlayerArmedPresentation : MonoBehaviour
     private bool _adsExiting;
     private AnimancerState _adsEventState;
 
-    public bool IsExiting => _exitRoutine != null;
+    /// <summary>Layer2 上一段非循环动画结束时缓存的片段与时间，供下次 Play 前作为淡入起点。</summary>
+    private AnimationClip _layer2HoldClip;
+    private float _layer2HoldTime;
+    private bool _layer2HoldPoseStored;
+
+    private float _overlayUpperWeightGoal;
+    private float _overlayUpperWeightSmoothed;
+    private float _overlayUpperWeightVel;
+
+    /// <summary>1＝持枪本地位移 X 全额；收枪片段播放中由 1 线性减到 0；片段结束后保持 0 直至复位。</summary>
+    private float _holsterArmedOffsetXMultiplier = 1f;
+
+    /// <summary>上半身基类层（索引 1）：仅 armedIdle / adsIdle。</summary>
+    private AnimancerLayer UpperBodyBaseLayer =>
+        _animancer != null && _animancer.Layers.Count > 1 ? _animancer.Layers[1] : null;
+
+    /// <summary>上半身覆盖层（索引 2）：draw / holster / adsEnter / adsExit / adsFire。</summary>
+    private AnimancerLayer UpperBodyOverlayLayer =>
+        _animancer != null && _animancer.Layers.Count > 2 ? _animancer.Layers[2] : null;
+
+    public bool IsExiting => _exitRoutine != null || _armedExitCoroutinePending;
+
+    /// <summary>
+    /// 供 <see cref="CameraPitchYOffset"/> 等：收枪片段播放中持枪本地位移 X 系数（1→0）。
+    /// </summary>
+    public float HolsterArmedOffsetXMultiplier => _holsterArmedOffsetXMultiplier;
+
+    /// <summary>
+    /// 分层持枪且配置了 ADS 包时：掏枪动画未结束或收枪流程中不允许 ADS 输入（上半身与武器运行时共用此门控）。
+    /// 非分层 / 无 ADS 包时为 true，不改变其它模式行为。
+    /// </summary>
+    public bool IsAdsInputAllowed
+    {
+        get
+        {
+            if (!_layeredArmedActive || _simpleMoveLoopOnly || _data == null || !_data.HasAdsAnimationPack)
+            {
+                return true;
+            }
+
+            return _readyForUpperBodyGameplay && !IsExiting;
+        }
+    }
+
+    /// <summary>
+    /// 分层持枪且配置了完整 ADS 动画包时，镜头 FOV / 跟随距离应与 enter / exit 里程碑对齐，而非仅跟按键。
+    /// </summary>
+    public bool UsesAnimatedAdsCameraGates =>
+        _layeredArmedActive &&
+        _data != null &&
+        _data.HasAdsAnimationPack;
+
+    /// <summary>
+    /// 开镜镜头：enter（含提前衔接）结束后为 true；关镜时于 exit 片段播放前即变为 false，镜头先回腰射。
+    /// 仅在 <see cref="UsesAnimatedAdsCameraGates"/> 为真时由镜头脚本读取。
+    /// </summary>
+    public bool IsAdsCameraAimActive =>
+        _adsInPose &&
+        !_adsExiting;
 
     /// <summary>
     /// 分层持枪时掏枪已播完且上半身进入 idle（可腰射开火）；非分层或未启用分层时视为始终就绪。
     /// </summary>
     public bool IsUpperBodyReadyForWeapon =>
         !_layeredArmedActive || _simpleMoveLoopOnly || _readyForUpperBodyGameplay;
+
+    /// <summary>
+    /// 掏枪动画结束后且未处于收枪协程中；收枪键、松移动触发的收枪等用。
+    /// </summary>
+    public bool IsHolsterInputAllowed => IsUpperBodyReadyForWeapon && !IsExiting;
+
+    /// <summary>
+    /// 掏枪结束后且未在收枪流程中；腰射/全自动开火 Tick 用（收枪片段与后续淡出期间均禁止）。
+    /// </summary>
+    public bool IsWeaponFireAllowed => IsUpperBodyReadyForWeapon && !IsExiting;
+
+    /// <summary>
+    /// 收枪协程未占用时可开始新一轮持枪分层（掏枪）；防止收枪未播完就再次掏枪。
+    /// </summary>
+    public bool CanBeginArmedPresentation => !IsExiting;
 
     public void Init(Player player)
     {
@@ -99,6 +180,7 @@ public class PlayerArmedPresentation : MonoBehaviour
     {
         StopAllCoroutines();
         _exitRoutine = null;
+        _armedExitCoroutinePending = false;
         ClearDrawOrHolsterEndEvent();
         ForceResetVisuals();
     }
@@ -113,18 +195,26 @@ public class PlayerArmedPresentation : MonoBehaviour
         {
             StopCoroutine(_exitRoutine);
             _exitRoutine = null;
+            _armedExitCoroutinePending = false;
         }
 
         ClearDrawOrHolsterEndEvent();
         if (!preserveLayeredUpperBody)
         {
+            ResetHolsterArmedOffsetXMultiplier();
             ResetAdsPresentationState();
+            InvalidateLayer2HoldPose();
             _rightIkWeight = 0f;
             _rightIkWeightTarget = 0f;
 
             if (_animancer != null && _animancer.Layers.Count > 1)
             {
                 _animancer.Layers[1].Weight = 0f;
+            }
+
+            if (_animancer != null && _animancer.Layers.Count > 2)
+            {
+                ResetOverlayUpperWeightSmoothing(0f);
             }
 
             _handIk?.SetHandIkWeight(0f);
@@ -137,6 +227,7 @@ public class PlayerArmedPresentation : MonoBehaviour
         }
         else
         {
+            ResetHolsterArmedOffsetXMultiplier();
             ResetAdsPresentationState();
         }
     }
@@ -168,6 +259,12 @@ public class PlayerArmedPresentation : MonoBehaviour
             return;
         }
 
+        // 收枪协程未结束前不允许再次掏枪/进入持枪分层（此前会先 StopExit 打断收枪，与「播完前不能掏枪」冲突）。
+        if (IsExiting)
+        {
+            return;
+        }
+
         bool layeredConfigured = data != null && data.UseLayeredPresentation;
         if (!layeredConfigured && moveLoop == null)
         {
@@ -176,6 +273,10 @@ public class PlayerArmedPresentation : MonoBehaviour
 
         bool preserveUpper = resumeLayeredPresentationWithoutDraw && layeredConfigured;
         StopExitAndClearUpperBodyHardware(preserveUpper);
+        if (!preserveUpper)
+        {
+            InvalidateLayer2HoldPose();
+        }
 
         if (preserveUpper)
         {
@@ -184,7 +285,7 @@ public class PlayerArmedPresentation : MonoBehaviour
             _layeredArmedActive = true;
             _readyForUpperBodyGameplay = true;
 
-            _animancer.Layers.SetMinCount(2);
+            _animancer.Layers.SetMinCount(3);
             if (data.locomotionBodyMask != null)
             {
                 ApplyLocomotionMaskForLayer0(_animancer.Layers, data.locomotionBodyMask);
@@ -195,10 +296,13 @@ public class PlayerArmedPresentation : MonoBehaviour
             }
 
             _animancer.Layers.SetMask(1, data.upperBodyMask);
-            var upper = _animancer.Layers[1];
-            if (upper.Weight < 0.001f)
+            _animancer.Layers.SetMask(2, data.upperBodyMask);
+            var baseL = _animancer.Layers[1];
+            var overlayL = _animancer.Layers[2];
+            ResetOverlayUpperWeightSmoothing(0f);
+            if (baseL.Weight < 0.001f)
             {
-                upper.Weight = data.upperBodyLayerWeight;
+                baseL.Weight = data.upperBodyLayerWeight;
             }
 
             _handIk?.SetRigBuilderEnabled(true);
@@ -225,7 +329,7 @@ public class PlayerArmedPresentation : MonoBehaviour
             return;
         }
 
-        _animancer.Layers.SetMinCount(2);
+        _animancer.Layers.SetMinCount(3);
         if (data.locomotionBodyMask != null)
         {
             ApplyLocomotionMaskForLayer0(_animancer.Layers, data.locomotionBodyMask);
@@ -236,8 +340,14 @@ public class PlayerArmedPresentation : MonoBehaviour
         }
 
         _animancer.Layers.SetMask(1, data.upperBodyMask);
-        var upperLayer = _animancer.Layers[1];
-        upperLayer.Weight = 0f;
+        _animancer.Layers.SetMask(2, data.upperBodyMask);
+        var baseLayer = _animancer.Layers[1];
+        var overlayLayer = _animancer.Layers[2];
+        baseLayer.Weight = data.upperBodyLayerWeight;
+        ResetOverlayUpperWeightSmoothing(0f);
+
+        float idleFadeUnderDraw = Mathf.Max(0.01f, data.drawToIdleFadeSeconds);
+        baseLayer.Play(data.armedIdle, idleFadeUnderDraw);
 
         _handIk?.SetRigBuilderEnabled(true);
         _handIk?.SetHandIkWeight(0f);
@@ -253,13 +363,22 @@ public class PlayerArmedPresentation : MonoBehaviour
 
         _layeredArmedActive = true;
         float drawIn = Mathf.Max(0f, data.drawFadeInSeconds);
-        _drawOrHolsterState = drawIn > 0f
-            ? upperLayer.Play(data.draw, drawIn)
-            : upperLayer.Play(data.draw);
-        if (drawIn <= 0f && Mathf.Abs(upperLayer.Weight - data.upperBodyLayerWeight) > 0.001f)
+        if (drawIn <= 0f)
         {
-            upperLayer.Weight = data.upperBodyLayerWeight;
+            ResetOverlayUpperWeightSmoothing(data.upperBodyLayerWeight);
         }
+        else
+        {
+            SetOverlayUpperWeightGoal(data.upperBodyLayerWeight);
+        }
+
+        TryApplyLayer2HoldPoseBeforePlay(overlayLayer);
+        _drawOrHolsterState = drawIn > 0f
+            ? overlayLayer.Play(data.draw, drawIn)
+            : overlayLayer.Play(data.draw);
+        RestorePresentationOverlayLayerWeight(overlayLayer);
+        NotifyLayer2OverlayRigStabilizer();
+
         if (_drawOrHolsterState != null)
         {
             _drawOrHolsterState.Events(this).OnEnd = OnDrawFinished;
@@ -277,13 +396,26 @@ public class PlayerArmedPresentation : MonoBehaviour
             return;
         }
 
+        if (_readyForUpperBodyGameplay)
+        {
+            return;
+        }
+
+        CaptureLayer2HoldPoseFromState(_drawOrHolsterState);
         ClearDrawOrHolsterEndEvent();
         ResetAdsPresentationState();
-        var upper = _animancer.Layers[1];
-        upper.Weight = _data.upperBodyLayerWeight;
-        upper.Play(_data.armedIdle, _data.drawToIdleFadeSeconds);
+        var baseL = UpperBodyBaseLayer;
+        SetOverlayUpperWeightGoal(0f);
+
+        if (baseL != null)
+        {
+            baseL.Weight = _data.upperBodyLayerWeight;
+            baseL.Play(_data.armedIdle, _data.drawToIdleFadeSeconds);
+        }
+
         _rightIkWeightTarget = 1f;
         _readyForUpperBodyGameplay = true;
+        ResetHolsterArmedOffsetXMultiplier();
     }
 
     /// <summary>持枪且上半身就绪时由 <see cref="PlayerArmedState"/> 每帧调用；<paramref name="adsEnterSpeedScale"/> 来自角色数值配置。</summary>
@@ -299,13 +431,18 @@ public class PlayerArmedPresentation : MonoBehaviour
             return;
         }
 
-        var upper = _animancer.Layers[1];
+        var baseL = UpperBodyBaseLayer;
+        var overlayL = UpperBodyOverlayLayer;
+        if (baseL == null || overlayL == null)
+        {
+            return;
+        }
 
         if (!adsHeld)
         {
             if (_adsInPose || _adsEntering)
             {
-                TryBeginAdsExit(upper);
+                TryBeginAdsExit(overlayL);
             }
 
             return;
@@ -318,17 +455,22 @@ public class PlayerArmedPresentation : MonoBehaviour
 
         if (!_adsInPose && !_adsEntering)
         {
-            BeginAdsEnter(upper, adsEnterSpeedScale);
+            BeginAdsEnter(overlayL, adsEnterSpeedScale);
             return;
         }
 
         if (_adsEntering)
         {
+            // 实际收尾在 LateUpdate 中根据片段进度检测（Animancer 先于本脚本更新），避免仅依赖 OnEnd 时漏接 adsIdle。
             return;
         }
 
         if (fireHeld)
         {
+            int shotsThisFrame = _player != null && _player.WeaponRuntime != null
+                ? _player.WeaponRuntime.SuccessfulShotsLastTick
+                : 0;
+
             bool fireLooping = _data.adsFire.Clip != null && _data.adsFire.Clip.isLooping;
             if (fireLooping)
             {
@@ -339,48 +481,84 @@ public class PlayerArmedPresentation : MonoBehaviour
                     return;
                 }
 
+                if (shotsThisFrame <= 0)
+                {
+                    return;
+                }
+
                 ClearAdsEventState();
                 float fireIn = Mathf.Max(
                     _data.adsFireFadeSeconds,
                     _data.adsIdleCrossFadeSeconds * 0.5f);
-                _adsLoopingFireState = upper.Play(_data.adsFire, fireIn);
+                SetOverlayUpperWeightGoal(_data.upperBodyLayerWeight);
+                TryApplyLayer2HoldPoseBeforePlay(overlayL);
+                _adsLoopingFireState = overlayL.Play(_data.adsFire, fireIn);
+                RestorePresentationOverlayLayerWeight(overlayL);
+                NotifyLayer2OverlayRigStabilizer();
             }
             else if (firePressedThisFrame)
             {
+                if (shotsThisFrame <= 0)
+                {
+                    return;
+                }
+
                 _adsLoopingFireState = null;
                 ClearAdsEventState();
                 float fireIn = Mathf.Max(
                     _data.adsFireFadeSeconds,
                     _data.adsIdleCrossFadeSeconds * 0.5f);
-                var fireState = upper.Play(_data.adsFire, fireIn);
+                SetOverlayUpperWeightGoal(_data.upperBodyLayerWeight);
+                TryApplyLayer2HoldPoseBeforePlay(overlayL);
+                var fireState = overlayL.Play(_data.adsFire, fireIn);
+                RestorePresentationOverlayLayerWeight(overlayL);
+                NotifyLayer2OverlayRigStabilizer();
                 _adsEventState = fireState;
                 fireState.Events(this).OnEnd = OnAdsFireClipFinished;
             }
         }
-        else if (upper.CurrentState != null && upper.CurrentState.Clip == _data.adsFire.Clip)
+        else if (overlayL.CurrentState != null && overlayL.CurrentState.Clip == _data.adsFire.Clip)
         {
             _adsLoopingFireState = null;
             ClearAdsEventState();
             float backFade = Mathf.Max(_data.adsFireFadeSeconds, _data.adsIdleCrossFadeSeconds);
-            PlayAdsIdleOrFallback(upper, backFade);
+            SetOverlayUpperWeightGoal(0f);
+            PlayAdsIdleOrFallback(baseL, backFade);
         }
         else if (_adsInPose)
         {
-            EnsureAdsIdlePlaying(upper);
+            EnsureAdsIdlePlaying(baseL);
         }
     }
 
-    private void BeginAdsEnter(AnimancerLayer upper, float adsEnterSpeedScale)
+    private void BeginAdsEnter(AnimancerLayer overlayLayer, float adsEnterSpeedScale)
     {
+        if (!IsAdsInputAllowed)
+        {
+            return;
+        }
+
         ClearAdsEventState();
         _adsLoopingFireState = null;
         _adsEntering = true;
         _adsInPose = false;
-        var st = upper.Play(_data.adsEnter, _data.adsEnterFadeSeconds);
+        SetOverlayUpperWeightGoal(_data.upperBodyLayerWeight);
+        TryApplyLayer2HoldPoseBeforePlay(overlayLayer);
+        var st = overlayLayer.Play(_data.adsEnter, _data.adsEnterFadeSeconds);
+        RestorePresentationOverlayLayerWeight(overlayLayer);
+        NotifyLayer2OverlayRigStabilizer();
         float scale = Mathf.Max(0.05f, adsEnterSpeedScale);
         st.Speed = _data.adsEnter.Speed * scale;
         _adsEventState = st;
         st.Events(this).OnEnd = OnAdsEnterFinished;
+
+        // Layer1 腰射 idle → ADS idle 的过渡与 adsEnter 同起止，避免 enter 播完后再用长淡入接 idle。
+        var baseL = UpperBodyBaseLayer;
+        if (baseL != null)
+        {
+            float blendSeconds = GetAdsOverlayAlignedBaseBlendSeconds(st, _data.adsIdleCrossFadeSeconds);
+            PlayAdsIdleOrFallback(baseL, blendSeconds);
+        }
     }
 
     private void OnAdsEnterFinished()
@@ -390,11 +568,71 @@ public class PlayerArmedPresentation : MonoBehaviour
             return;
         }
 
+        CompleteAdsEnterToIdle();
+    }
+
+    /// <summary>
+    /// 开镜 enter 播完：切 ADS idle。由 OnEnd 与 LateUpdate 进度检测共用；第二次调用因 _adsEntering 已为 false 直接忽略。
+    /// </summary>
+    private void CompleteAdsEnterToIdle()
+    {
+        if (!_adsEntering ||
+            _data == null ||
+            !_layeredArmedActive ||
+            _animancer == null ||
+            _animancer.Layers.Count < 3)
+        {
+            return;
+        }
+
+        CaptureLayer2HoldPoseFromState(_adsEventState);
         ClearAdsEventState();
         _adsLoopingFireState = null;
         _adsEntering = false;
         _adsInPose = true;
-        PlayAdsIdleOrFallback(_animancer.Layers[1], _data.adsEnterFadeSeconds);
+        SetOverlayUpperWeightGoal(0f);
+
+        var baseL = UpperBodyBaseLayer;
+        if (baseL != null)
+        {
+            var idleTrans = ResolveAdsIdleTransition();
+            var idleClip = idleTrans != null && idleTrans.IsValid ? idleTrans.Clip : null;
+            var cur = baseL.CurrentState;
+            if (idleClip != null && (cur == null || cur.Clip != idleClip))
+            {
+                PlayAdsIdleOrFallback(baseL, Mathf.Max(0.01f, _data.adsIdleCrossFadeSeconds));
+            }
+        }
+    }
+
+    /// <summary>
+    /// 非循环 adsEnter：剩余时间 ≤ 衔接淡入时提前切入 adsIdle，与上一段尾部重叠交叉淡化（Animancer Play 权重互补）。
+    /// </summary>
+    private void TryCompleteAdsEnterByProgress()
+    {
+        if (!_adsEntering || _data == null || !_layeredArmedActive || _animancer == null || _animancer.Layers.Count < 3)
+        {
+            return;
+        }
+
+        var enterClip = _data.adsEnter != null ? _data.adsEnter.Clip : null;
+        if (enterClip == null || _adsEventState == null)
+        {
+            return;
+        }
+
+        if (_adsEventState.Clip != enterClip || _adsEventState.IsLooping)
+        {
+            return;
+        }
+
+        float overlapFade = Mathf.Max(_data.adsEnterFadeSeconds, _data.adsIdleCrossFadeSeconds);
+        if (!ShouldStartEarlyClipHandoff(_adsEventState, overlapFade))
+        {
+            return;
+        }
+
+        CompleteAdsEnterToIdle();
     }
 
     private void OnAdsFireClipFinished()
@@ -404,13 +642,33 @@ public class PlayerArmedPresentation : MonoBehaviour
             return;
         }
 
+        CompleteAdsFireToIdle();
+    }
+
+    /// <summary>
+    /// 点射等非循环 adsFire 播完接 ADS idle；与进度提前衔接共用，防 OnEnd 多次触发。
+    /// </summary>
+    private void CompleteAdsFireToIdle()
+    {
+        if (!_adsInPose || _data == null || !_layeredArmedActive || _animancer == null || _animancer.Layers.Count < 3)
+        {
+            return;
+        }
+
+        CaptureLayer2HoldPoseFromState(_adsEventState ?? _adsLoopingFireState);
         _adsLoopingFireState = null;
         ClearAdsEventState();
         float backFade = Mathf.Max(_data.adsFireFadeSeconds, _data.adsIdleCrossFadeSeconds);
-        PlayAdsIdleOrFallback(_animancer.Layers[1], backFade);
+        SetOverlayUpperWeightGoal(0f);
+
+        var baseL = UpperBodyBaseLayer;
+        if (baseL != null)
+        {
+            PlayAdsIdleOrFallback(baseL, backFade);
+        }
     }
 
-    private void TryBeginAdsExit(AnimancerLayer upper)
+    private void TryBeginAdsExit(AnimancerLayer overlayLayer)
     {
         if (_adsExiting || _data == null)
         {
@@ -422,21 +680,62 @@ public class PlayerArmedPresentation : MonoBehaviour
         _adsEntering = false;
         _adsInPose = false;
         _adsExiting = true;
-        var st = upper.Play(_data.adsExit, _data.adsExitFadeSeconds);
+        SetOverlayUpperWeightGoal(_data.upperBodyLayerWeight);
+        TryApplyLayer2HoldPoseBeforePlay(overlayLayer);
+        var st = overlayLayer.Play(_data.adsExit, _data.adsExitFadeSeconds);
+        RestorePresentationOverlayLayerWeight(overlayLayer);
+        NotifyLayer2OverlayRigStabilizer();
         _adsEventState = st;
         st.Events(this).OnEnd = OnAdsExitFinished;
+
+        // Layer1 ADS idle → 腰射 idle 与 adsExit 同起止。
+        var baseL = UpperBodyBaseLayer;
+        if (baseL != null && _data.armedIdle != null && _data.armedIdle.IsValid)
+        {
+            float blendSeconds = GetAdsOverlayAlignedBaseBlendSeconds(st, _data.adsIdleCrossFadeSeconds);
+            baseL.Play(_data.armedIdle, blendSeconds);
+        }
     }
 
     private void OnAdsExitFinished()
     {
-        if (_data == null || !_layeredArmedActive)
+        if (!_adsExiting || _data == null || !_layeredArmedActive)
         {
             return;
         }
 
+        CompleteAdsExitToHipIdle();
+    }
+
+    /// <summary>
+    /// 关镜 exit 播完：切腰射 armedIdle。Animancer OnEnd 可能多次触发，须用 _adsExiting 防重复 Play。
+    /// </summary>
+    private void CompleteAdsExitToHipIdle()
+    {
+        if (!_adsExiting ||
+            _data == null ||
+            !_layeredArmedActive ||
+            _animancer == null ||
+            _animancer.Layers.Count < 3)
+        {
+            return;
+        }
+
+        CaptureLayer2HoldPoseFromState(_adsEventState);
         ClearAdsEventState();
         _adsExiting = false;
-        _animancer.Layers[1].Play(_data.armedIdle, _data.adsExitFadeSeconds);
+        SetOverlayUpperWeightGoal(0f);
+
+        var baseL = UpperBodyBaseLayer;
+        if (baseL != null && _data.armedIdle != null && _data.armedIdle.IsValid)
+        {
+            var hipClip = _data.armedIdle.Clip;
+            var cur = baseL.CurrentState;
+            if (hipClip != null && (cur == null || cur.Clip != hipClip))
+            {
+                baseL.Play(_data.armedIdle, Mathf.Max(0.01f, _data.adsIdleCrossFadeSeconds));
+            }
+        }
     }
 
     private ClipTransition ResolveAdsIdleTransition()
@@ -472,11 +771,41 @@ public class PlayerArmedPresentation : MonoBehaviour
         }
 
         var idle = ResolveAdsIdleTransition();
-        if (upper.CurrentState == null || upper.CurrentState.Clip != idle.Clip)
+        var cur = upper.CurrentState;
+        if (cur == null || cur.Clip == idle.Clip)
         {
-            ClearAdsEventState();
-            upper.Play(idle, _data.adsIdleCrossFadeSeconds);
+            return;
         }
+
+        // 与 CompleteAdsEnterToIdle / 开火回落 使用一致的淡入时长，避免比当前淡入更短的二次 Play 触发 Animancer 重启淡入而抽搐。
+        float fade = GetFadeSecondsBlendingToAdsIdle(cur);
+        ClearAdsEventState();
+        upper.Play(idle, fade);
+    }
+
+    private float GetFadeSecondsBlendingToAdsIdle(AnimancerState cur)
+    {
+        if (_data == null)
+        {
+            return 0.1f;
+        }
+
+        if (cur == null || cur.Clip == null)
+        {
+            return _data.adsIdleCrossFadeSeconds;
+        }
+
+        if (_data.adsEnter != null && _data.adsEnter.IsValid && cur.Clip == _data.adsEnter.Clip)
+        {
+            return Mathf.Max(_data.adsEnterFadeSeconds, _data.adsIdleCrossFadeSeconds);
+        }
+
+        if (_data.adsFire != null && _data.adsFire.IsValid && cur.Clip == _data.adsFire.Clip)
+        {
+            return Mathf.Max(_data.adsFireFadeSeconds, _data.adsIdleCrossFadeSeconds);
+        }
+
+        return _data.adsIdleCrossFadeSeconds;
     }
 
     private void ResetAdsPresentationState()
@@ -499,6 +828,276 @@ public class PlayerArmedPresentation : MonoBehaviour
         _adsEventState = null;
     }
 
+    private void LateUpdate()
+    {
+        // AnimancerComponent 默认 ExecutionOrder 为 -5000，先于本组件更新；此处用 RemainingDuration 做「提前衔接」与 OnEnd 兜底。
+        TryCompleteDrawToArmedIdleByProgress();
+        TryCompleteAdsEnterByProgress();
+        TryCompleteAdsFireToIdleByProgress();
+        TryCompleteAdsExitByProgress();
+        TickOverlayUpperWeightSmoothing();
+    }
+
+    private void ResetOverlayUpperWeightSmoothing(float absoluteWeight)
+    {
+        _overlayUpperWeightGoal = absoluteWeight;
+        _overlayUpperWeightSmoothed = absoluteWeight;
+        _overlayUpperWeightVel = 0f;
+        if (UpperBodyOverlayLayer != null)
+        {
+            UpperBodyOverlayLayer.Weight = absoluteWeight;
+        }
+    }
+
+    private void SetOverlayUpperWeightGoal(float absoluteWeight)
+    {
+        _overlayUpperWeightGoal = absoluteWeight;
+    }
+
+    private void TickOverlayUpperWeightSmoothing()
+    {
+        if (!_layeredArmedActive || _simpleMoveLoopOnly || _data == null || IsExiting)
+        {
+            return;
+        }
+
+        var o = UpperBodyOverlayLayer;
+        if (o == null)
+        {
+            return;
+        }
+
+        float t = Mathf.Max(0.001f, overlayUpperWeightSmoothTime);
+        _overlayUpperWeightSmoothed = Mathf.SmoothDamp(
+            _overlayUpperWeightSmoothed,
+            _overlayUpperWeightGoal,
+            ref _overlayUpperWeightVel,
+            t,
+            Mathf.Infinity,
+            Time.deltaTime);
+        o.Weight = _overlayUpperWeightSmoothed;
+    }
+
+    private void InvalidateLayer2HoldPose()
+    {
+        _layer2HoldPoseStored = false;
+        _layer2HoldClip = null;
+        _layer2HoldTime = 0f;
+    }
+
+    private void CaptureLayer2HoldPoseFromState(AnimancerState state)
+    {
+        if (!_layeredArmedActive || state == null || state.Clip == null || state.Clip.isLooping)
+        {
+            return;
+        }
+
+        float length = state.Length > 1e-5f
+            ? state.Length
+            : (state.Clip.length > 1e-5f ? state.Clip.length : 0f);
+        if (length <= 1e-5f)
+        {
+            return;
+        }
+
+        _layer2HoldClip = state.Clip;
+        _layer2HoldTime = Mathf.Clamp(state.Time, 0f, length - 1e-5f);
+        _layer2HoldPoseStored = true;
+    }
+
+    private void TryApplyLayer2HoldPoseBeforePlay(AnimancerLayer overlay)
+    {
+        if (overlay == null || !_layer2HoldPoseStored || _layer2HoldClip == null || !_layeredArmedActive)
+        {
+            return;
+        }
+
+        AnimancerState holdSt = overlay.Play(_layer2HoldClip, 0f);
+        if (holdSt == null)
+        {
+            return;
+        }
+
+        float length = holdSt.Length > 1e-5f
+            ? holdSt.Length
+            : (_layer2HoldClip.length > 1e-5f ? _layer2HoldClip.length : 0f);
+        if (length > 1e-5f)
+        {
+            holdSt.Time = Mathf.Clamp(_layer2HoldTime, 0f, length - 1e-5f);
+        }
+        else
+        {
+            holdSt.Time = 0f;
+        }
+
+        holdSt.IsPlaying = false;
+        RestorePresentationOverlayLayerWeight(overlay);
+        NotifyLayer2OverlayRigStabilizer();
+    }
+
+    private void RestorePresentationOverlayLayerWeight(AnimancerLayer overlay)
+    {
+        if (overlay == null)
+        {
+            return;
+        }
+
+        overlay.Weight = _overlayUpperWeightSmoothed;
+    }
+
+    private void NotifyLayer2OverlayRigStabilizer()
+    {
+        _handIk?.NotifyLayer2OverlayPlayed();
+    }
+
+    /// <summary>
+    /// 非循环 adsExit：在剩余时间 ≤ 衔接淡入时提前切入腰射 armedIdle，与上一段尾部重叠交叉淡化。
+    /// </summary>
+    private void TryCompleteAdsExitByProgress()
+    {
+        if (!_adsExiting ||
+            _data == null ||
+            !_layeredArmedActive ||
+            _animancer == null ||
+            _animancer.Layers.Count < 3)
+        {
+            return;
+        }
+
+        var exitClip = _data.adsExit != null ? _data.adsExit.Clip : null;
+        if (exitClip == null || _adsEventState == null)
+        {
+            return;
+        }
+
+        if (_adsEventState.Clip != exitClip || _adsEventState.IsLooping)
+        {
+            return;
+        }
+
+        float overlapFade = Mathf.Max(_data.adsExitFadeSeconds, _data.adsIdleCrossFadeSeconds);
+        if (!ShouldStartEarlyClipHandoff(_adsEventState, overlapFade))
+        {
+            return;
+        }
+
+        CompleteAdsExitToHipIdle();
+    }
+
+    /// <summary>
+    /// 非循环 adsFire：提前衔接回 ADS idle（与 OnAdsFireClipFinished 相同目标）。
+    /// </summary>
+    private void TryCompleteAdsFireToIdleByProgress()
+    {
+        if (!_adsInPose ||
+            _adsEntering ||
+            _adsExiting ||
+            _data == null ||
+            !_layeredArmedActive ||
+            _animancer == null ||
+            _animancer.Layers.Count < 3)
+        {
+            return;
+        }
+
+        var fireClip = _data.adsFire != null ? _data.adsFire.Clip : null;
+        if (fireClip == null || _adsEventState == null)
+        {
+            return;
+        }
+
+        if (_adsEventState.Clip != fireClip || _adsEventState.IsLooping)
+        {
+            return;
+        }
+
+        float overlapFade = Mathf.Max(_data.adsFireFadeSeconds, _data.adsIdleCrossFadeSeconds);
+        if (!ShouldStartEarlyClipHandoff(_adsEventState, overlapFade))
+        {
+            return;
+        }
+
+        CompleteAdsFireToIdle();
+    }
+
+    /// <summary>
+    /// 掏枪 draw：在剩余时间 ≤ draw→idle 淡入秒数时提前切入 armedIdle。
+    /// </summary>
+    private void TryCompleteDrawToArmedIdleByProgress()
+    {
+        if (!_layeredArmedActive ||
+            _simpleMoveLoopOnly ||
+            _data == null ||
+            _readyForUpperBodyGameplay ||
+            _animancer == null ||
+            _animancer.Layers.Count < 3)
+        {
+            return;
+        }
+
+        if (_data.draw == null || !_data.draw.IsValid || _drawOrHolsterState == null)
+        {
+            return;
+        }
+
+        if (_drawOrHolsterState.Clip != _data.draw.Clip || _drawOrHolsterState.IsLooping)
+        {
+            return;
+        }
+
+        float overlapFade = Mathf.Max(0.0001f, _data.drawToIdleFadeSeconds);
+        if (!ShouldStartEarlyClipHandoff(_drawOrHolsterState, overlapFade))
+        {
+            return;
+        }
+
+        OnDrawFinished();
+    }
+
+    /// <summary>
+    /// 当前非循环片段剩余播放时间（按 EffectiveSpeed）是否已进入与下一段的交叉淡化窗口。
+    /// </summary>
+    private static bool ShouldStartEarlyClipHandoff(AnimancerState state, float overlapFadeSeconds)
+    {
+        if (state == null || state.IsLooping || !state.IsPlaying)
+        {
+            return false;
+        }
+
+        overlapFadeSeconds = Mathf.Max(0.0001f, overlapFadeSeconds);
+        return state.RemainingDuration <= overlapFadeSeconds + 0.001f;
+    }
+
+    /// <summary>
+    /// Layer1 与 Layer2 的 adsEnter/adsExit 对齐的淡化秒数：优先用当前状态的 RemainingDuration，异常时用片段长度/速度或回退值。
+    /// </summary>
+    private static float GetAdsOverlayAlignedBaseBlendSeconds(AnimancerState st, float fallbackSeconds)
+    {
+        if (st == null)
+        {
+            return Mathf.Max(0.01f, fallbackSeconds);
+        }
+
+        float rd = st.RemainingDuration;
+        if (rd > 0.01f && !float.IsInfinity(rd) && !float.IsNaN(rd))
+        {
+            return rd;
+        }
+
+        float spd = Mathf.Abs(st.EffectiveSpeed);
+        if (spd < 0.001f)
+        {
+            spd = 1f;
+        }
+
+        if (!st.IsLooping && st.Length > 1e-5f)
+        {
+            return Mathf.Max(0.01f, st.Length / spd);
+        }
+
+        return Mathf.Max(0.01f, fallbackSeconds);
+    }
+
     private void Update()
     {
         if (!_layeredArmedActive || _data == null || _simpleMoveLoopOnly)
@@ -506,8 +1105,7 @@ public class PlayerArmedPresentation : MonoBehaviour
             return;
         }
 
-        var upper = _animancer.Layers.Count > 1 ? _animancer.Layers[1] : null;
-        var cur = upper != null ? upper.CurrentState : null;
+        var ikDrivingState = ResolveHandIkDrivingState();
 
         float dt = Time.deltaTime;
         float speedIn = _data.ikFadeInSeconds > 0f ? dt / _data.ikFadeInSeconds : 1f;
@@ -515,11 +1113,27 @@ public class PlayerArmedPresentation : MonoBehaviour
         float delta = _rightIkWeightTarget > _rightIkWeight ? speedIn : speedOut;
         _rightIkWeight = Mathf.MoveTowards(_rightIkWeight, _rightIkWeightTarget, delta);
 
-        float leftW = ComputeLeftHandIkWeight(cur);
+        float leftW = ComputeLeftHandIkWeight(ikDrivingState);
         _handIk?.SetLeftHandIkWeight(leftW);
         _handIk?.SetRightHandIkWeight(_rightIkWeight);
-        TickWeaponModelVisibility(cur);
+        TickWeaponModelVisibility(ikDrivingState);
         TickCrouchWeaponModelVisibility();
+    }
+
+    /// <summary>掏枪/收枪/ADS 覆盖层在播时优先用其状态驱动 IK 与武器显隐时间轴。</summary>
+    private AnimancerState ResolveHandIkDrivingState()
+    {
+        if (_drawOrHolsterState != null && _drawOrHolsterState.IsPlaying)
+        {
+            return _drawOrHolsterState;
+        }
+
+        if (_adsEventState != null && _adsEventState.IsPlaying)
+        {
+            return _adsEventState;
+        }
+
+        return UpperBodyBaseLayer != null ? UpperBodyBaseLayer.CurrentState : null;
     }
 
     private void TickWeaponModelVisibility(AnimancerState cur)
@@ -544,13 +1158,14 @@ public class PlayerArmedPresentation : MonoBehaviour
             return;
         }
 
-        if (cur == null || cur.Clip == null || cur.Clip != _data.draw.Clip)
+        var drawState = _drawOrHolsterState;
+        if (drawState == null || drawState.Clip == null || drawState.Clip != _data.draw.Clip)
         {
             return;
         }
 
         float threshold = FrameIndexToClipTimeSeconds(_data.draw.Clip, _data.drawWeaponModelVisibleAtFrame);
-        if (cur.Time >= threshold)
+        if (drawState.Time >= threshold)
         {
             ApplyWeaponModelVisible(true);
             _weaponShownForCurrentDraw = true;
@@ -621,13 +1236,14 @@ public class PlayerArmedPresentation : MonoBehaviour
             return;
         }
 
-        if (cur == null || cur.Clip == null || cur.Clip != _data.holster.Clip)
+        var holsterState = _drawOrHolsterState;
+        if (holsterState == null || holsterState.Clip == null || holsterState.Clip != _data.holster.Clip)
         {
             return;
         }
 
         float threshold = FrameIndexToClipTimeSeconds(_data.holster.Clip, _data.holsterWeaponModelHiddenAtFrame);
-        if (cur.Time >= threshold)
+        if (holsterState.Time >= threshold)
         {
             ApplyWeaponModelVisible(false);
             _weaponHiddenForCurrentHolster = true;
@@ -685,13 +1301,19 @@ public class PlayerArmedPresentation : MonoBehaviour
         return Mathf.Clamp01(cur.NormalizedTime);
     }
 
-    /// <summary>收枪或离开持枪：先播可选 holster，再淡出 Layer1，等待 IK 归零后回调。</summary>
+    private void ResetHolsterArmedOffsetXMultiplier()
+    {
+        _holsterArmedOffsetXMultiplier = 1f;
+    }
+
+    /// <summary>收枪或离开持枪：协程内先播可选 holster（再同步 Layer2 权重），收枪结束后再收 IK、淡出 Layer1，最后回调。</summary>
     public void BeginArmedExit(Action onComplete)
     {
         if (_exitRoutine != null)
         {
             StopCoroutine(_exitRoutine);
             _exitRoutine = null;
+            _armedExitCoroutinePending = false;
         }
 
         float holsterEndToIdleLocomotionFade = ReadCombinedHolsterToIdleLocomotionFade(_player);
@@ -709,6 +1331,7 @@ public class PlayerArmedPresentation : MonoBehaviour
         }
 
         ResetAdsPresentationState();
+        _armedExitCoroutinePending = true;
         _exitRoutine = StartCoroutine(CoArmedExit(onComplete, holsterEndToIdleLocomotionFade));
     }
 
@@ -736,11 +1359,22 @@ public class PlayerArmedPresentation : MonoBehaviour
 
     private IEnumerator CoArmedExit(Action onComplete, float holsterEndToIdleLocomotionFade)
     {
+        ResetHolsterArmedOffsetXMultiplier();
         ClearDrawOrHolsterEndEvent();
         ResetAdsPresentationState();
-        _rightIkWeightTarget = 0f;
 
-        var upper = _animancer.Layers[1];
+        if (_animancer == null)
+        {
+            _armedExitCoroutinePending = false;
+            _exitRoutine = null;
+            onComplete?.Invoke();
+            yield break;
+        }
+
+        _animancer.Layers.SetMinCount(3);
+        var baseL = UpperBodyBaseLayer;
+        var overlayL = UpperBodyOverlayLayer;
+
         _weaponHiddenForCurrentHolster = false;
         if (_data.HasHolsterTransition)
         {
@@ -750,13 +1384,20 @@ public class PlayerArmedPresentation : MonoBehaviour
                 _weaponHiddenForCurrentHolster = true;
             }
 
-            float holsterUpperStartW = Mathf.Max(upper.Weight, 0.0001f);
-            if (Mathf.Approximately(upper.Weight, 0f))
+            float holsterOverlayStartW = Mathf.Max(overlayL.Weight, 0.0001f);
+            if (Mathf.Approximately(overlayL.Weight, 0f))
             {
-                holsterUpperStartW = _data.upperBodyLayerWeight;
+                holsterOverlayStartW = _data.upperBodyLayerWeight;
             }
 
-            _drawOrHolsterState = upper.Play(_data.holster, _data.holsterFadeInSeconds);
+            // 先启动收枪片段，再同步 Layer2 权重/平滑目标，避免在换片前改层级权重与额外 Play（hold）过渡抢在收枪动画之前。
+            _drawOrHolsterState = overlayL.Play(_data.holster, _data.holsterFadeInSeconds);
+            _overlayUpperWeightSmoothed = holsterOverlayStartW;
+            _overlayUpperWeightGoal = holsterOverlayStartW;
+            _overlayUpperWeightVel = 0f;
+            RestorePresentationOverlayLayerWeight(overlayL);
+            overlayL.Weight = holsterOverlayStartW;
+            NotifyLayer2OverlayRigStabilizer();
             if (_drawOrHolsterState != null)
             {
                 bool ended = false;
@@ -769,6 +1410,8 @@ public class PlayerArmedPresentation : MonoBehaviour
                 float holsterFadeOut = Mathf.Max(0f, _data.holsterFadeOutSeconds);
                 while (!ended && _drawOrHolsterState != null && _drawOrHolsterState.IsPlaying)
                 {
+                    _holsterArmedOffsetXMultiplier = 1f - GetUpperLayerClipProgress01(_drawOrHolsterState);
+
                     if (holsterFadeOut > 0.0001f && _drawOrHolsterState.Length > 0.0001f)
                     {
                         double timeRemaining = _drawOrHolsterState.Length - _drawOrHolsterState.Time;
@@ -777,18 +1420,24 @@ public class PlayerArmedPresentation : MonoBehaviour
                             float k = holsterFadeOut > 0.0001f
                                 ? Mathf.Clamp01((float)(timeRemaining / holsterFadeOut))
                                 : 0f;
-                            upper.Weight = Mathf.Lerp(0f, holsterUpperStartW, k);
+                            overlayL.Weight = Mathf.Lerp(0f, holsterOverlayStartW, k);
                         }
                         else
                         {
-                            upper.Weight = holsterUpperStartW;
+                            overlayL.Weight = holsterOverlayStartW;
                         }
                     }
 
                     yield return null;
                 }
 
+                CaptureLayer2HoldPoseFromState(_drawOrHolsterState);
                 ClearDrawOrHolsterEndEvent();
+                _holsterArmedOffsetXMultiplier = 0f;
+            }
+            else
+            {
+                _holsterArmedOffsetXMultiplier = 0f;
             }
 
             if (_data.holsterWeaponModelHiddenAtFrame > 0 && !_weaponHiddenForCurrentHolster)
@@ -803,17 +1452,23 @@ public class PlayerArmedPresentation : MonoBehaviour
             _weaponHiddenForCurrentHolster = true;
         }
 
+        // 收枪片段结束后再收 IK，避免与「先播退出动画、再动层级」的顺序冲突。
+        _rightIkWeightTarget = 0f;
+
+        overlayL.Weight = 0f;
+        ResetOverlayUpperWeightSmoothing(0f);
+
         float layerOut = Mathf.Max(0.0001f, _data.layerFadeOutSeconds);
-        float startW = upper.Weight;
+        float startW = baseL.Weight;
         float t = 0f;
         while (t < 1f)
         {
             t += Time.deltaTime / layerOut;
-            upper.Weight = Mathf.Lerp(startW, 0f, Mathf.Clamp01(t));
+            baseL.Weight = Mathf.Lerp(startW, 0f, Mathf.Clamp01(t));
             yield return null;
         }
 
-        upper.Weight = 0f;
+        baseL.Weight = 0f;
         while (_rightIkWeight > 0.001f)
         {
             yield return null;
@@ -823,6 +1478,7 @@ public class PlayerArmedPresentation : MonoBehaviour
         _handIk?.SetRigBuilderEnabled(false);
         ForceResetVisuals();
 
+        _armedExitCoroutinePending = false;
         _exitRoutine = null;
         QueueHolsterExitToIdleLocomotionFade(holsterEndToIdleLocomotionFade);
         onComplete?.Invoke();
@@ -842,7 +1498,9 @@ public class PlayerArmedPresentation : MonoBehaviour
     /// <summary>清 Layer 事件、Layer1 权重与内部标记；不停止正在运行的收枪协程（由 <see cref="BeginArmedExit"/> 管理）。</summary>
     public void ForceResetVisuals()
     {
+        InvalidateLayer2HoldPose();
         ClearDrawOrHolsterEndEvent();
+        ResetHolsterArmedOffsetXMultiplier();
         ResetAdsPresentationState();
         _layeredArmedActive = false;
         _simpleMoveLoopOnly = false;
@@ -858,6 +1516,11 @@ public class PlayerArmedPresentation : MonoBehaviour
         if (_animancer != null && _animancer.Layers.Count > 1)
         {
             _animancer.Layers[1].Weight = 0f;
+        }
+
+        if (_animancer != null && _animancer.Layers.Count > 2)
+        {
+            ResetOverlayUpperWeightSmoothing(0f);
         }
 
         _handIk?.SetHandIkWeight(0f);
@@ -879,11 +1542,17 @@ public class PlayerArmedPresentation : MonoBehaviour
     {
         StopAllCoroutines();
         _exitRoutine = null;
+        _armedExitCoroutinePending = false;
         ClearDrawOrHolsterEndEvent();
         ResetAdsPresentationState();
         _readyForUpperBodyGameplay = false;
         _handIk?.SetRigBuilderEnabled(false);
         _handIk?.SetHandIkWeight(0f);
         ForceResetVisuals();
+        if (_player != null && _player.ReusableData != null)
+        {
+            _player.ReusableData.suppressCameraArmedLocalOffset = true;
+            _player.ReusableData.pendingCameraPitchArmedOffsetHardStrip = true;
+        }
     }
 }

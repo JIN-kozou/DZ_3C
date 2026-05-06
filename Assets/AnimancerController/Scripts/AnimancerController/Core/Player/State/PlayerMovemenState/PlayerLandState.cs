@@ -68,6 +68,11 @@ public class PlayerLandState : PlayerMovementState
             return;
         }
 
+        if (!player.CanBeginArmedPresentationNow())
+        {
+            return;
+        }
+
         reusableData.armedModeActive = true;
         reusableData.resumeArmedAfterBreak = false;
         reusableData.weaponSuppressedUntilStandFromCrouch = false;
@@ -79,8 +84,11 @@ public class PlayerLandState : PlayerMovementState
     {
         if (reusableData.armedModeActive && reusableData.AllowsArmedWeaponActions())
         {
-            playerStateMachine.ChangeState(playerStateMachine.armedState);
-            return;
+            if (player.CanBeginArmedPresentationNow())
+            {
+                playerStateMachine.ChangeState(playerStateMachine.armedState);
+                return;
+            }
         }
 
         OnStateDefaultEnd();
@@ -93,8 +101,11 @@ public class PlayerLandState : PlayerMovementState
         {
             if (reusableData.armedModeActive && reusableData.AllowsArmedWeaponActions())
             {
-                playerStateMachine.ChangeState(playerStateMachine.armedState);
-                return;
+                if (player.CanBeginArmedPresentationNow())
+                {
+                    playerStateMachine.ChangeState(playerStateMachine.armedState);
+                    return;
+                }
             }
 
             if (inputServer.Shift)

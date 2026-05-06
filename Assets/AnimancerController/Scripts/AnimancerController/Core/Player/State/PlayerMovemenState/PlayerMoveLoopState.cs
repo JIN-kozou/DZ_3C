@@ -62,6 +62,11 @@ public class PlayerMoveLoopState : PlayerMovementState
             return;
         }
 
+        if (!player.CanBeginArmedPresentationNow())
+        {
+            return;
+        }
+
         reusableData.armedModeActive = true;
         reusableData.resumeArmedAfterBreak = false;
         reusableData.weaponSuppressedUntilStandFromCrouch = false;

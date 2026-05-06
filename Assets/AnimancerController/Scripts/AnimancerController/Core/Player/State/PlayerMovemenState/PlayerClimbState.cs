@@ -174,6 +174,11 @@ public class PlayerClimbState : PlayerMovementState
     {
         if (reusableData.resumeArmedAfterBreak && reusableData.armedModeActive)
         {
+            if (!player.CanBeginArmedPresentationNow())
+            {
+                return false;
+            }
+
             playerStateMachine.ChangeState(playerStateMachine.armedState);
             return true;
         }

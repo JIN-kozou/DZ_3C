@@ -121,16 +121,6 @@ public class PlayerMovementState : StateBase
     protected void OnCrouch(InputAction.CallbackContext context)
     {
         reusableData.pendingStandWhenCrouchCeilingClears = false;
-        if (reusableData.armedModeActive)
-        {
-            reusableData.armedModeActive = false;
-            reusableData.resumeArmedAfterBreak = false;
-            reusableData.weaponSuppressedUntilStandFromCrouch = false;
-            reusableData.pendingCrouchAfterStandHolster = true;
-            reusableData.standValueParameter.TargetValue = 1;
-            return;
-        }
-
         reusableData.standValueParameter.TargetValue = 0;
     }
 

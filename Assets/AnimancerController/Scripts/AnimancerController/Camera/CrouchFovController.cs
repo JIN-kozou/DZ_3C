@@ -110,7 +110,14 @@ public class CrouchFovController : MonoBehaviour
         float dizzyWave = Mathf.Sin(_dizzyTime) * buffSnapshot.dizzyAmplitude;
         float dizzyFovOffset = dizzyWave + buffSnapshot.dizzyFovOffset;
         float baseFov = isCrouching ? crouchFov : _standFov;
-        bool ads = _weaponRuntime != null && _weaponRuntime.IsAds && _weaponRuntime.GunConfig != null;
+        bool adsInput = _weaponRuntime != null && _weaponRuntime.IsAds && _weaponRuntime.GunConfig != null;
+        bool ads = adsInput;
+        if (player.ArmedPresentation != null && player.ArmedPresentation.UsesAnimatedAdsCameraGates)
+        {
+            // 开镜：FOV/距离在 enter 播完后才跟上（IsAdsCameraAimActive）；关镜：exit 开始前 _adsInPose 已清，镜头先回腰射。
+            ads = adsInput && player.ArmedPresentation.IsAdsCameraAimActive;
+        }
+
         float targetFov = ads
             ? _weaponRuntime.GunConfig.adsFieldOfView + dizzyFovOffset
             : baseFov + dizzyFovOffset;

@@ -1,4 +1,4 @@
-﻿
+
 using Animancer;
 using System;
 using System.Collections.Generic;
@@ -93,6 +93,15 @@ public class PlayerReusableData
     public bool armedModeActive;
 
     /// <summary>
+    /// 攀爬打断、非收枪键的下蹲收枪等：禁止 <see cref="CameraPitchYOffset"/> 合成持枪本地位移（避免逻辑上已退出持枪表现但 armed 仍为 true 时偏移被加回）。
+    /// 在 <see cref="armedModeActive"/> 变为 false 时由相机脚本清除；再进 <see cref="PlayerArmedState"/> 时由持枪态 OnEnter 清除。
+    /// </summary>
+    public bool suppressCameraArmedLocalOffset;
+
+    /// <summary>下一帧由 <see cref="CameraPitchYOffset"/> 消费：从 transform 去掉已叠加的持枪分量并清平滑状态。</summary>
+    public bool pendingCameraPitchArmedOffsetHardStrip;
+
+    /// <summary>
     /// 离开 <see cref="PlayerArmedState"/> 时若仍为持枪模式（如起跳/空中/落地），下次再进持枪则跳过掏枪、仅同步 Layer/Mask（不覆盖 Layer0 当前片段）。
     /// 收枪、攀爬打断或 <see cref="PlayerArmedPresentation"/> 强制复位时会清零。
     /// </summary>
@@ -113,7 +122,7 @@ public class PlayerReusableData
     public bool weaponSuppressedUntilStandFromCrouch;
     /// <summary>松开蹲键或自动低矮探头下蹲时因头顶阻挡保持下蹲；头顶按站起射线净空后由状态机自动设回站立。</summary>
     public bool pendingStandWhenCrouchCeilingClears;
-    /// <summary>持枪/ADS 时下蹲：已收枪并先站直，站直且蹲键仍按住时再自动下蹲。</summary>
+    /// <summary>遗留：收枪流程中曾用于「先站直再蹲」；持枪下蹲已改为直接下蹲。若仍被置位，由 Player 每帧逻辑消费。</summary>
     public bool pendingCrouchAfterStandHolster;
     //外力跳跃
     public float jumpExternalForce = 15;
