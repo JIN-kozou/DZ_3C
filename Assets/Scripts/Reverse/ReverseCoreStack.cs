@@ -354,25 +354,39 @@ namespace DZ_3C.Reverse
 
         private void TryRespawn()
         {
-            if (registry == null || registry.DeployedCount == 0)
-            {
-                OnGameOver?.Invoke();
-                return;
-            }
             Vector3 pos = transform.position;
-            ReverseArray target = registry.FindRespawnTarget(pos);
-            if (target == null)
+            ReverseArray target = null;
+            bool respawnFromArray = false;
+            if (registry != null && registry.DeployedCount > 0)
+            {
+                target = registry.FindRespawnTarget(pos);
+            }
+
+            Vector3 respawnPosition;
+            if (target != null)
+            {
+                respawnPosition = target.transform.position;
+                respawnFromArray = true;
+            }
+            else if (!ReverseBatteryRespawnStore.TryGetBatteryRespawnPoint(out respawnPosition))
             {
                 OnGameOver?.Invoke();
                 return;
             }
 
+            Vector3 offset = Vector3.zero;
+            if (config != null)
+            {
+                offset = respawnFromArray ? config.arrayRespawnOffset : config.batteryRespawnOffset;
+            }
+            respawnPosition += offset;
+
             // 放回阵列位置（不消耗阵列，不改变核心数量），核心列表槽位补满血、锚补满。
             // CharacterController 会覆盖直接改 transform.position；需短暂禁用再写位置。
-            TeleportToWorldPosition(target.transform.position);
+            TeleportToWorldPosition(respawnPosition);
             RefillExistingCoresAndAnchorToFull();
             invincibleSecondsRemaining = config != null ? config.respawnInvincibleSeconds : 1.5f;
-            OnRespawned?.Invoke(target.transform.position);
+            OnRespawned?.Invoke(respawnPosition);
         }
 
         public void RefillExistingCoresAndAnchorToFull()

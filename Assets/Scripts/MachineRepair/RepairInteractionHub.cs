@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DZ_3C.Reverse;
 using UnityEngine;
 
 namespace DZ_3C.MachineRepair
@@ -10,12 +11,14 @@ namespace DZ_3C.MachineRepair
     [DisallowMultipleComponent]
     public class RepairInteractionHub : MonoBehaviour
     {
-        [SerializeField] private KeyCode interactKey = KeyCode.F;
-
         private readonly HashSet<MachinePart> partsInRange = new();
         private readonly HashSet<MachinePartReceiver> receiversInRange = new();
 
         private MachinePartInventory inventory;
+        private Player player;
+        private ReverseConfig reverseConfig;
+        private bool wasInteractiveHeldLastFrame;
+        private float interactiveHoldSeconds;
 
         private void Awake()
         {
@@ -24,6 +27,8 @@ namespace DZ_3C.MachineRepair
             {
                 inventory = gameObject.AddComponent<MachinePartInventory>();
             }
+            player = GetComponent<Player>();
+            reverseConfig = Resources.Load<ReverseConfig>("Config/Reverse/ReverseConfig");
         }
 
         public MachinePartInventory Inventory => inventory;//只读属性，允许被.add
@@ -44,11 +49,44 @@ namespace DZ_3C.MachineRepair
 
         private void Update()
         {
-            if (!Input.GetKeyDown(interactKey)) return;//按下F进行后续操作
+            var inputService = InputService.Instance;
+            if (inputService == null) return;
             if (inventory == null) return;
 
-            if (TrySubmitNearestReceiver()) return;
-            TryPickupNearestPart();
+            bool inBatteryZone = ReverseBatteryZone.IsPlayerInsideAnyBatteryZone(player);
+            bool isHeld = inputService.Interactive;
+
+            if (!inBatteryZone)
+            {
+                interactiveHoldSeconds = 0f;
+                wasInteractiveHeldLastFrame = isHeld;
+                if (!inputService.InteractiveWasPressedThisFrame) return;
+                if (TrySubmitNearestReceiver()) return;
+                TryPickupNearestPart();
+                return;
+            }
+
+            if (isHeld) interactiveHoldSeconds += Time.deltaTime;
+
+            if (!isHeld && wasInteractiveHeldLastFrame)
+            {
+                float holdThreshold = reverseConfig != null ? reverseConfig.batteryZoneHoldDuration : 1.2f;
+                bool treatedAsBatteryLongPress = inBatteryZone && interactiveHoldSeconds >= holdThreshold;
+                if (!treatedAsBatteryLongPress)
+                {
+                    if (TrySubmitNearestReceiver()) return;
+                    TryPickupNearestPart();
+                }
+
+                interactiveHoldSeconds = 0f;
+            }
+
+            if (!isHeld && !wasInteractiveHeldLastFrame)
+            {
+                interactiveHoldSeconds = 0f;
+            }
+
+            wasInteractiveHeldLastFrame = isHeld;
         }
 
         private bool TrySubmitNearestReceiver()

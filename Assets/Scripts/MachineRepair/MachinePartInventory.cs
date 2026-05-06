@@ -16,6 +16,14 @@ namespace DZ_3C.MachineRepair
 
         private readonly Dictionary<MachinePartDefinition, int> counts = new();
 
+        private void Awake()
+        {
+            if (carryRules == null)
+            {
+                carryRules = Resources.Load<MachinePartCarryRules>("Config/MachineRepair/MachinePartCarryRules");
+            }
+        }
+
         public int GetCount(MachinePartDefinition definition)
         {
             if (definition == null) return 0;

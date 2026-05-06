@@ -77,6 +77,12 @@ public class InputService : MonoSingleton<InputService>
 
     public bool Interactive => inputMap.Player.Interactive.ReadValue<float>()!= 0;
 
+    public bool InteractiveWasPressedThisFrame =>
+        inputMap != null && inputMap.Player.Interactive.WasPressedThisFrame();
+
+    public bool InteractiveWasReleasedThisFrame =>
+        inputMap != null && inputMap.Player.Interactive.WasReleasedThisFrame();
+
     public bool Shift
     {
        get

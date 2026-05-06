@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace DZ_3C.Reverse
 {
@@ -22,6 +23,8 @@ namespace DZ_3C.Reverse
         [SerializeField] private KeyCode instantKillKey = KeyCode.F9;
         [Tooltip("清除复活无敌，便于紧接着再测死亡。")]
         [SerializeField] private KeyCode clearInvincibilityKey = KeyCode.F8;
+        [Tooltip("重开测试：回到初始点，清空阵列与 checkpoint，并重置逆重状态。")]
+        [SerializeField] private KeyCode resetRunKey = KeyCode.F7;
 
         [Header("扣血量")]
         [SerializeField] private float stepDamage = 20f;
@@ -38,9 +41,14 @@ namespace DZ_3C.Reverse
         [Tooltip("向 Console 打印 Death / Respawn / GameOver 以及部署阵列数量（需本组件启用）。")]
         [SerializeField] private bool logReverseEvents = true;
 
+        private Vector3 initialWorldPosition;
+        private Quaternion initialWorldRotation;
+
         private void Awake()
         {
             if (coreStack == null) coreStack = GetComponent<ReverseCoreStack>();
+            initialWorldPosition = transform.position;
+            initialWorldRotation = transform.rotation;
         }
 
         private void OnEnable()
@@ -83,29 +91,77 @@ namespace DZ_3C.Reverse
         {
             if (!listenKeys || coreStack == null) return;
 
-            if (Input.GetKeyDown(clearInvincibilityKey))
+            if (IsKeyDownThisFrame(clearInvincibilityKey))
             {
                 coreStack.ClearRespawnInvincibility();
                 Debug.Log("[ReverseRespawnTestDriver] 已清除复活无敌（F8）", this);
             }
 
-            float amount = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)
+            bool shiftHeld = Keyboard.current != null &&
+                             (Keyboard.current.leftShiftKey.isPressed || Keyboard.current.rightShiftKey.isPressed);
+            float amount = shiftHeld
                 ? stepDamage * shiftMultiplier
                 : stepDamage;
 
-            if (Input.GetKeyDown(stepDamageKey))
+            if (IsKeyDownThisFrame(stepDamageKey))
             {
                 PrepareDamage();
                 coreStack.ApplyDamage(amount);
                 LogIfDamageSkipped();
             }
 
-            if (Input.GetKeyDown(instantKillKey))
+            if (IsKeyDownThisFrame(instantKillKey))
             {
                 PrepareDamage();
                 coreStack.ApplyDamage(instantKillDamage);
                 LogIfDamageSkipped();
             }
+
+            if (IsKeyDownThisFrame(resetRunKey))
+            {
+                ResetRunToInitialState();
+            }
+        }
+
+        private static bool IsKeyDownThisFrame(KeyCode keyCode)
+        {
+            if (Keyboard.current == null) return false;
+            switch (keyCode)
+            {
+                case KeyCode.F7: return Keyboard.current.f7Key.wasPressedThisFrame;
+                case KeyCode.F8: return Keyboard.current.f8Key.wasPressedThisFrame;
+                case KeyCode.F9: return Keyboard.current.f9Key.wasPressedThisFrame;
+                case KeyCode.Minus: return Keyboard.current.minusKey.wasPressedThisFrame;
+                default: return false;
+            }
+        }
+
+        private void ResetRunToInitialState()
+        {
+            if (coreStack == null) return;
+
+            var player = coreStack.Player;
+            player?.BuffSystem?.ClearAll(includeUndispellable: true);
+
+            if (coreStack.Registry != null)
+            {
+                coreStack.Registry.ClearAll();
+            }
+
+            ReverseBatteryRespawnStore.Clear();
+            coreStack.ClearRespawnInvincibility();
+
+            // 回到开局位置时和 CharacterController 兼容：先禁用再设置位置。
+            var cc = GetComponent<CharacterController>();
+            if (cc != null) cc.enabled = false;
+            transform.SetPositionAndRotation(initialWorldPosition, initialWorldRotation);
+            if (cc != null) cc.enabled = true;
+            Physics.SyncTransforms();
+
+            coreStack.InitializeCoresFull();
+            coreStack.RefillExistingCoresAndAnchorToFull();
+
+            Debug.Log("[ReverseRespawnTestDriver] 已重开：回到初始点、清空阵列、清空 checkpoint、重置核心与锚。", this);
         }
 
         private void PrepareDamage()
@@ -154,6 +210,19 @@ namespace DZ_3C.Reverse
             PrepareDamage();
             coreStack.ApplyDamage(instantKillDamage);
             LogIfDamageSkipped();
+        }
+
+        [ContextMenu("Test/Reset Run To Initial State")]
+        private void ContextResetRun()
+        {
+            if (coreStack == null) coreStack = GetComponent<ReverseCoreStack>();
+            if (coreStack == null)
+            {
+                Debug.LogWarning("[ReverseRespawnTestDriver] No ReverseCoreStack.", this);
+                return;
+            }
+
+            ResetRunToInitialState();
         }
     }
 }

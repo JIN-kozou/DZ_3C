@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace DZ_3C.Reverse
 {
@@ -15,6 +16,7 @@ namespace DZ_3C.Reverse
     [RequireComponent(typeof(Collider))]
     public class ReverseBatteryZone : MonoBehaviour
     {
+        private static readonly HashSet<int> PlayersInsideAnyZone = new HashSet<int>();
         [Header("Buff Config")]
         [Tooltip("ReverseBatteryConfig.asset：BuffType=Regeneration、RecoverTargetType=ReverseSystem。")]
         [SerializeField] private PlayerBuffConfigSO batteryBuffConfig;
@@ -26,8 +28,36 @@ namespace DZ_3C.Reverse
                  "关掉则任由 buff 自然过期。")]
         [SerializeField] private bool removeBuffOnExit = true;
 
-        // 记录当前已在本区域内并已申请过 buff 的玩家，避免 OnTriggerStay 重复申请。
+        [Header("Hold Interaction")]
+        [SerializeField] private ReverseConfig reverseConfig;
+        [Tooltip("当未配置 ReverseConfig 时使用该按键。")]
+        [SerializeField] private KeyCode holdKey = KeyCode.E;
+        [Tooltip("当未配置 ReverseConfig 时使用该长按阈值（秒）。")]
+        [Min(0.1f)]
+        [SerializeField] private float holdDuration = 1.2f;
+        [SerializeField] private string promptText = "长按E开始充能，并且存储该重生点";
+        [SerializeField] private bool useOnGuiPromptFallback = true;
+
         private readonly HashSet<int> appliedPlayerIds = new HashSet<int>();
+        private readonly HashSet<int> playersInZone = new HashSet<int>();
+        private Player activePlayer;
+        private float holdElapsed;
+        private bool hasActivatedInCurrentStay;
+
+        public bool IsPlayerInside => activePlayer != null;
+        public bool IsCharging => IsPlayerInside && !hasActivatedInCurrentStay && holdElapsed > 0f;
+        public float ChargeProgressNormalized
+        {
+            get
+            {
+                float duration = GetHoldDuration();
+                if (duration <= 0f) return 0f;
+                return Mathf.Clamp01(holdElapsed / duration);
+            }
+        }
+
+        public bool IsActivatedInCurrentStay => hasActivatedInCurrentStay;
+        public string PromptText => promptText;
 
         private void Reset()
         {
@@ -35,32 +65,100 @@ namespace DZ_3C.Reverse
             if (col != null) col.isTrigger = true;
         }
 
+        private void Awake()
+        {
+            if (reverseConfig == null)
+            {
+                reverseConfig = Resources.Load<ReverseConfig>("Config/Reverse/ReverseConfig");
+            }
+        }
+
+        private void Update()
+        {
+            if (activePlayer == null || hasActivatedInCurrentStay) return;
+            if (!IsHoldInputPressed())
+            {
+                holdElapsed = 0f;
+                return;
+            }
+
+            holdElapsed += Time.deltaTime;
+            if (holdElapsed < GetHoldDuration()) return;
+
+            holdElapsed = 0f;
+            hasActivatedInCurrentStay = true;
+            TryApplyBuff(activePlayer);
+            ReverseBatteryRespawnStore.SaveBatteryRespawnPoint(transform);
+        }
+
+        private void OnGUI()
+        {
+            if (!useOnGuiPromptFallback) return;
+            if (!IsPlayerInside || IsActivatedInCurrentStay) return;
+
+            const float width = 460f;
+            const float height = 36f;
+            float x = (Screen.width - width) * 0.5f;
+            float y = Screen.height - 120f;
+            GUI.Label(new Rect(x, y, width, height), promptText);
+
+            const float barHeight = 18f;
+            float barY = y + height + 6f;
+            Rect bgRect = new Rect(x, barY, width, barHeight);
+            GUI.Box(bgRect, GUIContent.none);
+
+            float fill = ChargeProgressNormalized;
+            if (fill > 0f)
+            {
+                Rect fillRect = new Rect(x + 2f, barY + 2f, (width - 4f) * fill, barHeight - 4f);
+                GUI.Box(fillRect, GUIContent.none);
+            }
+        }
+
         private void OnTriggerEnter(Collider other)
         {
-            if (batteryBuffConfig == null) return;
             Player player = ResolvePlayer(other);
             if (player == null) return;
-            TryApplyBuff(player);
+            int id = player.GetInstanceID();
+            playersInZone.Add(id);
+            PlayersInsideAnyZone.Add(id);
+            activePlayer = player;
+            holdElapsed = 0f;
+            hasActivatedInCurrentStay = false;
         }
 
         private void OnTriggerStay(Collider other)
         {
-            // 兜底：某些初始化/物理时序下，角色初始已在触发器内时可能不会立刻触发 Enter。
-            // 用 Stay 保证"进入范围就开始恢复"语义，即便角色没有额外位移。
-            if (batteryBuffConfig == null) return;
             Player player = ResolvePlayer(other);
             if (player == null) return;
-            TryApplyBuff(player);
+            int id = player.GetInstanceID();
+            if (!playersInZone.Contains(id))
+            {
+                playersInZone.Add(id);
+            }
+            PlayersInsideAnyZone.Add(id);
+            activePlayer = player;
         }
 
         private void OnTriggerExit(Collider other)
         {
-            if (!removeBuffOnExit) return;
-            if (batteryBuffConfig == null) return;
             Player player = ResolvePlayer(other);
             if (player == null) return;
-            appliedPlayerIds.Remove(player.GetInstanceID());
-            player.BuffSystem?.RemoveBuff(batteryBuffConfig.BuffId);
+            int id = player.GetInstanceID();
+            playersInZone.Remove(id);
+            PlayersInsideAnyZone.Remove(id);
+            appliedPlayerIds.Remove(id);
+            if (removeBuffOnExit && batteryBuffConfig != null)
+            {
+                player.BuffSystem?.RemoveBuff(batteryBuffConfig.BuffId);
+            }
+
+            if (activePlayer == player)
+            {
+                activePlayer = null;
+                holdElapsed = 0f;
+                hasActivatedInCurrentStay = false;
+            }
         }
 
         private void TryApplyBuff(Player player)
@@ -78,6 +176,46 @@ namespace DZ_3C.Reverse
             Player p = other.GetComponent<Player>();
             if (p == null) p = other.GetComponentInParent<Player>();
             return p;
+        }
+
+        public static bool IsPlayerInsideAnyBatteryZone(Player player)
+        {
+            return player != null && PlayersInsideAnyZone.Contains(player.GetInstanceID());
+        }
+
+        private KeyCode GetHoldKey()
+        {
+            return reverseConfig != null ? reverseConfig.batteryZoneHoldKey : holdKey;
+        }
+
+        private float GetHoldDuration()
+        {
+            return reverseConfig != null ? reverseConfig.batteryZoneHoldDuration : holdDuration;
+        }
+
+        private bool IsHoldInputPressed()
+        {
+            var inputService = InputService.Instance;
+            if (inputService != null && GetHoldKey() == KeyCode.E)
+            {
+                return inputService.Interactive;
+            }
+
+            if (Keyboard.current == null) return false;
+            Key key = KeyFromKeyCode(GetHoldKey());
+            return key != Key.None && Keyboard.current[key].isPressed;
+        }
+
+        private static Key KeyFromKeyCode(KeyCode keyCode)
+        {
+            switch (keyCode)
+            {
+                case KeyCode.E: return Key.E;
+                case KeyCode.F: return Key.F;
+                case KeyCode.G: return Key.G;
+                case KeyCode.Q: return Key.Q;
+                default: return Key.None;
+            }
         }
     }
 }

@@ -58,10 +58,14 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  deployKey: 101
+  deployKey: 102
   retrieveLastKey: 113
   retrieveBySlotKeys: 310000003200000033000000
+  batteryZoneHoldKey: 101
+  batteryZoneHoldDuration: 1.2
   deathThreshold: 0
   refillCoresOnRespawn: 1
   keepArraysOnRespawn: 1
   respawnInvincibleSeconds: 1.5
+  arrayRespawnOffset: {x: 0, y: 0.5, z: 0}
+  batteryRespawnOffset: {x: 1, y: 0.5, z: -2.4}

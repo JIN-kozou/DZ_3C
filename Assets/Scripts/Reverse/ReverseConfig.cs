@@ -70,14 +70,20 @@ namespace DZ_3C.Reverse
         // ---------- 输入键位 ----------
 
         [Header("Input Keys (键位)")]
-        [Tooltip("E：从最内层往外扫描第一个满血核心，部署为阵列。")]
-        public KeyCode deployKey = KeyCode.E;
+        [Tooltip("F：从最内层往外扫描第一个满血核心，部署为阵列。")]
+        public KeyCode deployKey = KeyCode.F;
 
         [Tooltip("Q：远程拿回最后一次部署的阵列（栈顶 LIFO）。")]
         public KeyCode retrieveLastKey = KeyCode.Q;
 
         [Tooltip("数字键 1/2/3：远程拿回对应槽位的阵列（按部署顺序的槽位号，槽 1 = 第一次部署的位置）。")]
         public KeyCode[] retrieveBySlotKeys = new[] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3 };
+
+        [Tooltip("Battery Zone 交互键。长按达到阈值后才会开始充能并保存重生点。")]
+        public KeyCode batteryZoneHoldKey = KeyCode.E;
+
+        [Tooltip("Battery Zone 长按触发充能与存档的阈值（秒）。")]
+        [Min(0.1f)] public float batteryZoneHoldDuration = 1.2f;
 
         // ---------- 复活 ----------
 
@@ -93,5 +99,11 @@ namespace DZ_3C.Reverse
 
         [Tooltip("复活后短暂的无敌时间（秒），呼吸/外伤都被跳过。0 表示无无敌期。")]
         [Min(0f)] public float respawnInvincibleSeconds = 1.5f;
+
+        [Tooltip("重生在逆重阵列时附加的位置偏移（世界坐标偏移）。可用于避免卡进模型。")]
+        public Vector3 arrayRespawnOffset = new Vector3(0f, 0.5f, 0f);
+
+        [Tooltip("重生在 Battery checkpoint 时附加的位置偏移（世界坐标偏移）。可用于避免卡进模型。")]
+        public Vector3 batteryRespawnOffset = new Vector3(0f, 0.5f, 0f);
     }
 }

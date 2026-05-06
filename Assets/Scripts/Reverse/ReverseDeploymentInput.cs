@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace DZ_3C.Reverse
 {
@@ -60,12 +61,12 @@ namespace DZ_3C.Reverse
         {
             if (config == null) return;
 
-            if (Input.GetKeyDown(config.deployKey))
+            if (IsKeyDownThisFrame(config.deployKey))
             {
                 TryDeploy();
             }
 
-            if (Input.GetKeyDown(config.retrieveLastKey))
+            if (IsKeyDownThisFrame(config.retrieveLastKey))
             {
                 TryRetrieveLast();
             }
@@ -74,7 +75,7 @@ namespace DZ_3C.Reverse
             {
                 for (int i = 0; i < config.retrieveBySlotKeys.Length; i++)
                 {
-                    if (Input.GetKeyDown(config.retrieveBySlotKeys[i]))
+                    if (IsKeyDownThisFrame(config.retrieveBySlotKeys[i]))
                     {
                         TryRetrieveBySlot(i + 1);
                     }
@@ -159,6 +160,21 @@ namespace DZ_3C.Reverse
             OnRetrieved?.Invoke(arr);
             Destroy(arr.gameObject);
             return true;
+        }
+
+        private static bool IsKeyDownThisFrame(KeyCode keyCode)
+        {
+            if (Keyboard.current == null) return false;
+            switch (keyCode)
+            {
+                case KeyCode.E: return Keyboard.current.eKey.wasPressedThisFrame;
+                case KeyCode.F: return Keyboard.current.fKey.wasPressedThisFrame;
+                case KeyCode.Q: return Keyboard.current.qKey.wasPressedThisFrame;
+                case KeyCode.Alpha1: return Keyboard.current.digit1Key.wasPressedThisFrame;
+                case KeyCode.Alpha2: return Keyboard.current.digit2Key.wasPressedThisFrame;
+                case KeyCode.Alpha3: return Keyboard.current.digit3Key.wasPressedThisFrame;
+                default: return false;
+            }
         }
     }
 }
