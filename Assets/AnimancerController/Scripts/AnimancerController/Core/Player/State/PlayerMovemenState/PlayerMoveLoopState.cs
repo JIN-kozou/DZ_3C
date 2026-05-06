@@ -89,7 +89,7 @@ public class PlayerMoveLoopState : PlayerMovementState
 
     private void OnCheckInput()
     {
-        if (inputServer.MoveDiscrete != UnityEngine.Vector2.zero)
+        if (inputServer.Move != UnityEngine.Vector2.zero)
         {
             return;
         }

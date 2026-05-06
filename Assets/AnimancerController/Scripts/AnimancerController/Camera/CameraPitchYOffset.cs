@@ -23,6 +23,11 @@ public class CameraPitchYOffset : MonoBehaviour
     [Tooltip("0 为不平滑；越大越跟手。")]
     [SerializeField, Min(0f)] private float smoothSpeed = 20f;
 
+    [Header("下蹲本地位移（仅 Local 模式）")]
+    [Tooltip("勾选且角色非「几乎站立」时，本物体 localPosition 直接设为下列值，本帧不叠加俯仰 Y 与持枪偏移。")]
+    [SerializeField] private bool useCrouchLocalPositionOverride;
+    [SerializeField] private Vector3 crouchLocalPosition;
+
     [Header("持枪本地位移（与 pitch 同事一帧合成）")]
     [Tooltip("为空则依次尝试 GetComponentInParent<Player>、FindObjectOfType<Player>。")]
     [SerializeField] private Player armedPlayer;
@@ -105,6 +110,17 @@ public class CameraPitchYOffset : MonoBehaviour
         {
             ResolveArmedPlayer();
             TryConsumePendingArmedHardStripFromPlayer();
+
+            if (useCrouchLocalPositionOverride && IsCharacterCrouching())
+            {
+                transform.localPosition = crouchLocalPosition;
+                _lastWrittenLocalPos = crouchLocalPosition;
+                _hasLastWrittenLocalPos = true;
+                _smoothedArmedOffset = Vector3.zero;
+                _armedSmoothVelocity = Vector3.zero;
+                return;
+            }
+
             Vector3 prevArmed = _smoothedArmedOffset;
             Vector3 targetArmed = ShouldApplyArmedOffset() ? armedLocalOffset : Vector3.zero;
             float holsterXMul = 1f;
@@ -177,6 +193,16 @@ public class CameraPitchYOffset : MonoBehaviour
         {
             armedPlayer = FindObjectOfType<Player>();
         }
+    }
+
+    private bool IsCharacterCrouching()
+    {
+        if (armedPlayer == null || armedPlayer.ReusableData == null)
+        {
+            return false;
+        }
+
+        return !armedPlayer.ReusableData.AllowsArmedWeaponActions();
     }
 
     private bool ShouldApplyArmedOffset()

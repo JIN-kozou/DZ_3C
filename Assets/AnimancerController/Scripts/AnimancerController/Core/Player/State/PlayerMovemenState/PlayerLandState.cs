@@ -97,7 +97,7 @@ public class PlayerLandState : PlayerMovementState
     public override void OnUpdate()
     {
         base.OnUpdate();
-        if (player.isOnGround.Value && inputServer.MoveDiscrete != UnityEngine.Vector2.zero)
+        if (player.isOnGround.Value && inputServer.Move != UnityEngine.Vector2.zero)
         {
             if (reusableData.armedModeActive && reusableData.AllowsArmedWeaponActions())
             {

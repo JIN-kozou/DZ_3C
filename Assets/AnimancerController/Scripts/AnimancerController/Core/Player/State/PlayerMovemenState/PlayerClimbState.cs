@@ -104,7 +104,7 @@ public class PlayerClimbState : PlayerMovementState
                 cancelClimbTask = null;
             }
             float angle = GetTargetAngle();
-            if (inputServer.MoveDiscrete!=Vector2.zero && Mathf.Abs(angle) > 100)
+            if (inputServer.Move!=Vector2.zero && Mathf.Abs(angle) > 100)
             {
                 Debug.Log("开始取消攀爬");
                 float currentTime = animancerState.NormalizedTime;
@@ -154,7 +154,7 @@ public class PlayerClimbState : PlayerMovementState
             return;
         }
 
-        if (inputServer.MoveDiscrete != Vector2.zero)
+        if (inputServer.Move != Vector2.zero)
         {
             if (inputServer.Shift)
             {

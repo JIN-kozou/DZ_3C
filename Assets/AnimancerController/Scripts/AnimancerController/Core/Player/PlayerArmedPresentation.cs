@@ -114,7 +114,7 @@ public class PlayerArmedPresentation : MonoBehaviour
         !_layeredArmedActive || _simpleMoveLoopOnly || _readyForUpperBodyGameplay;
 
     /// <summary>
-    /// 掏枪动画结束后且未处于收枪协程中；收枪键、蹲/松移动触发的收枪等用。
+    /// 掏枪动画结束后且未处于收枪协程中；收枪键、松移动触发的收枪等用。
     /// </summary>
     public bool IsHolsterInputAllowed => IsUpperBodyReadyForWeapon && !IsExiting;
 
@@ -127,12 +127,6 @@ public class PlayerArmedPresentation : MonoBehaviour
     /// 收枪协程未占用时可开始新一轮持枪分层（掏枪）；防止收枪未播完就再次掏枪。
     /// </summary>
     public bool CanBeginArmedPresentation => !IsExiting;
-
-    /// <summary>
-    /// 持枪三层 Animancer（Layer0 遮罩 + Layer1 上半身 + Layer2 覆盖）已启用且非「仅 Layer0 单轨」降级；供 <see cref="PlayerArmedHandIkRig"/> 监听 Layer0/1 换片。
-    /// </summary>
-    public bool IsLayeredArmedAnimancerActive =>
-        _layeredArmedActive && !_simpleMoveLoopOnly;
 
     public void Init(Player player)
     {

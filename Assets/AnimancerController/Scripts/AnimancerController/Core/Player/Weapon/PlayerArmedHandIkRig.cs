@@ -1,10 +1,9 @@
-using Animancer;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
 /// <summary>
 /// 持枪双手 IK：在角色上挂 <see cref="RigBuilder"/> + 左右 <see cref="TwoBoneIKConstraint"/>，Target 指向武器 grip 等 Transform；运行时由 <see cref="PlayerArmedPresentation"/> 调节 IK weight，以及整包 RigBuilder 或单层 <see cref="Rig"/> 的开关。
-/// Layer2 换片时由 Presentation 调用 <see cref="NotifyLayer2OverlayPlayed"/>；Layer0/1 换片由本组件在 <see cref="LateUpdate"/> 内比对 <see cref="AnimancerLayer.CommandCount"/> 触发同一套脊柱 Rig 过渡稳定（Layer0 默认关闭以免 locomotion 频繁触发）。
+/// 可选：Layer2 换片时由 <see cref="PlayerArmedPresentation"/> 调用 <see cref="NotifyLayer2OverlayPlayed"/>，立刻降低脊柱 Rig 权重并在 <see cref="Update"/> 中用 SmoothDamp 拉回，避免晚于 <see cref="PlayerArmedPresentation"/> 的 LateUpdate 检测错过与 Rig 求解的时序。
 /// </summary>
 [DisallowMultipleComponent]
 [DefaultExecutionOrder(50)]
@@ -19,7 +18,7 @@ public class PlayerArmedHandIkRig : MonoBehaviour
     private Rig armedIkRigLayerOnly;
 
     [SerializeField, Tooltip(
-        "可选。影响脊柱等上身的 Rig 层（如 Rig Builder 中的 Rig1）。Layer2 Play 后由 Presentation 调用 Notify；Layer0/1 换片由本脚本 LateUpdate 检测 CommandCount；勿与「仅持枪 Rig 层」拖成同一 Rig。")]
+        "可选。影响脊柱等上身的 Rig 层（如 Rig Builder 中的 Rig1）。由 Presentation 在每次 Layer2 Play 后调用 Notify；勿与「仅持枪 Rig 层」拖成同一 Rig。")]
     private Rig spineRigLayerForLayer2Transition;
 
     [SerializeField, Tooltip("Notify 后脊柱 Rig.weight 用 SmoothDamp 回到 1 的近似时长（秒）。建议约 0.08～0.18。")]
@@ -40,17 +39,6 @@ public class PlayerArmedHandIkRig : MonoBehaviour
     [Min(0f)]
     private float armedRigLayerBlendSeconds = 0.1f;
 
-    [SerializeField, Tooltip("持枪分层时：Animancer Layer0（常见为 locomotion）CommandCount 变化时触发脊柱 Rig 稳定。易与跑走频繁换片叠加，默认关；若 Layer0 换片仍抽再开。")]
-    private bool watchLayer0CommandForSpineStabilizer;
-
-    [SerializeField, Tooltip("持枪分层时：Animancer Layer1（腰射/ADS idle）CommandCount 变化时触发脊柱 Rig 稳定。")]
-    private bool watchLayer1CommandForSpineStabilizer = true;
-
-    private Player _player;
-    private int _lastLayer0CommandCount;
-    private int _lastLayer1CommandCount;
-    private bool _layer01CommandBaselineCaptured;
-
     private float _armedRigLayerSmoothedWeight;
     private float _armedRigLayerTargetWeight;
     private bool _armedRigLayerWeightsInitialized;
@@ -60,14 +48,8 @@ public class PlayerArmedHandIkRig : MonoBehaviour
     private bool _spineRigRecoverActive;
     private bool _loggedSpineSameAsArmedRig;
 
-    private void Awake()
-    {
-        _player = GetComponentInParent<Player>();
-    }
-
     private void OnEnable()
     {
-        ResetLayer01CommandCountBaseline();
         if (armedIkRigLayerOnly != null)
         {
             armedIkRigLayerOnly.weight = 0f;
@@ -95,8 +77,6 @@ public class PlayerArmedHandIkRig : MonoBehaviour
 
     private void LateUpdate()
     {
-        TickSpineStabilizerFromLayer01CommandCounts();
-
         if (armedIkRigLayerOnly == null || armedRigLayerBlendSeconds <= 0.0001f)
         {
             return;
@@ -112,11 +92,6 @@ public class PlayerArmedHandIkRig : MonoBehaviour
     /// </summary>
     public void NotifyLayer2OverlayPlayed()
     {
-        TriggerSpineRigOverlayTransitionStabilizer();
-    }
-
-    private void TriggerSpineRigOverlayTransitionStabilizer()
-    {
         if (!CanRunSpineLayer2Stabilizer())
         {
             return;
@@ -127,75 +102,6 @@ public class PlayerArmedHandIkRig : MonoBehaviour
         _spineRigSmoothVelocity = 0f;
         spineRigLayerForLayer2Transition.weight = w;
         _spineRigRecoverActive = true;
-    }
-
-    private void ResetLayer01CommandCountBaseline()
-    {
-        _layer01CommandBaselineCaptured = false;
-    }
-
-    private void TickSpineStabilizerFromLayer01CommandCounts()
-    {
-        if (!watchLayer0CommandForSpineStabilizer && !watchLayer1CommandForSpineStabilizer)
-        {
-            return;
-        }
-
-        if (_player == null ||
-            _player.ArmedPresentation == null ||
-            !_player.ArmedPresentation.IsLayeredArmedAnimancerActive)
-        {
-            ResetLayer01CommandCountBaseline();
-            return;
-        }
-
-        if (!CanRunSpineLayer2Stabilizer())
-        {
-            ResetLayer01CommandCountBaseline();
-            return;
-        }
-
-        AnimancerComponent anim = _player.animancer;
-        if (anim == null || anim.Layers.Count < 2)
-        {
-            return;
-        }
-
-        if (!_layer01CommandBaselineCaptured)
-        {
-            if (watchLayer0CommandForSpineStabilizer && anim.Layers.Count > 0)
-            {
-                _lastLayer0CommandCount = anim.Layers[0].CommandCount;
-            }
-
-            if (watchLayer1CommandForSpineStabilizer)
-            {
-                _lastLayer1CommandCount = anim.Layers[1].CommandCount;
-            }
-
-            _layer01CommandBaselineCaptured = true;
-            return;
-        }
-
-        bool changed = false;
-        if (watchLayer0CommandForSpineStabilizer && anim.Layers.Count > 0 &&
-            anim.Layers[0].CommandCount != _lastLayer0CommandCount)
-        {
-            changed = true;
-            _lastLayer0CommandCount = anim.Layers[0].CommandCount;
-        }
-
-        if (watchLayer1CommandForSpineStabilizer &&
-            anim.Layers[1].CommandCount != _lastLayer1CommandCount)
-        {
-            changed = true;
-            _lastLayer1CommandCount = anim.Layers[1].CommandCount;
-        }
-
-        if (changed)
-        {
-            TriggerSpineRigOverlayTransitionStabilizer();
-        }
     }
 
     private bool CanRunSpineLayer2Stabilizer()

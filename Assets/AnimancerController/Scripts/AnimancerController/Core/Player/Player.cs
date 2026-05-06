@@ -112,7 +112,6 @@ public class Player : CharacterBase
         base.Update();
         BuffSystem?.Tick(Time.deltaTime);
         UpdateBuffDrivenValues();
-        TickMoveInputSmoothing();
         StateMachine?.OnUpdate();
         TryHolsterWeaponInputIfArmed();
         // 先结算武器 Tick（SuccessfulShotsLastTick），再播 ADS 开火动画，避免未射出子弹仍播开火。
@@ -120,19 +119,6 @@ public class Player : CharacterBase
         TickArmedUpperBodyAdsIfNeeded();
         TryApplyPendingCrouchAfterStandHolster();
         TryResumeArmedAfterCrouchStand();
-    }
-
-    void TickMoveInputSmoothing()
-    {
-        if (InputService == null)
-        {
-            return;
-        }
-
-        var numeric = playerSO?.playerMovementData?.PlayerNumericConfig;
-        bool enable = numeric == null || numeric.keyboardMoveInputSmoothing;
-        float smoothTime = numeric != null ? numeric.keyboardMoveSmoothTime : 0.12f;
-        InputService.TickMoveSmoothing(Time.deltaTime, smoothTime, enable);
     }
 
     /// <summary>
