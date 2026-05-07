@@ -231,6 +231,8 @@ MonoBehaviour:
       walkSpeedParameter: 2.5
       runSpeedParameter: 5
       inAirMoveSpeed: 20
+      keyboardMoveInputSmoothing: 1
+      keyboardMoveSmoothTime: 0.1
       standControllerRadius: 0.2
       standControllerHeight: 1
       standControllerCenter: {x: 0, y: 0.5, z: 0}
@@ -281,7 +283,7 @@ MonoBehaviour:
       locomotionBodyMask: {fileID: 0}
       draw:
         _FadeDuration: 0.25
-        _Speed: 1
+        _Speed: 2
         _Events:
           _NormalizedTimes: []
           _Callbacks: []
@@ -299,7 +301,7 @@ MonoBehaviour:
         _NormalizedStartTime: NaN
       holster:
         _FadeDuration: 0.25
-        _Speed: 1
+        _Speed: 3
         _Events:
           _NormalizedTimes: []
           _Callbacks: []
@@ -307,15 +309,15 @@ MonoBehaviour:
         _Clip: {fileID: 7400000, guid: db4fc9dd7c3c704459d45ebb8f82f471, type: 2}
         _NormalizedStartTime: NaN
       upperBodyLayerWeight: 1
-      drawFadeInSeconds: 0.3
-      drawToIdleFadeSeconds: 0.3
-      ikFadeInSeconds: 0.3
-      ikFadeOutSeconds: 0.3
-      holsterExitToIdleLocomotionFadeSeconds: 0.3
-      holsterToBareHandsLocomotionFadeSeconds: 0.3
-      layerFadeOutSeconds: 0.3
-      holsterFadeInSeconds: 0.3
-      holsterFadeOutSeconds: 0.3
+      drawFadeInSeconds: 0.2
+      drawToIdleFadeSeconds: 0.2
+      ikFadeInSeconds: 0.2
+      ikFadeOutSeconds: 0.2
+      holsterExitToIdleLocomotionFadeSeconds: 0.2
+      holsterToBareHandsLocomotionFadeSeconds: 0.2
+      layerFadeOutSeconds: 0.2
+      holsterFadeInSeconds: 0.2
+      holsterFadeOutSeconds: 0.2
       drawWeaponModelVisibleAtFrame: 30
       holsterWeaponModelHiddenAtFrame: 26
       adsEnter:
@@ -338,7 +340,7 @@ MonoBehaviour:
         _NormalizedStartTime: NaN
       adsExit:
         _FadeDuration: 0.25
-        _Speed: 1
+        _Speed: 2
         _Events:
           _NormalizedTimes: []
           _Callbacks: []

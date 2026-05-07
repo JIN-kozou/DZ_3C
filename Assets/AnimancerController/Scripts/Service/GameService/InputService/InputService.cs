@@ -13,6 +13,8 @@ public class InputService : MonoSingleton<InputService>
     Vector2 _moveSmoothed;
     Vector2 _moveSmoothVelocity;
     bool _moveSmoothPrimed;
+    /// <summary>上一段移动由键盘驱动时保持 SmoothDamp 到零，避免松键瞬间 activeControl 为空导致不平滑。</summary>
+    bool _keyboardMoveSmoothSession;
 
     protected override void Awake()
     {
@@ -25,6 +27,7 @@ public class InputService : MonoSingleton<InputService>
         _moveSmoothed = Vector2.zero;
         _moveSmoothVelocity = Vector2.zero;
         _moveSmoothPrimed = false;
+        _keyboardMoveSmoothSession = false;
     }
     private void OnDestroy()
     {
@@ -171,8 +174,26 @@ public class InputService : MonoSingleton<InputService>
             return;
         }
 
-        bool fromKeyboard = inputMap.Player.Move.activeControl?.device is Keyboard;
-        if (applyKeyboardSmoothing && fromKeyboard && smoothTime > 0.0001f)
+        InputDevice moveDevice = inputMap.Player.Move.activeControl?.device;
+        bool fromGamepad = moveDevice is Gamepad;
+        bool fromKeyboard = moveDevice is Keyboard;
+
+        if (fromGamepad)
+        {
+            _keyboardMoveSmoothSession = false;
+        }
+        else if (discrete.sqrMagnitude > 0.0001f && fromKeyboard)
+        {
+            _keyboardMoveSmoothSession = true;
+        }
+
+        bool useKeyboardSmooth =
+            applyKeyboardSmoothing &&
+            smoothTime > 0.0001f &&
+            !fromGamepad &&
+            (fromKeyboard || (_keyboardMoveSmoothSession && _moveSmoothed.sqrMagnitude > 0.0001f));
+
+        if (useKeyboardSmooth)
         {
             _moveSmoothed = Vector2.SmoothDamp(
                 _moveSmoothed,
@@ -181,11 +202,18 @@ public class InputService : MonoSingleton<InputService>
                 smoothTime,
                 Mathf.Infinity,
                 deltaTime);
+            if (discrete.sqrMagnitude < 0.0001f && _moveSmoothed.sqrMagnitude < 0.0001f)
+            {
+                _keyboardMoveSmoothSession = false;
+                _moveSmoothed = Vector2.zero;
+                _moveSmoothVelocity = Vector2.zero;
+            }
         }
         else
         {
             _moveSmoothed = discrete;
             _moveSmoothVelocity = Vector2.zero;
+            _keyboardMoveSmoothSession = false;
         }
     }
     public Vector2 Scroll =>inputMap.Player.Scroll.ReadValue<Vector2>();

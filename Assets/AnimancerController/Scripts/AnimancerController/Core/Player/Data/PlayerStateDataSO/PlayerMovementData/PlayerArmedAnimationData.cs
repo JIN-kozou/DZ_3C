@@ -58,7 +58,7 @@ public class PlayerArmedAnimationData
     [Min(0f)]
     public float holsterFadeInSeconds = 0.12f;
 
-    [Tooltip("收枪片段结束前将 Layer1 权重从当前值平滑降到 0 的时长（秒），与上半身淡出衔接；0 表示不在片段末尾单独做权重淡出（仍走 layerFadeOutSeconds）。")]
+    [Tooltip("已弃用：Layer2 不再在收枪片段末尾淡出；Layer2 在 Layer1 淡出之后与 Layer0 切入 idle 同步淡出（时长取 holsterExit / holsterToBareHands 与 idle 淡入一致）。保留字段仅避免已有资源丢序列化数据。")]
     [Min(0f)]
     public float holsterFadeOutSeconds = 0.18f;
 

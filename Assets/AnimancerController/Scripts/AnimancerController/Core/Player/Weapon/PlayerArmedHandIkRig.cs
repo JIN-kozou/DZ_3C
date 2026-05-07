@@ -1,14 +1,21 @@
+using Animancer;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
 /// <summary>
 /// 持枪双手 IK：在角色上挂 <see cref="RigBuilder"/> + 左右 <see cref="TwoBoneIKConstraint"/>，Target 指向武器 grip 等 Transform；运行时由 <see cref="PlayerArmedPresentation"/> 调节 IK weight，以及整包 RigBuilder 或单层 <see cref="Rig"/> 的开关。
 /// 可选：Layer2 换片时由 <see cref="PlayerArmedPresentation"/> 调用 <see cref="NotifyLayer2OverlayPlayed"/>，立刻降低脊柱 Rig 权重并在 <see cref="Update"/> 中用 SmoothDamp 拉回，避免晚于 <see cref="PlayerArmedPresentation"/> 的 LateUpdate 检测错过与 Rig 求解的时序。
+/// 程序化修改 Rig/约束权重后调用 <see cref="TryRefreshPlayableOutputAfterRigWrite"/>，与 Animancer 官方 Animation Rigging 集成说明一致，减轻 Playable 连断触发的 Rebind 把权重打回默认值的问题。
 /// </summary>
 [DisallowMultipleComponent]
 [DefaultExecutionOrder(50)]
 public class PlayerArmedHandIkRig : MonoBehaviour
 {
+    [SerializeField, Tooltip("可选。指定后用于 PlayableOutputRefresher；为空时在父级缓存解析 AnimancerComponent。")]
+    private AnimancerComponent animancerOverride;
+
+    private AnimancerComponent _animancerResolvedFromParent;
+
     [SerializeField, Tooltip("用于解析 RigBuilder；指定「仅单层」模式时也会用来保持 builder 开启。")]
     private RigBuilder rigBuilder;
 
@@ -29,10 +36,12 @@ public class PlayerArmedHandIkRig : MonoBehaviour
     [Range(0f, 1f)]
     private float spineRigMinWeightOnLayer2Play = 0f;
 
-    [SerializeField, Tooltip("左手 Two Bone IK（Target 建议绑武器 grip 子物体）。")]
+    [SerializeField, Tooltip(
+        "左手 Two Bone IK（Target 建议绑武器 grip 等）。Animancer 文档：IK Target/Hint 不要作为角色 Animator 所在 GameObject 的子物体，否则易受 Rebind 影响导致位姿跳变。")]
     private TwoBoneIKConstraint leftHandIk;
 
-    [SerializeField, Tooltip("右手 Two Bone IK。")]
+    [SerializeField, Tooltip(
+        "右手 Two Bone IK。Animancer 文档：IK Target/Hint 不要作为角色 Animator 所在 GameObject 的子物体，否则易受 Rebind 影响导致位姿跳变。")]
     private TwoBoneIKConstraint rightHandIk;
 
     [SerializeField, Tooltip("使用「仅持枪 Rig 层」时，Rig.weight 在开关之间的平滑时间（秒）。0 表示立即切换。")]
@@ -48,14 +57,21 @@ public class PlayerArmedHandIkRig : MonoBehaviour
     private bool _spineRigRecoverActive;
     private bool _loggedSpineSameAsArmedRig;
 
+    private PlayableOutputRefresher _playableOutputRefresher;
+    private bool _playableOutputRefresherValid;
+
     private void OnEnable()
     {
+        _animancerResolvedFromParent = null;
+        InvalidatePlayableOutputRefresher();
+
         if (armedIkRigLayerOnly != null)
         {
             armedIkRigLayerOnly.weight = 0f;
             _armedRigLayerSmoothedWeight = 0f;
             _armedRigLayerTargetWeight = 0f;
             _armedRigLayerWeightsInitialized = true;
+            TryRefreshPlayableOutputAfterRigWrite();
         }
 
         _spineRigRecoverActive = false;
@@ -68,6 +84,11 @@ public class PlayerArmedHandIkRig : MonoBehaviour
         {
             _spineRigSmoothedWeight = 1f;
         }
+    }
+
+    private void OnDisable()
+    {
+        InvalidatePlayableOutputRefresher();
     }
 
     private void Update()
@@ -85,6 +106,47 @@ public class PlayerArmedHandIkRig : MonoBehaviour
         float step = Time.deltaTime / armedRigLayerBlendSeconds;
         _armedRigLayerSmoothedWeight = Mathf.MoveTowards(_armedRigLayerSmoothedWeight, _armedRigLayerTargetWeight, step);
         armedIkRigLayerOnly.weight = _armedRigLayerSmoothedWeight;
+        TryRefreshPlayableOutputAfterRigWrite();
+    }
+
+    private AnimancerComponent ResolveAnimancer()
+    {
+        if (animancerOverride != null)
+        {
+            return animancerOverride;
+        }
+
+        if (_animancerResolvedFromParent == null)
+        {
+            _animancerResolvedFromParent = GetComponentInParent<AnimancerComponent>();
+        }
+
+        return _animancerResolvedFromParent;
+    }
+
+    private void InvalidatePlayableOutputRefresher()
+    {
+        _playableOutputRefresherValid = false;
+    }
+
+    /// <summary>
+    /// 在程序化写入 Rig.weight 或 TwoBoneIKConstraint.weight 之后调用，减轻 Animancer 图连断时 Animation Rigging 属性被 Rebind 打回 Inspector 默认值的问题。
+    /// </summary>
+    private void TryRefreshPlayableOutputAfterRigWrite()
+    {
+        AnimancerComponent animancer = ResolveAnimancer();
+        if (animancer == null || !animancer.IsGraphInitialized)
+        {
+            return;
+        }
+
+        if (!_playableOutputRefresherValid)
+        {
+            _playableOutputRefresher = new PlayableOutputRefresher(animancer.Graph);
+            _playableOutputRefresherValid = true;
+        }
+
+        _playableOutputRefresher.Refresh();
     }
 
     /// <summary>
@@ -102,6 +164,7 @@ public class PlayerArmedHandIkRig : MonoBehaviour
         _spineRigSmoothVelocity = 0f;
         spineRigLayerForLayer2Transition.weight = w;
         _spineRigRecoverActive = true;
+        TryRefreshPlayableOutputAfterRigWrite();
     }
 
     private bool CanRunSpineLayer2Stabilizer()
@@ -158,6 +221,8 @@ public class PlayerArmedHandIkRig : MonoBehaviour
             _spineRigRecoverActive = false;
             _spineRigSmoothVelocity = 0f;
         }
+
+        TryRefreshPlayableOutputAfterRigWrite();
     }
 
     /// <summary>
@@ -190,6 +255,7 @@ public class PlayerArmedHandIkRig : MonoBehaviour
             {
                 _armedRigLayerSmoothedWeight = _armedRigLayerTargetWeight;
                 armedIkRigLayerOnly.weight = _armedRigLayerTargetWeight;
+                TryRefreshPlayableOutputAfterRigWrite();
             }
 
             return;
@@ -209,6 +275,7 @@ public class PlayerArmedHandIkRig : MonoBehaviour
         }
 
         leftHandIk.weight = Mathf.Clamp01(weight);
+        TryRefreshPlayableOutputAfterRigWrite();
     }
 
     public void SetRightHandIkWeight(float weight)
@@ -219,13 +286,26 @@ public class PlayerArmedHandIkRig : MonoBehaviour
         }
 
         rightHandIk.weight = Mathf.Clamp01(weight);
+        TryRefreshPlayableOutputAfterRigWrite();
     }
 
     /// <summary>左右手使用同一权重（收枪末尾、复位等）。</summary>
     public void SetHandIkWeight(float weight)
     {
         float w = Mathf.Clamp01(weight);
-        SetLeftHandIkWeight(w);
-        SetRightHandIkWeight(w);
+        if (leftHandIk != null)
+        {
+            leftHandIk.weight = w;
+        }
+
+        if (rightHandIk != null)
+        {
+            rightHandIk.weight = w;
+        }
+
+        if (leftHandIk != null || rightHandIk != null)
+        {
+            TryRefreshPlayableOutputAfterRigWrite();
+        }
     }
 }

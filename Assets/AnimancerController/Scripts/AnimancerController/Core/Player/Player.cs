@@ -112,6 +112,7 @@ public class Player : CharacterBase
         base.Update();
         BuffSystem?.Tick(Time.deltaTime);
         UpdateBuffDrivenValues();
+        TickKeyboardMoveSmoothing();
         StateMachine?.OnUpdate();
         TryHolsterWeaponInputIfArmed();
         // 先结算武器 Tick（SuccessfulShotsLastTick），再播 ADS 开火动画，避免未射出子弹仍播开火。
@@ -119,6 +120,30 @@ public class Player : CharacterBase
         TickArmedUpperBodyAdsIfNeeded();
         TryApplyPendingCrouchAfterStandHolster();
         TryResumeArmedAfterCrouchStand();
+    }
+
+    /// <summary>
+    /// 在状态机前刷新 <see cref="InputService.Move"/>（键鼠 SmoothDamp 摇杆模拟）；门控与攀爬等仍用 <see cref="InputService.MoveDiscrete"/>。
+    /// </summary>
+    private void TickKeyboardMoveSmoothing()
+    {
+        if (InputService == null)
+        {
+            return;
+        }
+
+        PlayerNumericConfig numericConfig = playerSO?.playerMovementData?.PlayerNumericConfig;
+        if (numericConfig != null)
+        {
+            InputService.TickMoveSmoothing(
+                Time.deltaTime,
+                numericConfig.keyboardMoveSmoothTime,
+                numericConfig.keyboardMoveInputSmoothing);
+        }
+        else
+        {
+            InputService.TickMoveSmoothing(Time.deltaTime, 0.12f, true);
+        }
     }
 
     /// <summary>
@@ -162,11 +187,12 @@ public class Player : CharacterBase
 
         ArmedPresentation.BeginArmedExit(() =>
         {
+            // 先切 Idle（armed 仍为 true）再关 armed，避免 Idle.OnEnter 里 NotifyArmedStateForceQuit 打断收枪协程末尾的 Layer2 淡出。
+            StateMachine.ChangeState(StateMachine.idleState);
             ReusableData.armedModeActive = false;
             ReusableData.resumeArmedAfterBreak = false;
             ReusableData.weaponSuppressedUntilStandFromCrouch = false;
             ReusableData.pendingCrouchAfterStandHolster = false;
-            StateMachine.ChangeState(StateMachine.idleState);
         });
     }
 

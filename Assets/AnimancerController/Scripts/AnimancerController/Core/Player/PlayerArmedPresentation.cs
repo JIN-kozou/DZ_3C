@@ -6,6 +6,7 @@ using UnityEngine;
 /// <summary>
 /// 持枪 Animancer 三层：Layer0 下半身 locomotion；Layer1 腰射 <see cref="PlayerArmedAnimationData.armedIdle"/> 与 ADS idle 互切，其淡化与 Layer2 的 adsEnter / adsExit 同起止；
 /// Layer2 覆盖式播放掏枪 / 收枪 / ADS enter·exit·fire。掏枪时 Layer1 即开始播腰射 idle，与 Layer2 掏枪叠加，减少单层抢同一 Mask 的抽搐。
+/// 收枪时 Layer2 权重在 Layer1 淡出之后，与 Layer0 切入空手 idle 的淡入同时进行。
 /// </summary>
 [DisallowMultipleComponent]
 public class PlayerArmedPresentation : MonoBehaviour
@@ -905,6 +906,39 @@ public class PlayerArmedPresentation : MonoBehaviour
         _layer2HoldPoseStored = true;
     }
 
+    /// <summary>
+    /// 收枪片段自然结束后冻结最后一帧：复用当前状态，避免再 <c>Play(clip)</c> 叠出第二个同名状态。
+    /// </summary>
+    private void TryFreezeHolsterOverlayStateInPlace(AnimancerLayer overlay, AnimancerState holsterState)
+    {
+        if (overlay == null ||
+            !_layeredArmedActive ||
+            holsterState == null ||
+            holsterState.Clip == null ||
+            _data == null ||
+            _data.holster == null ||
+            !_data.holster.IsValid ||
+            holsterState.Clip != _data.holster.Clip ||
+            overlay.CurrentState != holsterState)
+        {
+            TryApplyLayer2HoldPoseBeforePlay(overlay);
+            return;
+        }
+
+        float len = holsterState.Length > 1e-5f
+            ? holsterState.Length
+            : (holsterState.Clip.length > 1e-5f ? holsterState.Clip.length : 0f);
+        if (len > 1e-5f)
+        {
+            float holdTime = _layer2HoldPoseStored ? _layer2HoldTime : (float)holsterState.Time;
+            holsterState.Time = Mathf.Clamp(holdTime, 0f, len - 1e-5f);
+        }
+
+        holsterState.IsPlaying = false;
+        RestorePresentationOverlayLayerWeight(overlay);
+        NotifyLayer2OverlayRigStabilizer();
+    }
+
     private void TryApplyLayer2HoldPoseBeforePlay(AnimancerLayer overlay)
     {
         if (overlay == null || !_layer2HoldPoseStored || _layer2HoldClip == null || !_layeredArmedActive)
@@ -1306,7 +1340,7 @@ public class PlayerArmedPresentation : MonoBehaviour
         _holsterArmedOffsetXMultiplier = 1f;
     }
 
-    /// <summary>收枪或离开持枪：协程内先播可选 holster（再同步 Layer2 权重），收枪结束后再收 IK、淡出 Layer1，最后回调。</summary>
+    /// <summary>收枪或离开持枪：协程内先播可选 holster；收枪片段结束后再收 IK、淡出 Layer1；Layer2 权重与 Layer0 idle 淡入同步淡出，最后回调与复位。</summary>
     public void BeginArmedExit(Action onComplete)
     {
         if (_exitRoutine != null)
@@ -1375,6 +1409,9 @@ public class PlayerArmedPresentation : MonoBehaviour
         var baseL = UpperBodyBaseLayer;
         var overlayL = UpperBodyOverlayLayer;
 
+        float overlayWeightForLocomotionSyncFade = 0f;
+        bool layer2NeedsLocomotionSyncFade = false;
+
         _weaponHiddenForCurrentHolster = false;
         if (_data.HasHolsterTransition)
         {
@@ -1389,6 +1426,9 @@ public class PlayerArmedPresentation : MonoBehaviour
             {
                 holsterOverlayStartW = _data.upperBodyLayerWeight;
             }
+
+            overlayWeightForLocomotionSyncFade = holsterOverlayStartW;
+            layer2NeedsLocomotionSyncFade = true;
 
             // 先启动收枪片段，再同步 Layer2 权重/平滑目标，避免在换片前改层级权重与额外 Play（hold）过渡抢在收枪动画之前。
             _drawOrHolsterState = overlayL.Play(_data.holster, _data.holsterFadeInSeconds);
@@ -1407,32 +1447,17 @@ public class PlayerArmedPresentation : MonoBehaviour
                 }
 
                 _drawOrHolsterState.Events(this).OnEnd = OnHolsterEnd;
-                float holsterFadeOut = Mathf.Max(0f, _data.holsterFadeOutSeconds);
                 while (!ended && _drawOrHolsterState != null && _drawOrHolsterState.IsPlaying)
                 {
                     _holsterArmedOffsetXMultiplier = 1f - GetUpperLayerClipProgress01(_drawOrHolsterState);
-
-                    if (holsterFadeOut > 0.0001f && _drawOrHolsterState.Length > 0.0001f)
-                    {
-                        double timeRemaining = _drawOrHolsterState.Length - _drawOrHolsterState.Time;
-                        if (timeRemaining <= holsterFadeOut)
-                        {
-                            float k = holsterFadeOut > 0.0001f
-                                ? Mathf.Clamp01((float)(timeRemaining / holsterFadeOut))
-                                : 0f;
-                            overlayL.Weight = Mathf.Lerp(0f, holsterOverlayStartW, k);
-                        }
-                        else
-                        {
-                            overlayL.Weight = holsterOverlayStartW;
-                        }
-                    }
-
                     yield return null;
                 }
 
                 CaptureLayer2HoldPoseFromState(_drawOrHolsterState);
+                var holsterStateToFreeze = _drawOrHolsterState;
                 ClearDrawOrHolsterEndEvent();
+                // 不再对同一 clip 二次 Play：否则会多一个状态节点（Inspector 里像「播了两次」），且与 ClipTransition 首播并存。
+                TryFreezeHolsterOverlayStateInPlace(overlayL, holsterStateToFreeze);
                 _holsterArmedOffsetXMultiplier = 0f;
             }
             else
@@ -1455,8 +1480,11 @@ public class PlayerArmedPresentation : MonoBehaviour
         // 收枪片段结束后再收 IK，避免与「先播退出动画、再动层级」的顺序冲突。
         _rightIkWeightTarget = 0f;
 
-        overlayL.Weight = 0f;
-        ResetOverlayUpperWeightSmoothing(0f);
+        if (!layer2NeedsLocomotionSyncFade && overlayL != null)
+        {
+            overlayL.Weight = 0f;
+            ResetOverlayUpperWeightSmoothing(0f);
+        }
 
         float layerOut = Mathf.Max(0.0001f, _data.layerFadeOutSeconds);
         float startW = baseL.Weight;
@@ -1476,12 +1504,39 @@ public class PlayerArmedPresentation : MonoBehaviour
 
         _handIk?.SetHandIkWeight(0f);
         _handIk?.SetRigBuilderEnabled(false);
+
+        float locomotionFade = Mathf.Max(0f, holsterEndToIdleLocomotionFade);
+        QueueHolsterExitToIdleLocomotionFade(holsterEndToIdleLocomotionFade);
+        onComplete?.Invoke();
+
+        if (layer2NeedsLocomotionSyncFade &&
+            overlayL != null &&
+            overlayWeightForLocomotionSyncFade > 0.0001f &&
+            locomotionFade > 0.0001f)
+        {
+            float wStart = overlayWeightForLocomotionSyncFade;
+            float u = 0f;
+            while (u < 1f)
+            {
+                u += Time.deltaTime / locomotionFade;
+                float k = Mathf.Clamp01(u);
+                float w = Mathf.Lerp(wStart, 0f, k);
+                overlayL.Weight = w;
+                _overlayUpperWeightSmoothed = w;
+                _overlayUpperWeightGoal = w;
+                yield return null;
+            }
+        }
+        else if (overlayL != null)
+        {
+            overlayL.Weight = 0f;
+        }
+
+        ResetOverlayUpperWeightSmoothing(0f);
         ForceResetVisuals();
 
         _armedExitCoroutinePending = false;
         _exitRoutine = null;
-        QueueHolsterExitToIdleLocomotionFade(holsterEndToIdleLocomotionFade);
-        onComplete?.Invoke();
     }
 
     private void ClearDrawOrHolsterEndEvent()
