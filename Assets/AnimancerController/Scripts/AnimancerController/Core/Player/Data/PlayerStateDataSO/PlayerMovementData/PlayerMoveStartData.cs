@@ -1,10 +1,9 @@
-﻿using Animancer;
+using Animancer;
 using UnityEngine;
 
 [System.Serializable]
 public class PlayerMoveStartData
 {
-    [field: SerializeField] public TransitionAsset moveStart { get; private set; }
     [field: SerializeField] public TransitionAsset moveStart_F { get; private set; }
     [field: SerializeField] public TransitionAsset moveStart_L45 { get; private set; }
     [field: SerializeField] public TransitionAsset moveStart_L90 { get; private set; }

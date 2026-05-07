@@ -1,4 +1,4 @@
-﻿using Animancer;
+using Animancer;
 using System;
 using UnityEngine;
 
@@ -13,10 +13,4 @@ public class PlayerJumpFallAndLandData
 
     [field: SerializeField] public ClipTransition[] placeJumpLand { get; private set; }//按照下落高度分为不同的着陆动画
     [field: SerializeField] public ClipTransition[] forwardJumpLand { get; private set; }//按照下落高度分为不同的着陆动画
-
-    [field: SerializeField] public ClipTransition platformerUpStart;
-
-    [field: SerializeField] public ClipTransition platformerUpLoop;
-
-    [field: SerializeField] public ClipTransition platFormerDownLoop;
 }

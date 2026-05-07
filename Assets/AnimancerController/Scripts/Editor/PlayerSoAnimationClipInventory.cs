@@ -60,7 +60,7 @@ public sealed class PlayerSoAnimationClipInventoryWindow : EditorWindow
         }
 
         EditorGUILayout.HelpBox(
-            "Collects AnimationClips from the serialized dependency closure of Player SO (ClipTransition, TransitionAsset mixers, optional AnimationClip[] on idle data).",
+            "Collects AnimationClips from the serialized dependency closure of Player SO (ClipTransition, TransitionAsset mixers, and other referenced assets).",
             MessageType.Info);
 
         if (!string.IsNullOrEmpty(lastLogSummary))

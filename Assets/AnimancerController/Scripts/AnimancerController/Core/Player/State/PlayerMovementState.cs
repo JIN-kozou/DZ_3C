@@ -101,6 +101,15 @@ public class PlayerMovementState : StateBase
 
     private void UpdateLockValue()
     {
+        // 松键后 MoveDiscrete 立即为 0，但 Move 仍可能 SmoothDamp 多帧非零；Idle 下继续用 Move 会驱动锁敌 blend 与「已停步」不一致，松移动时易抽一下。
+        if (ReferenceEquals(playerStateMachine.currentState, playerStateMachine.idleState) &&
+            inputServer.MoveDiscrete == Vector2.zero)
+        {
+            reusableData.lock_X_ValueParameter.TargetValue = 0f;
+            reusableData.lock_Y_ValueParameter.TargetValue = 0f;
+            return;
+        }
+
         reusableData.lock_X_ValueParameter.TargetValue = inputServer.Move.x * reusableData.speedValueParameter.TargetValue;
         reusableData.lock_Y_ValueParameter.TargetValue = inputServer.Move.y * reusableData.speedValueParameter.TargetValue;
     }
@@ -203,6 +212,15 @@ public class PlayerMovementState : StateBase
        float finalSpeed = (baseSpeed + reusableData.buffSnapshot.moveSpeedAdditive) * reusableData.buffSnapshot.moveSpeedMultiplier;
        return reusableData.speedValueParameter.TargetValue = Mathf.Max(0f, finalSpeed);
     }
+    /// <summary>
+    /// 进入跑循环/持枪位移等 locomotion 时，避免把 <see cref="PlayerReusableData.rotationValueParameter"/> 打成 0 导致 blend tree 第一帧与 Idle 姿态硬切。
+    /// </summary>
+    protected void SyncRotationParameterToLocomotionEntry()
+    {
+        float angleDeg = GetTargetAngle();
+        reusableData.rotationValueParameter.CurrentValue = angleDeg * Mathf.Deg2Rad;
+    }
+
     protected float UpdateRotation(bool isUpdateRotationParameter = true, float rotationSmoothTime = 0.7f, bool isRotationCompensation = true, float rotationSize = 1.4f)
     {
         float angle = GetTargetAngle();

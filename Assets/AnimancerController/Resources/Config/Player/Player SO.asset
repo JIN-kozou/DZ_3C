@@ -16,13 +16,7 @@ MonoBehaviour:
     <PlayerIdleData>k__BackingField:
       <idle>k__BackingField: {fileID: 11400000, guid: 332d7aac94dee8344a532cd1faca4aa8,
         type: 2}
-      <strandIdle_Lock>k__BackingField: []
-      <crouchIdle_Lock>k__BackingField: []
-      <strandIdle>k__BackingField: []
-      <crouchIdle>k__BackingField: []
     <PlayerMoveStartData>k__BackingField:
-      <moveStart>k__BackingField: {fileID: 11400000, guid: 60f8c68084a2fac469a2ce692d12c90a,
-        type: 2}
       <moveStart_F>k__BackingField: {fileID: 11400000, guid: 60f8c68084a2fac469a2ce692d12c90a,
         type: 2}
       <moveStart_L45>k__BackingField: {fileID: 11400000, guid: be52c68bdc1eace46a628e2c1a646268,
@@ -57,20 +51,6 @@ MonoBehaviour:
         type: 2}
       <moveLoopCrouch>k__BackingField: {fileID: 11400000, guid: 774efe4fc0f05074e99cde44ef202aab,
         type: 2}
-    <PlayerMoveEndData>k__BackingField:
-      <moveEnd_L>k__BackingField: {fileID: 11400000, guid: 1cf926f503199d3449b0ba8997b9703e,
-        type: 2}
-      <moveEnd_R>k__BackingField: {fileID: 11400000, guid: d395dfc6341c6dc458176bf775fda299,
-        type: 2}
-      <moveToWall>k__BackingField:
-        _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes: []
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 7400000, guid: 13f4277778fb44f4087d6b5e207265f0, type: 2}
-        _NormalizedStartTime: NaN
     <PlayerClimbData>k__BackingField:
       climbs:
       - _FadeDuration: 0.25
@@ -212,33 +192,6 @@ MonoBehaviour:
           - {fileID: 11400000, guid: 546bdb412bbcf824496de50d0635d3fb, type: 2}
         _Clip: {fileID: 7400156, guid: dd4bc59541169e34ead96f0310ddc7bd, type: 3}
         _NormalizedStartTime: NaN
-      platformerUpStart:
-        _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes: []
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 7400146, guid: dd4bc59541169e34ead96f0310ddc7bd, type: 3}
-        _NormalizedStartTime: NaN
-      platformerUpLoop:
-        _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes: []
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 7400148, guid: dd4bc59541169e34ead96f0310ddc7bd, type: 3}
-        _NormalizedStartTime: NaN
-      platFormerDownLoop:
-        _FadeDuration: 0.25
-        _Speed: 1
-        _Events:
-          _NormalizedTimes: []
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 7400150, guid: dd4bc59541169e34ead96f0310ddc7bd, type: 3}
-        _NormalizedStartTime: NaN
     <PlayerNumericConfig>k__BackingField:
       moveSpeedMultiplier: 1
       walkSpeedParameter: 2.5
@@ -330,7 +283,6 @@ MonoBehaviour:
       holsterToBareHandsLocomotionFadeSeconds: 0.2
       layerFadeOutSeconds: 0.2
       holsterFadeInSeconds: 0.2
-      holsterFadeOutSeconds: 0.2
       drawWeaponModelVisibleAtFrame: 30
       holsterWeaponModelHiddenAtFrame: 26
       adsEnter:
@@ -396,8 +348,6 @@ MonoBehaviour:
     <Lock_Y_ValueParameter>k__BackingField: {fileID: 11400000, guid: 155c8c7c1da9fca4b9aa0ba689448d5d,
       type: 2}
     <moveInterruptEvent>k__BackingField: {fileID: 11400000, guid: 546bdb412bbcf824496de50d0635d3fb,
-      type: 2}
-    <cancelClimbEvent>k__BackingField: {fileID: 11400000, guid: 380fccd68d7a4e14491c22fdb8c2fc60,
       type: 2}
   references:
     version: 2

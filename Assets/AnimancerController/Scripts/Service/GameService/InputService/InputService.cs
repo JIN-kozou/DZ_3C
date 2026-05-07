@@ -216,6 +216,27 @@ public class InputService : MonoSingleton<InputService>
             _keyboardMoveSmoothSession = false;
         }
     }
+
+    /// <summary>
+    /// 将平滑后的 <see cref="Move"/> 立即对齐到当前读数经 <see cref="QuantizeMove"/> 的结果。
+    /// 松键帧若 Input 早于 <see cref="TickMoveSmoothing"/>，<see cref="Move"/> 仍可能带上一帧 SmoothDamp 尾巴；离开跑循环进 Idle 前调用可避免 blend 与状态不一致。
+    /// </summary>
+    public void SnapMoveSmoothToCurrentDiscrete()
+    {
+        if (inputMap == null)
+        {
+            return;
+        }
+
+        Vector2 discrete = QuantizeMove(inputMap.Player.Move.ReadValue<Vector2>());
+        _moveSmoothed = discrete;
+        _moveSmoothVelocity = Vector2.zero;
+        if (discrete.sqrMagnitude < 0.0001f)
+        {
+            _keyboardMoveSmoothSession = false;
+        }
+    }
+
     public Vector2 Scroll =>inputMap.Player.Scroll.ReadValue<Vector2>();
 
     public bool FireHeld => inputMap != null && inputMap.Player.Fire.ReadValue<float>() > 0f;

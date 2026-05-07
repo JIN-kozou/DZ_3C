@@ -1,6 +1,10 @@
+using UnityEngine;
 using UnityEngine.InputSystem;
+
 public class PlayerIdleState : PlayerMovementState
 {
+    const float LocomotionToIdleCrossFadeSeconds = 0.22f;
+
     PlayerIdleData idleData;
     public PlayerIdleState(PlayerStateMachine stateMachine) : base(stateMachine)
     {
@@ -14,11 +18,46 @@ public class PlayerIdleState : PlayerMovementState
         }
 
         base.OnEnter();
-        reusableData.currentCrouchIdleIndex = -1;
-        reusableData.currentStandIdleIndex = -1;
+
+        bool fromLocomotion =
+            ReferenceEquals(playerStateMachine.lastState, playerStateMachine.moveLoopState) ||
+            ReferenceEquals(playerStateMachine.lastState, playerStateMachine.moveStartState) ||
+            ReferenceEquals(playerStateMachine.lastState, playerStateMachine.armedState);
+
+        if (fromLocomotion)
+        {
+            inputServer.SnapMoveSmoothToCurrentDiscrete();
+            // ForceLockOn 只写 Target；混合树若读 Current，会有一帧未完全进入锁敌/蹲姿权重，松移动切 Idle 时易闪一下。
+            reusableData.lockValueParameter.CurrentValue = 1f;
+            reusableData.standValueParameter.CurrentValue = reusableData.standValueParameter.TargetValue;
+        }
+
+        if (!fromLocomotion)
+        {
+            reusableData.currentCrouchIdleIndex = -1;
+            reusableData.currentStandIdleIndex = -1;
+        }
+
         float holsterLocomotionFade = reusableData.ConsumePendingHolsterExitToIdleLocomotionFade();
-        reusableLogic.InitIldeState(holsterLocomotionFade);
-        reusableLogic.PlayNextState();
+        float idleCrossFade = holsterLocomotionFade > 0f ? holsterLocomotionFade : LocomotionToIdleCrossFadeSeconds;
+        reusableLogic.InitIldeState(idleCrossFade);
+
+        if (inputServer.MoveDiscrete == Vector2.zero)
+        {
+            reusableData.lock_X_ValueParameter.CurrentValue = 0f;
+            reusableData.lock_Y_ValueParameter.CurrentValue = 0f;
+            reusableData.rotationValueParameter.CurrentValue = 0f;
+        }
+
+        if (fromLocomotion)
+        {
+            reusableData.currentStandIdleIndex = reusableData.standIdleList.Count > 0 ? 0 : -1;
+            reusableData.currentCrouchIdleIndex = reusableData.crouchIdleList.Count > 0 ? 0 : -1;
+        }
+        else
+        {
+            reusableLogic.PlayNextState();
+        }
     }
     protected override void AddEventListening()
     {

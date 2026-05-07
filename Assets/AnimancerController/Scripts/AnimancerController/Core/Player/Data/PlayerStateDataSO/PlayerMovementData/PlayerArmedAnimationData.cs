@@ -58,10 +58,6 @@ public class PlayerArmedAnimationData
     [Min(0f)]
     public float holsterFadeInSeconds = 0.12f;
 
-    [Tooltip("已弃用：Layer2 不再在收枪片段末尾淡出；Layer2 在 Layer1 淡出之后与 Layer0 切入 idle 同步淡出（时长取 holsterExit / holsterToBareHands 与 idle 淡入一致）。保留字段仅避免已有资源丢序列化数据。")]
-    [Min(0f)]
-    public float holsterFadeOutSeconds = 0.18f;
-
     [Header("Weapon model (IArmedWeaponModelVisibility)")]
     [Tooltip("≤0：掏枪一开始就显示武器；>0：draw 播放到该帧（按片段 frameRate）时显示。")]
     public int drawWeaponModelVisibleAtFrame = 30;

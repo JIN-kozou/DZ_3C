@@ -9,6 +9,8 @@ public class PlayerMoveLoopState : PlayerMovementState
     PlayerMoveLoopData moveLoopData;
     int tid = -1;
     bool _moveLoopPlayingCrouchAsset;
+    /// <summary>蹲姿松移动：至少再跑一整帧 MoveLoop（让 SmoothMove + blend 收到停步）再进 Idle，减轻与 idle 根图切换的硬跳。</summary>
+    int _idleAfterCrouchReleaseNotBeforeFrame = -1;
 
     public PlayerMoveLoopState(PlayerStateMachine stateMachine) : base(stateMachine)
     {
@@ -17,11 +19,12 @@ public class PlayerMoveLoopState : PlayerMovementState
     public override void OnEnter()
     {
         base.OnEnter();
+        _idleAfterCrouchReleaseNotBeforeFrame = -1;
         bool crouchIntent = reusableData.standValueParameter.TargetValue < 0.99f;
         _moveLoopPlayingCrouchAsset = crouchIntent;
         PlayMoveLoopTransition(moveLoopData.ResolveMoveLoop(crouchIntent));
         OnCheckInput();
-        reusableData.rotationValueParameter.CurrentValue = 0;
+        SyncRotationParameterToLocomotionEntry();
     }
 
     void PlayMoveLoopTransition(TransitionAsset transition)
@@ -36,6 +39,19 @@ public class PlayerMoveLoopState : PlayerMovementState
     public override void OnUpdate()
     {
         base.OnUpdate();
+
+        if (inputServer.MoveDiscrete != Vector2.zero)
+        {
+            _idleAfterCrouchReleaseNotBeforeFrame = -1;
+        }
+        else if (_idleAfterCrouchReleaseNotBeforeFrame >= 0 &&
+                 Time.frameCount >= _idleAfterCrouchReleaseNotBeforeFrame)
+        {
+            _idleAfterCrouchReleaseNotBeforeFrame = -1;
+            playerStateMachine.ChangeState(playerStateMachine.idleState);
+            return;
+        }
+
         bool crouchIntent = reusableData.standValueParameter.TargetValue < 0.99f;
         if (crouchIntent != _moveLoopPlayingCrouchAsset)
         {
@@ -120,6 +136,15 @@ public class PlayerMoveLoopState : PlayerMovementState
         {
             return;
         }
+
+        bool crouchIntent = reusableData.standValueParameter.TargetValue < 0.99f;
+        if (crouchIntent)
+        {
+            // 当前帧之后至少再经过 1 个完整 Update（Time.frameCount+2），本帧已跑过的 MoveLoop.OnUpdate 不算。
+            _idleAfterCrouchReleaseNotBeforeFrame = Time.frameCount + 2;
+            return;
+        }
+
         playerStateMachine.ChangeState(playerStateMachine.idleState);
     }
 }
