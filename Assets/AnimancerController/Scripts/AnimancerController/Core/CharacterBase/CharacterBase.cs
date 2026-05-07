@@ -258,13 +258,7 @@ public class CharacterBase : MonoBehaviour
         if (controller.enabled == true)
         {
             animationVelocity = deltaDir;
-            Vector3 stableMove = deltaDir;
-            // 轻微贴地，减少地面接缝/台阶边缘处的瞬时离地导致的卡脚。
-            if (isOnGround.Value && !disEnableGravity && verticalSpeed <= 0.05f)
-            {
-                stableMove += Vector3.down * 0.03f;
-            }
-            controller.Move(stableMove);
+            controller.Move(deltaDir);
         }
       
     }

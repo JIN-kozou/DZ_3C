@@ -73,6 +73,9 @@ public class PlayerReusableData
     //跳跃
     public float horizontalSpeed;
     public Vector3 inAirMoveDirection;
+    /// <summary>离地后 Coyote Time 剩余秒数；&gt;0 时仍可按跳起跳（见 <see cref="PlayerNumericConfig.coyoteJumpTimeSeconds"/>）。</summary>
+    public float coyoteTimeRemaining;
+
     //跳跃惯性
     public Vector3 currentInertialVelocity;
     public int cashIndex = 0;

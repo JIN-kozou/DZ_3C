@@ -160,7 +160,16 @@ public class PlayerReusableLogic
     /// </summary>
     public void OnJump()
     {
-        // 跳跃按下时只进入跳跃状态，不在地面瞬间触发攀爬。
+        var nc = playerSO?.playerMovementData?.PlayerNumericConfig;
+        bool grounded = player.isOnGround.Value;
+        float coyoteCfg = nc != null ? nc.coyoteJumpTimeSeconds : 0f;
+        bool coyoteOk = coyoteCfg > 0f && reusableData.coyoteTimeRemaining > 0f;
+        if (!grounded && !coyoteOk)
+        {
+            return;
+        }
+
+        reusableData.coyoteTimeRemaining = 0f;
         player.StateMachine.ChangeState(player.StateMachine.jumpState);
     }
 

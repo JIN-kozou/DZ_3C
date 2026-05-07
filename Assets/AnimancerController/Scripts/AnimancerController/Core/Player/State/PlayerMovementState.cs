@@ -44,6 +44,7 @@ public class PlayerMovementState : StateBase
     public override void OnUpdate()
     {
         ForceLockOn();
+        TickCoyoteTimeThenMaybeFall();
         //处理索敌
         if (reusableData.lockValueParameter.TargetValue == 1)
         {
@@ -302,8 +303,31 @@ public class PlayerMovementState : StateBase
         reusableData.canCheckClimbInAirAfterJump = true;
         reusableLogic.OnJump();
     }
+
+    /// <summary>Coyote 倒计时耗尽后进入下落；跳跃/下落态不在此消耗（由 <see cref="OnCheckFall"/> 控制是否获得 Coyote）。</summary>
+    void TickCoyoteTimeThenMaybeFall()
+    {
+        if (player.isOnGround.Value || reusableData.coyoteTimeRemaining <= 0f)
+        {
+            return;
+        }
+
+        reusableData.coyoteTimeRemaining -= Time.deltaTime;
+        if (reusableData.coyoteTimeRemaining > 0f)
+        {
+            return;
+        }
+
+        reusableData.coyoteTimeRemaining = 0f;
+        OnEnterFall();
+    }
     protected void OnEnterFall()
     {
+        if (ReferenceEquals(playerStateMachine.currentState, playerStateMachine.fallLoopState))
+        {
+            return;
+        }
+
         if (Time.time - lastFallSwitchTime < stateSwitchCooldown)
         {
             return;
@@ -317,10 +341,22 @@ public class PlayerMovementState : StateBase
     }
     protected void OnCheckFall(bool isGround)
     {
-        if (!isGround)
+        if (isGround)
         {
-            timerServer.AddTimer(50, OnLandToFall);
+            reusableData.coyoteTimeRemaining = 0f;
+            return;
         }
+
+        float coyoteCfg = numericConfig != null ? numericConfig.coyoteJumpTimeSeconds : 0f;
+        if (coyoteCfg > 0f &&
+            playerStateMachine.currentState != playerStateMachine.jumpState &&
+            playerStateMachine.currentState != playerStateMachine.fallLoopState)
+        {
+            reusableData.coyoteTimeRemaining = coyoteCfg;
+            return;
+        }
+
+        OnLandToFall();
     }
     protected void OnFallToLand(bool onGround)
     {

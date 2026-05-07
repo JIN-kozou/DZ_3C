@@ -17,6 +17,7 @@ public class PlayerJumpState : PlayerMovementState
     public override void OnEnter()
     {
         base.OnEnter();
+        reusableData.coyoteTimeRemaining = 0f;
         float dt = Mathf.Max(Time.deltaTime, 0.0001f);
         Vector3 takeoffVelocity = player.AnimationVelocity;
         takeoffVelocity.y = 0f;

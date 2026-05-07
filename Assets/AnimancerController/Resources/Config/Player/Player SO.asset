@@ -223,12 +223,13 @@ MonoBehaviour:
       slideMaxSpeed: 8
       slideControlDamping: 4
       minGroundNormalY: 0.1
+      coyoteJumpTimeSeconds: 0.12
       defaultJumpHeight: 0.8
       outPlaceJumpHeight: 0.8
-      platformerJumpHeight: 1
+      platformerJumpHeight: 0.8
       jumpInertiaTriggerSpeedThreshold: 10
       inAirSpeedCap: 20
-      inAirSpeedDecay: 0
+      inAirSpeedDecay: 4
       inAirInputMaintainAcceleration: 8
       climbDetectionAngle: 60
       wallProbeDistance: 0.25

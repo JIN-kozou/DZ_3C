@@ -58,6 +58,8 @@ public class PlayerNumericConfig
     [Range(0f, 1f)] public float minGroundNormalY = 0.1f;
 
     [Header("Jump")]
+    [Tooltip("台边 Coyote：离地后仍可起跳的秒数；0 表示离地立即进下落（不再使用原 50ms 定时器）。")]
+    [Min(0f)] public float coyoteJumpTimeSeconds = 0.12f;
     [Min(0f)] public float defaultJumpHeight = 0.8f;
     [Min(0f)] public float outPlaceJumpHeight = 0.8f;
     [Min(0f)] public float platformerJumpHeight = 15f;

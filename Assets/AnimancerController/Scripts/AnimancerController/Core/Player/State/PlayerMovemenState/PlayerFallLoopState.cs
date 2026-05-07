@@ -15,6 +15,7 @@ public class PlayerFallLoopState : PlayerMovementState
     public override void OnEnter()
     {
         base.OnEnter();
+        reusableData.coyoteTimeRemaining = 0f;
         //this.Log("惯性速度：" + reusableData.currentInertialVelocity / Time.deltaTime);
 
         player.ignoreRootMotionY = false;
