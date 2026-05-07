@@ -41,8 +41,21 @@ MonoBehaviour:
         type: 2}
       <moveStart_R180>k__BackingField: {fileID: 11400000, guid: e617ef6da8f9a4d4280e6b759341554a,
         type: 2}
+      <moveStartCrouchOmni>k__BackingField: {fileID: 11400000, guid: 5051021901046cb45b033d4ed09abed5,
+        type: 2}
+      <moveStart_F_Crouch>k__BackingField: {fileID: 0}
+      <moveStart_L45_Crouch>k__BackingField: {fileID: 0}
+      <moveStart_L90_Crouch>k__BackingField: {fileID: 0}
+      <moveStart_L135_Crouch>k__BackingField: {fileID: 0}
+      <moveStart_L180_Crouch>k__BackingField: {fileID: 0}
+      <moveStart_R45_Crouch>k__BackingField: {fileID: 0}
+      <moveStart_R90_Crouch>k__BackingField: {fileID: 0}
+      <moveStart_R135_Crouch>k__BackingField: {fileID: 0}
+      <moveStart_R180_Crouch>k__BackingField: {fileID: 0}
     <PlayerMoveLoopData>k__BackingField:
-      <moveLoop>k__BackingField: {fileID: 11400000, guid: c4d72ffdfc3326c4082db72d2c1738cb,
+      <moveLoop>k__BackingField: {fileID: 11400000, guid: 3d0127017b3923b4e852ff4a77747c03,
+        type: 2}
+      <moveLoopCrouch>k__BackingField: {fileID: 11400000, guid: 774efe4fc0f05074e99cde44ef202aab,
         type: 2}
     <PlayerMoveEndData>k__BackingField:
       <moveEnd_L>k__BackingField: {fileID: 11400000, guid: 1cf926f503199d3449b0ba8997b9703e,
@@ -72,7 +85,7 @@ MonoBehaviour:
         _Clip: {fileID: 7400050, guid: dd4bc59541169e34ead96f0310ddc7bd, type: 3}
         _NormalizedStartTime: 0
       - _FadeDuration: 0.21666668
-        _Speed: 1
+        _Speed: 2
         _Events:
           _NormalizedTimes:
           - 0.5146872

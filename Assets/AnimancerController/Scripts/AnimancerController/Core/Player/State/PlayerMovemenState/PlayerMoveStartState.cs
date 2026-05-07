@@ -1,4 +1,5 @@
 using Animancer;
+using UnityEngine;
 using UnityEngine.InputSystem;
 /**************************************************************************
 作者: HuHu
@@ -24,40 +25,18 @@ public class PlayerMoveStartState : PlayerMovementState
             playerStateMachine.ChangeState(playerStateMachine.moveLoopState);
             return;
         }
+
+        bool crouchIntent = reusableData.standValueParameter.TargetValue < 0.99f;
         targetAngle = UpdateRotation();
-        if (targetAngle < 22.5 &&targetAngle >=0|| targetAngle >= -22.5&&targetAngle <= 0)
+        TransitionAsset startTrans = moveStartData.ResolveMoveStart(targetAngle, crouchIntent);
+        if (startTrans == null || !startTrans.IsValid)
         {
-            state = animancer.Play(moveStartData.moveStart_F);
-            isForwardMove = true;
+            playerStateMachine.ChangeState(playerStateMachine.moveLoopState);
+            return;
         }
-        else if (targetAngle >= 22.5 && targetAngle < 67.5)
-        {
-            state = animancer.Play(moveStartData.moveStart_R45);
-        }
-        else if (targetAngle >= 67.5 && targetAngle < 112.5)
-        {
-            state = animancer.Play(moveStartData.moveStart_R90);
-        }
-        else if (targetAngle >= 112.5 && targetAngle < 157.5)
-        {
-            state = animancer.Play(moveStartData.moveStart_R135);
-        }
-        else if (targetAngle >= 157.5 || targetAngle < -157.5)
-        {
-            state = animancer.Play(moveStartData.moveStart_R180);
-        }
-        else if (targetAngle >= -157.5 && targetAngle < -112.5)
-        {
-            state = animancer.Play(moveStartData.moveStart_L135);
-        }
-        else if (targetAngle >= -112.5 && targetAngle < -67.5)
-        {
-            state = animancer.Play(moveStartData.moveStart_L90);
-        }
-        else if (targetAngle >= -67.5 && targetAngle < -22.5)
-        {
-            state = animancer.Play(moveStartData.moveStart_L45);
-        }
+
+        state = animancer.Play(startTrans);
+        isForwardMove = targetAngle < 22.5f && targetAngle >= 0f || targetAngle >= -22.5f && targetAngle <= 0f;
         state.Events(player).OnEnd = OnMoveStartEnd;
     }
     protected override void AddEventListening()
@@ -107,7 +86,7 @@ public class PlayerMoveStartState : PlayerMovementState
 
     private void OnCheckInput()
     {
-        if (inputServer.Move != UnityEngine.Vector2.zero)
+        if (inputServer.MoveDiscrete != UnityEngine.Vector2.zero)
         {
             return;
         }

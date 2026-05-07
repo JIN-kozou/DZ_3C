@@ -23,7 +23,8 @@ public class PlayerArmedState : PlayerMovementState
         var armedAnim = playerSO.playerMovementData.PlayerArmedAnimationData;
         bool resumeLayers = reusableData.resumeArmedPresentationWithoutDraw;
         reusableData.resumeArmedPresentationWithoutDraw = false;
-        player.ArmedPresentation.BeginArmedEnter(_moveLoopData.moveLoop, armedAnim, resumeLayers);
+        bool crouchIntent = reusableData.standValueParameter.TargetValue < 0.99f;
+        player.ArmedPresentation.BeginArmedEnter(_moveLoopData.ResolveMoveLoop(crouchIntent), armedAnim, resumeLayers);
         reusableData.rotationValueParameter.CurrentValue = 0;
         var weapon = player.GetComponent<PlayerWeaponRuntime>();
         weapon?.RefillMagazine();
@@ -92,7 +93,7 @@ public class PlayerArmedState : PlayerMovementState
     /// </summary>
     private void TryEnterLocomotionIfMoveAlreadyHeld()
     {
-        if (!player.isOnGround.Value || inputServer.Move == Vector2.zero)
+        if (!player.isOnGround.Value || inputServer.MoveDiscrete == Vector2.zero)
         {
             return;
         }
@@ -109,7 +110,7 @@ public class PlayerArmedState : PlayerMovementState
 
     private void OnCheckMoveEnd(InputAction.CallbackContext context)
     {
-        if (inputServer.Move != Vector2.zero)
+        if (inputServer.MoveDiscrete != Vector2.zero)
         {
             return;
         }

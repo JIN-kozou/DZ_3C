@@ -11,6 +11,11 @@ public class StateMachineBase
     /// <param name="targetState"></param>
     public virtual void ChangeState(IState targetState)
     {
+        if (targetState != null && targetState == currentState)
+        {
+            return;
+        }
+
         currentState?.OnExit();
         lastState = currentState;
         currentState = targetState;

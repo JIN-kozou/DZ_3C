@@ -1,10 +1,15 @@
+using Animancer;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerMoveLoopState : PlayerMovementState
 {
+    const float StanceLocomotionCrossFade = 0.08f;
+
     PlayerMoveLoopData moveLoopData;
     int tid = -1;
+    bool _moveLoopPlayingCrouchAsset;
+
     public PlayerMoveLoopState(PlayerStateMachine stateMachine) : base(stateMachine)
     {
         moveLoopData = playerSO.playerMovementData.PlayerMoveLoopData;
@@ -12,15 +17,36 @@ public class PlayerMoveLoopState : PlayerMovementState
     public override void OnEnter()
     {
         base.OnEnter();
-        animancer.Play(moveLoopData.moveLoop);
+        bool crouchIntent = reusableData.standValueParameter.TargetValue < 0.99f;
+        _moveLoopPlayingCrouchAsset = crouchIntent;
+        PlayMoveLoopTransition(moveLoopData.ResolveMoveLoop(crouchIntent));
         OnCheckInput();
         reusableData.rotationValueParameter.CurrentValue = 0;
+    }
+
+    void PlayMoveLoopTransition(TransitionAsset transition)
+    {
+        if (transition != null && transition.IsValid)
+        {
+            animancer.Play((ITransition)transition);
+        }
     }
 
 
     public override void OnUpdate()
     {
         base.OnUpdate();
+        bool crouchIntent = reusableData.standValueParameter.TargetValue < 0.99f;
+        if (crouchIntent != _moveLoopPlayingCrouchAsset)
+        {
+            _moveLoopPlayingCrouchAsset = crouchIntent;
+            TransitionAsset next = moveLoopData.ResolveMoveLoop(crouchIntent);
+            if (next != null && next.IsValid)
+            {
+                animancer.Play((ITransition)next, StanceLocomotionCrossFade);
+            }
+        }
+
         UpdateCashVelocity(player.AnimationVelocity);
         if (reusableData.lockValueParameter.TargetValue == 1)
         {
@@ -89,7 +115,8 @@ public class PlayerMoveLoopState : PlayerMovementState
 
     private void OnCheckInput()
     {
-        if (inputServer.Move != UnityEngine.Vector2.zero)
+        // 用 MoveDiscrete：松键后 Move 仍可能因 SmoothDamp 非零，否则会卡在 MoveLoop。
+        if (inputServer.MoveDiscrete != UnityEngine.Vector2.zero)
         {
             return;
         }

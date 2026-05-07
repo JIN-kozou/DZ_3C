@@ -264,7 +264,7 @@ public class PlayerMovementState : StateBase
         Debug.Log("添加打断检测");
         reusableData.inputInterruptionCB = () =>
             {
-                if (inputServer.Move != Vector2.zero)
+                if (inputServer.MoveDiscrete != Vector2.zero)
                 {
                     if (player.isOnGround.Value)
                     {
