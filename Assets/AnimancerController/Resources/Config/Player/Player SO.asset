@@ -109,88 +109,70 @@ MonoBehaviour:
         enableCCTimeOffset: 0.1
     <PlayerJumpFallAndLandData>k__BackingField:
       <placeJumpStart>k__BackingField:
-        _FadeDuration: 0.1
-        _Speed: 0.4
-        _Events:
-          _NormalizedTimes:
-          - 0.7
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 7400000, guid: f1aa01a1ae316e341a90e023a4d7f074, type: 2}
-        _NormalizedStartTime: 0.25
-      <forwardJumpStart>k__BackingField:
-        _FadeDuration: 0.11666667
-        _Speed: 0.4
-        _Events:
-          _NormalizedTimes:
-          - 0.7
-          _Callbacks: []
-          _Names: []
-        _Clip: {fileID: 7400000, guid: 96badaec63604d64085f487e686f1bba, type: 2}
-        _NormalizedStartTime: 0.12
-      <fallStart>k__BackingField:
-        _FadeDuration: 0.14
-        _Speed: 0.5
+        _FadeDuration: 0
+        _Speed: 1
         _Events:
           _NormalizedTimes: []
           _Callbacks: []
           _Names: []
-        _Clip: {fileID: 7400000, guid: a4c254a083ac9954ebc0edaf490a2ddb, type: 2}
+        _Clip: {fileID: 3094330708855449807, guid: 53186c660ca35254cb302f56f055063e,
+          type: 3}
+        _NormalizedStartTime: 0
+      <forwardJumpStart>k__BackingField:
+        _FadeDuration: 0
+        _Speed: 1
+        _Events:
+          _NormalizedTimes: []
+          _Callbacks: []
+          _Names: []
+        _Clip: {fileID: 3094330708855449807, guid: 53186c660ca35254cb302f56f055063e,
+          type: 3}
+        _NormalizedStartTime: 0
+      <fallStart>k__BackingField:
+        _FadeDuration: 0.4
+        _Speed: 1
+        _Events:
+          _NormalizedTimes: []
+          _Callbacks: []
+          _Names: []
+        _Clip: {fileID: 8908273484855622883, guid: 1455f282db7117d419994bb5c5f3acc2,
+          type: 3}
         _NormalizedStartTime: 0
       <fall>k__BackingField:
-        _FadeDuration: 0.13000001
-        _Speed: 1.1
+        _FadeDuration: 0
+        _Speed: 1
         _Events:
           _NormalizedTimes: []
           _Callbacks: []
           _Names: []
-        _Clip: {fileID: 7400000, guid: 890a07b1827bed54d8f196abd204522c, type: 2}
+        _Clip: {fileID: 8908273484855622883, guid: 1455f282db7117d419994bb5c5f3acc2,
+          type: 3}
         _NormalizedStartTime: NaN
       <placeJumpLand>k__BackingField:
-      - _FadeDuration: 0.08433334
-        _Speed: 1.2
-        _Events:
-          _NormalizedTimes:
-          - 0.2
-          - 0.6939343
-          _Callbacks: []
-          _Names:
-          - {fileID: 11400000, guid: 546bdb412bbcf824496de50d0635d3fb, type: 2}
-        _Clip: {fileID: 7400126, guid: dd4bc59541169e34ead96f0310ddc7bd, type: 3}
-        _NormalizedStartTime: NaN
-      - _FadeDuration: 0.08433334
+      - _FadeDuration: 0.2
         _Speed: 1
         _Events:
           _NormalizedTimes:
-          - 0.73
-          - 0.95
+          - 0.2
+          - NaN
           _Callbacks: []
           _Names:
           - {fileID: 11400000, guid: 546bdb412bbcf824496de50d0635d3fb, type: 2}
-        _Clip: {fileID: 7400158, guid: dd4bc59541169e34ead96f0310ddc7bd, type: 3}
+        _Clip: {fileID: 3094330708855449807, guid: fa72f21fa809c0542b384cb2889e901e,
+          type: 3}
         _NormalizedStartTime: NaN
       <forwardJumpLand>k__BackingField:
-      - _FadeDuration: 0.1
+      - _FadeDuration: 0.2
         _Speed: 1
         _Events:
           _NormalizedTimes:
           - 0.2
-          - 0.9
+          - NaN
           _Callbacks: []
           _Names:
           - {fileID: 11400000, guid: 546bdb412bbcf824496de50d0635d3fb, type: 2}
-        _Clip: {fileID: 7400132, guid: dd4bc59541169e34ead96f0310ddc7bd, type: 3}
-        _NormalizedStartTime: NaN
-      - _FadeDuration: 0.1
-        _Speed: 1
-        _Events:
-          _NormalizedTimes:
-          - 0.7803109
-          - 0.9
-          _Callbacks: []
-          _Names:
-          - {fileID: 11400000, guid: 546bdb412bbcf824496de50d0635d3fb, type: 2}
-        _Clip: {fileID: 7400156, guid: dd4bc59541169e34ead96f0310ddc7bd, type: 3}
+        _Clip: {fileID: 3094330708855449807, guid: fa72f21fa809c0542b384cb2889e901e,
+          type: 3}
         _NormalizedStartTime: NaN
     <PlayerNumericConfig>k__BackingField:
       moveSpeedMultiplier: 1
