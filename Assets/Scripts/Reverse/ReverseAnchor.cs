@@ -18,6 +18,12 @@ namespace DZ_3C.Reverse
 
         [Tooltip("逆重系统配置。用于读 anchorMaxHealth 校验和 deathThreshold。")]
         [SerializeField] private ReverseConfig config;
+        [Header("Low Health Buff (optional)")]
+        [SerializeField] private PlayerBuffConfigSO lowHealthVisualBuffConfig;
+        [SerializeField] private PlayerBuffSourceType lowHealthBuffSourceType = PlayerBuffSourceType.Other;
+        [Min(0f)]
+        [SerializeField] private float lowHealthThreshold = 15f;
+        [SerializeField] private bool removeLowHealthBuffWhenRecovered = true;
 
         /// <summary>锚血降到死亡阈值（含等于）时触发一次。</summary>
         public event Action OnAnchorDied;
@@ -26,6 +32,7 @@ namespace DZ_3C.Reverse
         public event Action<float> OnAnchorHealthChanged;
 
         private bool subscribed;
+        private bool lowHealthBuffApplied;
 
         public Player Player => player;
         public ReverseConfig Config => config;
@@ -71,6 +78,7 @@ namespace DZ_3C.Reverse
         {
             // 兜底：Player.Awake 后 ReusableData 才存在，确保订阅成功。
             TrySubscribe();
+            SyncLowHealthBuff(CurrentHealth);
             if (config != null && config.validateAnchorHealthSync && player != null
                 && Mathf.Abs(player.MaxHealth - config.anchorMaxHealth) > 0.01f)
             {
@@ -82,6 +90,12 @@ namespace DZ_3C.Reverse
 
         private void OnDisable()
         {
+            if (removeLowHealthBuffWhenRecovered && lowHealthBuffApplied && player != null && lowHealthVisualBuffConfig != null)
+            {
+                player.BuffSystem?.RemoveBuff(lowHealthVisualBuffConfig.BuffId);
+                lowHealthBuffApplied = false;
+            }
+
             if (player != null && player.ReusableData != null && subscribed)
             {
                 player.ReusableData.health.ValueChanged -= HandleHealthChanged;
@@ -100,11 +114,30 @@ namespace DZ_3C.Reverse
         private void HandleHealthChanged(float newHealth)
         {
             OnAnchorHealthChanged?.Invoke(newHealth);
+            SyncLowHealthBuff(newHealth);
             float threshold = (config != null ? config.deathThreshold : 0f);
             if (newHealth <= threshold)
             {
                 OnAnchorDied?.Invoke();
             }
+        }
+
+        private void SyncLowHealthBuff(float health)
+        {
+            if (lowHealthVisualBuffConfig == null || player == null || player.BuffSystem == null) return;
+
+            bool shouldApply = health < lowHealthThreshold;
+            if (shouldApply)
+            {
+                if (lowHealthBuffApplied) return;
+                player.ApplyBuff(lowHealthVisualBuffConfig, new PlayerBuffSourceContext(lowHealthBuffSourceType, gameObject));
+                lowHealthBuffApplied = true;
+                return;
+            }
+
+            if (!removeLowHealthBuffWhenRecovered || !lowHealthBuffApplied) return;
+            player.BuffSystem.RemoveBuff(lowHealthVisualBuffConfig.BuffId);
+            lowHealthBuffApplied = false;
         }
 
         /// <summary>把锚补到满。复活时使用。</summary>

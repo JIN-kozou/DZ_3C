@@ -1,0 +1,79 @@
+🔧 Quick Setup Guide
+
+🔹Select the folder of the render pipeline you are using when importing the content. The demo scene is only compatible with the HDRP render pipeline, but it is for visual purposes only. Therefore, you do not need to import it. Just follow the instructions below.
+
+URP:
+
+1- Select your URP Asset (e.g., URP-HighFidelity-Renderer).
+2- Go to Add Renderer Feature → Choose Full Screen Pass Renderer Feature.
+3- Set Injection Point to Before Rendering Post Processing.
+4- Drag the desired material into the Pass Material slot.
+	⚠️ Make sure material names start with "M_" to enable parameter adjustments.
+
+HDRP:
+
+1- Right-click in your scene hierarchy → Volume → Custom Pass.
+2- Set Injection Point to Before Post Process.
+3- Click ➕ to add a new Custom Pass.
+4- Drag your chosen material into the FullScreen Material slot.
+	⚠️ Material names must begin with "M_" to allow parameter control.
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+🎯 Full Screen Effects Pack – Bring Your Game to Life with Stunning Visual Feedback
+
+Enhance the visual clarity and emotional impact of your game with this Full Screen Effects Pack, designed exclusively for Unity. Whether you're developing an FPS, RPG, horror, survival, or action game, these effects provide immersive, high-quality feedback that lets players truly feel every hit, power-up, or environmental hazard.
+
+
+
+🌀 What’s Inside?
+
+A collection of 17 full-screen effects that visually represent a wide range of in-game scenarios:
+
+💥 Damage Vignette Effects – Blood splatter, red haze
+⚡ Power-Up Glow Effects – Shine and highlight moments of power gain
+🔥 Adrenaline Mode / Advanced Vignette Effects – Create high-tension visuals
+🌪️ Environmental Effects – Heat distortion, freezing cold, poison, storms, and more
+💡 Screen Flash & Blur – Amplify tension or indicate critical moments
+
+
+
+⚙️ Features
+
+* Adjust color, opacity, duration, and animation with ease.🎨 Fully Customizable
+* Simple to use – just drag into your scene and go.🧩 Drag-and-Drop Integration
+* Most effects are texture-free (excluding a few), ensuring smooth gameplay even on lower-end devices.🚀 Lightweight & Performance-Optimized
+* Compatible with URP and HDRP (minor setup required).🎮 Render Pipeline Support
+
+
+
+✅ Ideal For:
+
+* FPS (First-Person Shooters)
+* RPGs
+* Horror & Survival Games
+* Action Games
+* Any genre that benefits from impactful screen-based visual feedback
+
+
+
+📦 Technical Info
+Unity Version: 2022.2 and above
+File Size: Lightweight & modular
+Animations: Not included, but every effect includes an Alpha parameter to easily animate transitions using Unity's tools.
+
+
+
+🎮 Make Every Moment Count
+With the Full Screen Effects Pack, you can give players feedback they’ll see and feel. From taking a hit to entering a toxic zone or powering up – let every moment hit harder.
+	💡 Create intense, cinematic experiences without heavy performance costs.

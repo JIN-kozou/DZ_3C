@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,12 +20,22 @@ public class PlayerBuffInstance
     }
 }
 
+public struct PlayerBuffLifecycleEvent
+{
+    public string buffId;
+    public PlayerBuffConfigSO config;
+    public PlayerBuffSourceContext sourceContext;
+    public bool isRefresh;
+}
+
 public class PlayerBuffSystem
 {
     private readonly Player player;
     private readonly List<PlayerBuffInstance> activeBuffs = new List<PlayerBuffInstance>();
     private readonly Dictionary<string, PlayerBuffInstance> uniqueBuffMap = new Dictionary<string, PlayerBuffInstance>();
     private PlayerBuffRuntimeSnapshot runtimeSnapshot = PlayerBuffRuntimeSnapshot.Default;
+    public event Action<PlayerBuffLifecycleEvent> BuffApplied;
+    public event Action<PlayerBuffLifecycleEvent> BuffRemoved;
 
     public PlayerBuffSystem(Player player)
     {
@@ -76,6 +87,7 @@ public class PlayerBuffSystem
         if (config.StackRule == PlayerBuffStackRule.IndependentDuration)
         {
             AddIndependentBuff(config, sourceContext);
+            RaiseBuffApplied(config, sourceContext, false);
             RebuildSnapshot();
             return;
         }
@@ -85,6 +97,7 @@ public class PlayerBuffSystem
             instance = new PlayerBuffInstance(config, sourceContext);
             uniqueBuffMap[config.BuffId] = instance;
             activeBuffs.Add(instance);
+            RaiseBuffApplied(config, sourceContext, false);
             RebuildSnapshot();
             return;
         }
@@ -97,12 +110,14 @@ public class PlayerBuffSystem
                 instance.tickTimer = 0f;
                 instance.config = config;
                 instance.sourceContext = sourceContext;
+                RaiseBuffApplied(config, sourceContext, true);
                 break;
             case PlayerBuffStackRule.RefreshDuration:
             default:
                 instance.stackCount = Mathf.Min(instance.stackCount + 1, config.MaxStack);
                 instance.remainDuration = Mathf.Max(instance.remainDuration, config.Duration);
                 instance.sourceContext = sourceContext;
+                RaiseBuffApplied(config, sourceContext, true);
                 break;
         }
 
@@ -133,6 +148,10 @@ public class PlayerBuffSystem
     {
         if (includeUndispellable)
         {
+            for (int i = 0; i < activeBuffs.Count; i++)
+            {
+                RaiseBuffRemoved(activeBuffs[i].config, activeBuffs[i].sourceContext);
+            }
             activeBuffs.Clear();
             uniqueBuffMap.Clear();
         }
@@ -160,6 +179,7 @@ public class PlayerBuffSystem
 
     private void RemoveInstance(PlayerBuffInstance instance, int index)
     {
+        RaiseBuffRemoved(instance.config, instance.sourceContext);
         activeBuffs.RemoveAt(index);
 
         if (instance.config.StackRule != PlayerBuffStackRule.IndependentDuration &&
@@ -168,6 +188,28 @@ public class PlayerBuffSystem
         {
             uniqueBuffMap.Remove(instance.config.BuffId);
         }
+    }
+
+    private void RaiseBuffApplied(PlayerBuffConfigSO config, PlayerBuffSourceContext sourceContext, bool isRefresh)
+    {
+        BuffApplied?.Invoke(new PlayerBuffLifecycleEvent
+        {
+            buffId = config != null ? config.BuffId : string.Empty,
+            config = config,
+            sourceContext = sourceContext,
+            isRefresh = isRefresh
+        });
+    }
+
+    private void RaiseBuffRemoved(PlayerBuffConfigSO config, PlayerBuffSourceContext sourceContext)
+    {
+        BuffRemoved?.Invoke(new PlayerBuffLifecycleEvent
+        {
+            buffId = config != null ? config.BuffId : string.Empty,
+            config = config,
+            sourceContext = sourceContext,
+            isRefresh = false
+        });
     }
 
     private void ProcessRegeneration(PlayerBuffInstance instance, float deltaTime)

@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: M_FCE_Poison
+  m_Shader: {fileID: -6465566751694194690, guid: 109cd0123a50b8e47844c657847ed357,
+    type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _SampleTexture2D_2917f6d169be404bad52ea265a119951_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: 8b11e5cb3f67a2a448d11a9e6df5302a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_fd1fedb5e51841df815f5c0a1d654334_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: 282171faa0fc16d409c65773c5695fde, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _Alpha: 1
+    - _Anti_tile: 1
+    - _Background: 0.5
+    - _Mask_Bevel: 0
+    - _Mask_Feather: 1
+    - _Mask_Noise: 0
+    - _Mask_Size: 0.3
+    - _Power: 0.2
+    - _Size: 1
+    - _Speed: 0.5
+    m_Colors:
+    - _Color: {r: 0, g: 0.05882353, b: 0, a: 0}
+  m_BuildTextureStacks: []
