@@ -1,5 +1,37 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8045974056289856034
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c63d03a0d0289964bbb6ee8040b67dd1, type: 3}
+  m_Name: MosaicSettings
+  m_EditorClassIdentifier: 
+  active: 0
+  renderPassEvent:
+    m_OverrideState: 1
+    m_Value: 550
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  overlayTexture:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
+    dimension: 1
+  overlayColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.3773585, g: 0.3773585, b: 0.3773585, a: 1}
+  xTileCount:
+    m_OverrideState: 1
+    m_Value: 320
+  usePointFiltering:
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &-7230809979979181493
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -25,6 +57,35 @@ MonoBehaviour:
   blurType:
     m_OverrideState: 1
     m_Value: 0
+--- !u!114 &-6443786052090970598
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7e6d113b8f8ecc4e9a43c8762887a89, type: 3}
+  m_Name: GlitchSettings
+  m_EditorClassIdentifier: 
+  active: 0
+  renderPassEvent:
+    m_OverrideState: 1
+    m_Value: 550
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  offsetTexture:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
+    dimension: 1
+  offsetStrength:
+    m_OverrideState: 1
+    m_Value: 0
+  verticalTiling:
+    m_OverrideState: 1
+    m_Value: 6.8
 --- !u!114 &-6009583995492162746
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -65,14 +126,14 @@ MonoBehaviour:
     m_Value: 550
   strength:
     m_OverrideState: 1
-    m_Value: 12
+    m_Value: 30
   luminanceThreshold:
     m_OverrideState: 1
     m_Value: 0.7
   downsampleAmount:
     m_OverrideState: 1
     m_Value: 5
---- !u!114 &-446470113263100115
+--- !u!114 &-1585880696005037362
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -143,9 +204,14 @@ MonoBehaviour:
   - {fileID: -4491274928641573729}
   - {fileID: 2837537973815853588}
   - {fileID: -7230809979979181493}
-  - {fileID: -446470113263100115}
   - {fileID: 6887426221271322997}
   - {fileID: -6009583995492162746}
+  - {fileID: -1585880696005037362}
+  - {fileID: 3065354846150996045}
+  - {fileID: 6030229854883965199}
+  - {fileID: -6443786052090970598}
+  - {fileID: -8045974056289856034}
+  - {fileID: 2882086990940200957}
 --- !u!114 &2837537973815853588
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -180,6 +246,78 @@ MonoBehaviour:
   powerRamp:
     m_OverrideState: 1
     m_Value: 0.46
+--- !u!114 &2882086990940200957
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b52e5c16327dbe943b312dcaf1208cc3, type: 3}
+  m_Name: PixelateSettings
+  m_EditorClassIdentifier: 
+  active: 1
+  renderPassEvent:
+    m_OverrideState: 1
+    m_Value: 550
+  pixelSize:
+    m_OverrideState: 1
+    m_Value: 2
+--- !u!114 &3065354846150996045
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 693a2db7bfb07904b81fcc3c73a50679, type: 3}
+  m_Name: SNESSettings
+  m_EditorClassIdentifier: 
+  active: 0
+  renderPassEvent:
+    m_OverrideState: 1
+    m_Value: 550
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  bandingValues:
+    m_OverrideState: 1
+    m_Value: 16
+  powerRamp:
+    m_OverrideState: 1
+    m_Value: 0.59
+--- !u!114 &6030229854883965199
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6e5cd28d2c7734409543cd8fc4eddb7, type: 3}
+  m_Name: SilhouetteSettings
+  m_EditorClassIdentifier: 
+  active: 0
+  renderPassEvent:
+    m_OverrideState: 1
+    m_Value: 550
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  nearColor:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+  farColor:
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  powerRamp:
+    m_OverrideState: 1
+    m_Value: 0.37
 --- !u!114 &6887426221271322997
 MonoBehaviour:
   m_ObjectHideFlags: 3

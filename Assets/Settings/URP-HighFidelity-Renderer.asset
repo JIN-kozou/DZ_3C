@@ -59,6 +59,19 @@ MonoBehaviour:
   m_Name: Light Streaks
   m_EditorClassIdentifier: 
   m_Active: 1
+--- !u!114 &-6454459603344556102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 975bd39b8808f6a4ca999ba1edc68379, type: 3}
+  m_Name: Pixelate
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &-2168426387385348316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -139,6 +152,12 @@ MonoBehaviour:
   - {fileID: -6915492055071612519}
   - {fileID: 7657486331668331859}
   - {fileID: 7257494503185593354}
+  - {fileID: 4309645113310826695}
+  - {fileID: 1836387725348405824}
+  - {fileID: 5136199921021181529}
+  - {fileID: 200446381492199809}
+  - {fileID: 7581731952795454879}
+  - {fileID: -6454459603344556102}
   m_RendererFeatureMap: adc0de57c6d2eee51ed5f273d86b790c5e052bd57414b083b4c1b3c93b6bcf0b7825dea0d73e2d40
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -182,6 +201,19 @@ MonoBehaviour:
   m_CopyDepthMode: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
+--- !u!114 &200446381492199809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 645952c83e6c5364195b48f2eaad083f, type: 3}
+  m_Name: Glitch
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &851016759127556532
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,6 +280,19 @@ MonoBehaviour:
   m_Name: Cutout
   m_EditorClassIdentifier: 
   m_Active: 1
+--- !u!114 &1836387725348405824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d001b9fd173162419294fceb5783af5, type: 3}
+  m_Name: SNES
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &2784483597640039054
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,6 +319,19 @@ MonoBehaviour:
   m_Name: Blur
   m_EditorClassIdentifier: 
   m_Active: 1
+--- !u!114 &4309645113310826695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33025a380cadc544e80fb4d06662d9ff, type: 3}
+  m_Name: Fancy Outline
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &4624421488217171320
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -294,6 +352,19 @@ MonoBehaviour:
   passIndex: 0
   bindDepthStencilAttachment: 0
   m_Version: 1
+--- !u!114 &5136199921021181529
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 487e1b4f790496d4d988a6d0cc86a71c, type: 3}
+  m_Name: Silhouette
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &7257494503185593354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -305,6 +376,19 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f6755a047d31b424380a30e141e21490, type: 3}
   m_Name: Kaleidoscope
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &7581731952795454879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9828f52f24a30743a9d6df20372ab33, type: 3}
+  m_Name: Mosaic
   m_EditorClassIdentifier: 
   m_Active: 1
 --- !u!114 &7657486331668331859
