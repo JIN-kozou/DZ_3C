@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8273480910206864871
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3e290bf031d9dd468f6d661fd2033de, type: 3}
+  m_Name: UnderwaterSettings
+  m_EditorClassIdentifier: 
+  active: 1
+  renderPassEvent:
+    m_OverrideState: 0
+    m_Value: 550
+  bumpMap:
+    m_OverrideState: 1
+    m_Value: {fileID: 2800000, guid: 5e5d1f1dce29a71498368c03bc1414af, type: 3}
+    dimension: 1
+  strength:
+    m_OverrideState: 1
+    m_Value: 8.56
+  waterFogColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.21176468, g: 0.68473065, b: 0.9254902, a: 1}
+  fogStrength:
+    m_OverrideState: 1
+    m_Value: 0.538
+  useCaustics:
+    m_OverrideState: 1
+    m_Value: 1
+  causticsTexture:
+    m_OverrideState: 1
+    m_Value: {fileID: 2800000, guid: e2c851ca3d284c546a719edb8125a70f, type: 3}
+    dimension: 1
+  causticsNoiseSpeed:
+    m_OverrideState: 1
+    m_Value: 0.86
+  causticsNoiseScale:
+    m_OverrideState: 1
+    m_Value: 0.61
+  causticsNoiseStrength:
+    m_OverrideState: 1
+    m_Value: 0.06
+  causticsScrollVelocity1:
+    m_OverrideState: 1
+    m_Value: {x: 0.5, y: 0.3, z: 0}
+  causticsScrollVelocity2:
+    m_OverrideState: 1
+    m_Value: {x: -0.7, y: -0.25, z: 0}
+  causticsTiling:
+    m_OverrideState: 1
+    m_Value: {x: 0.1, y: 0.17}
+  causticsTint:
+    m_OverrideState: 1
+    m_Value: {r: 2, g: 2, b: 2, a: 0.23921569}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
+  m_Name: Underwater
+  m_EditorClassIdentifier: 
+  components:
+  - {fileID: -8273480910206864871}

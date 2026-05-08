@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-1189478170459794405
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c11d79c0bf1b054799b9c8ee6d5ee96, type: 3}
+  m_Name: HeightFogSettings
+  m_EditorClassIdentifier: 
+  active: 1
+  renderPassEvent:
+    m_OverrideState: 1
+    m_Value: 300
+  strength:
+    m_OverrideState: 1
+    m_Value: 1
+  startDistance:
+    m_OverrideState: 1
+    m_Value: 20
+  distanceStartColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.9333334, g: 0.8588236, b: 0.8313726, a: 1}
+  endDistance:
+    m_OverrideState: 1
+    m_Value: 50
+  distanceEndColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.9339623, g: 0.82455766, b: 0.8076718, a: 1}
+  distanceFalloff:
+    m_OverrideState: 1
+    m_Value: 7.25
+  startHeight:
+    m_OverrideState: 1
+    m_Value: 5
+  heightStartColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.8196079, g: 0.7803922, b: 0.76470596, a: 1}
+  endHeight:
+    m_OverrideState: 1
+    m_Value: -5
+  heightEndColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.5958823, g: 0.7830189, b: 0.7540706, a: 1}
+  heightFalloff:
+    m_OverrideState: 1
+    m_Value: 2.31
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
+  m_Name: Height Fog
+  m_EditorClassIdentifier: 
+  components:
+  - {fileID: -1189478170459794405}

@@ -1,0 +1,560 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7825662825854217861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 487e1b4f790496d4d988a6d0cc86a71c, type: 3}
+  m_Name: Silhouette
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-7538405776241290125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33025a380cadc544e80fb4d06662d9ff, type: 3}
+  m_Name: Fancy Outline
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-7525161099488577349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dffd90785e594e545a93a297144491aa, type: 3}
+  m_Name: Sobel Outline
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-7394653175727852835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e331a186ce4d6e549a5a00b88fc6b945, type: 3}
+  m_Name: Invert
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-6887599022104968138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e959d238d7e523e49939b627d13f2cfc, type: 3}
+  m_Name: Painting
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-5865238584794842518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12cdd4d5bd508a94b8545ce8b6844d17, type: 3}
+  m_Name: Underwater
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-5730367267010588496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f921ea61a888e84094f1deb5844ba04, type: 3}
+  m_Name: Text Adventure
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-5729723407990804162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18ff6811944d97e44bd00f95d1de3a43, type: 3}
+  m_Name: Height Fog
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-5345191656538539394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 848cdb1153ebfd6489cd34268b50275a, type: 3}
+  m_Name: Basic Dither
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-4764608489778743196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 645952c83e6c5364195b48f2eaad083f, type: 3}
+  m_Name: Glitch
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-4414873939035910681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 812fc0aad8cefbd4a8611f65674ee837, type: 3}
+  m_Name: Greyscale
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-4269928877137913889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 393c99904222aec40913d9e9dc404967, type: 3}
+  m_Name: Sepia Tone
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-3866726328567903101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db4acdecba5a2c746855e84b0db06f8f, type: 3}
+  m_Name: Drawing
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-3639946796182392300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f77c821bf943fe4e9a8ebf3b3a4e547, type: 3}
+  m_Name: Fancy Dither
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-3638235773389506125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbc5ecaac2b941147bf1260176d37b4d, type: 3}
+  m_Name: Fancy Neon
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-3401713001021182963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d001b9fd173162419294fceb5783af5, type: 3}
+  m_Name: SNES
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-2410133505068522462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a17c0ba7597b9349b685f585401e149, type: 3}
+  m_Name: Light Streaks
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-2093049860748594284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6755a047d31b424380a30e141e21490, type: 3}
+  m_Name: Kaleidoscope
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-1651274673843776513
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc0b5a488cb186f4fa3d4f4bacb7b655, type: 3}
+  m_Name: Cutout
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-556260740084628398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2aa232402f7d4449959f90fe32e84ad, type: 3}
+  m_Name: Sobel Neon
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-107620358812014205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b27439882d016c7408ea0cc711bea445, type: 3}
+  m_Name: Colorize
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de640fe3d0db1804a85f9fc8f5cadab6, type: 3}
+  m_Name: SnapshotRenderer
+  m_EditorClassIdentifier: 
+  debugShaders:
+    debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7, type: 3}
+    hdrDebugViewPS: {fileID: 4800000, guid: 573620ae32aec764abd4d728906d2587, type: 3}
+  m_RendererFeatures:
+  - {fileID: 5350561443530724216}
+  - {fileID: -6887599022104968138}
+  - {fileID: -5865238584794842518}
+  - {fileID: -3401713001021182963}
+  - {fileID: 6889336349311789440}
+  - {fileID: -7525161099488577349}
+  - {fileID: -556260740084628398}
+  - {fileID: -7825662825854217861}
+  - {fileID: 2580472020995696558}
+  - {fileID: 7926046022148681828}
+  - {fileID: 8690123984364840100}
+  - {fileID: -4414873939035910681}
+  - {fileID: -4269928877137913889}
+  - {fileID: -5345191656538539394}
+  - {fileID: -3866726328567903101}
+  - {fileID: -2093049860748594284}
+  - {fileID: 329710663229476833}
+  - {fileID: -3638235773389506125}
+  - {fileID: -1651274673843776513}
+  - {fileID: -4764608489778743196}
+  - {fileID: -7394653175727852835}
+  - {fileID: -2410133505068522462}
+  - {fileID: 4345012743017122498}
+  - {fileID: 7446025751035238525}
+  - {fileID: -107620358812014205}
+  - {fileID: 8166095536433554609}
+  - {fileID: -3639946796182392300}
+  - {fileID: 2689594091090694313}
+  - {fileID: 7318855230761514863}
+  - {fileID: 7764900193325598535}
+  - {fileID: 3749356289940552741}
+  - {fileID: -7538405776241290125}
+  - {fileID: 285316839509081334}
+  - {fileID: -5730367267010588496}
+  - {fileID: 4206371795540755951}
+  - {fileID: -5729723407990804162}
+  m_RendererFeatureMap: 78d38cce4803414a739462fee233629768a8aef10c68ae04b4276e989d51a57ef63c606327a6f503f672f5dedca6c0c5efc56d9adc08603a3eb177f5eaee7bb0
+  m_UseNativeRenderPass: 0
+  postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
+  xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
+  shaders:
+    blitPS: {fileID: 4800000, guid: c17132b1f77d20942aa75f8429c0f8bc, type: 3}
+    copyDepthPS: {fileID: 4800000, guid: d6dae50ee9e1bfa4db75f19f99355220, type: 3}
+    screenSpaceShadowPS: {fileID: 4800000, guid: 0f854b35a0cf61a429bd5dcfea30eddd, type: 3}
+    samplingPS: {fileID: 4800000, guid: 04c410c9937594faa893a11dceb85f7e, type: 3}
+    stencilDeferredPS: {fileID: 4800000, guid: e9155b26e1bc55942a41e518703fe304, type: 3}
+    fallbackErrorPS: {fileID: 4800000, guid: e6e9a19c3678ded42a3bc431ebef7dbd, type: 3}
+    fallbackLoadingPS: {fileID: 4800000, guid: 7f888aff2ac86494babad1c2c5daeee2, type: 3}
+    materialErrorPS: {fileID: 4800000, guid: 5fd9a8feb75a4b5894c241777f519d4e, type: 3}
+    coreBlitPS: {fileID: 4800000, guid: 93446b5c5339d4f00b85c159e1159b7c, type: 3}
+    coreBlitColorAndDepthPS: {fileID: 4800000, guid: d104b2fc1ca6445babb8e90b0758136b, type: 3}
+    blitHDROverlay: {fileID: 4800000, guid: a89bee29cffa951418fc1e2da94d1959, type: 3}
+    cameraMotionVector: {fileID: 4800000, guid: c56b7e0d4c7cb484e959caeeedae9bbf, type: 3}
+    objectMotionVector: {fileID: 4800000, guid: 7b3ede40266cd49a395def176e1bc486, type: 3}
+  m_AssetVersion: 2
+  m_OpaqueLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_TransparentLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_DefaultStencilState:
+    overrideStencilState: 0
+    stencilReference: 0
+    stencilCompareFunction: 8
+    passOperation: 0
+    failOperation: 0
+    zFailOperation: 0
+  m_ShadowTransparentReceive: 1
+  m_RenderingMode: 0
+  m_DepthPrimingMode: 0
+  m_CopyDepthMode: 0
+  m_AccurateGbufferNormals: 0
+  m_IntermediateTextureMode: 1
+--- !u!114 &285316839509081334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67905ee498bf23a45a94639cecf4b9da, type: 3}
+  m_Name: World Scan
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &329710663229476833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 056e8b976f09f5049b2140190ad8e263, type: 3}
+  m_Name: Scanlines
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &2580472020995696558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9828f52f24a30743a9d6df20372ab33, type: 3}
+  m_Name: Mosaic
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &2689594091090694313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68b5457e8e9a34a47979f4e8c4fed8b5, type: 3}
+  m_Name: Halftone
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &3749356289940552741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a8dbd8ff3d2fe24683240ca73c93e9c, type: 3}
+  m_Name: Noise Grain
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &4206371795540755951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98c2daec20cbe8641bbf472065ebc971, type: 3}
+  m_Name: Posterize
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &4345012743017122498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8cfd1c861ce2884f9b651c48441b7c5, type: 3}
+  m_Name: Radial Blur
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &5350561443530724216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52b950965898f3040a19914c7ed54d82, type: 3}
+  m_Name: Blur
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &6889336349311789440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a19035aaa47e5954da5737133e5d9d17, type: 3}
+  m_Name: Game Boy
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &7318855230761514863
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0fed9015cd76b8478ac7dfa505af8e6, type: 3}
+  m_Name: Vortex
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &7446025751035238525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c003a7a0d755aa545bb11466551b062a, type: 3}
+  m_Name: Sharpen
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &7764900193325598535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c175b78545d6a6e46ad0ab99b48dde58, type: 3}
+  m_Name: Synthwave
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &7926046022148681828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 975bd39b8808f6a4ca999ba1edc68379, type: 3}
+  m_Name: Pixelate
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &8166095536433554609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d60fdfc929a74345be5a78abf6da4cc, type: 3}
+  m_Name: Barrel Distortion
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &8690123984364840100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f6d887d1cad5f44eabb34c7e203c189, type: 3}
+  m_Name: Film Bars
+  m_EditorClassIdentifier: 
+  m_Active: 1
