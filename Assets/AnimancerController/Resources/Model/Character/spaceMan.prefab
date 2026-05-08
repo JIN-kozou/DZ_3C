@@ -1101,6 +1101,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 2643124645407894212}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 79d08a8e5026c214f8e4cc1ee37b9eea,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1182431237816266507}
   m_SourcePrefab: {fileID: 100100000, guid: 79d08a8e5026c214f8e4cc1ee37b9eea, type: 3}
 --- !u!95 &1466246767075371036 stripped
 Animator:
@@ -1322,6 +1326,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 8290477009155567879}
   config: {fileID: 11400000, guid: 39b4218859a146a2a65162d85c8a8f6d, type: 2}
+  lowHealthVisualBuffConfig: {fileID: 0}
+  lowHealthBuffSourceType: 3
+  lowHealthThreshold: 15
+  removeLowHealthBuffWhenRecovered: 1
 --- !u!114 &3145329897165780605
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1473,6 +1481,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   reverseCoreStack: {fileID: 5421706574336869697}
   player: {fileID: 8290477009155567879}
+  hurtVisualBuffConfig: {fileID: 0}
+  hurtBuffSourceType: 2
 --- !u!114 &1415669441445574658
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1580,6 +1590,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponModelRoot: {fileID: 1520535881018182254}
+--- !u!114 &1182431237816266507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5328563006661601500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fc2f7c998104c89a0e0f251f3f07f98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 8290477009155567879}
+  bindingsConfig: {fileID: 11400000, guid: 6de871ace0f821442bd4f58c4c94515c, type: 2}
+  deactivateAllFeaturesOnEnable: 1
 --- !u!4 &5788252891706579291 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1542398575506050262, guid: 79d08a8e5026c214f8e4cc1ee37b9eea,
