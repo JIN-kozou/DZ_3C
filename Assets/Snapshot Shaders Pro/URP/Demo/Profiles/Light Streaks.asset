@@ -1,5 +1,52 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7230809979979181493
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 586c063f0d599334c9b91fb9af9b1ab7, type: 3}
+  m_Name: BlurSettings
+  m_EditorClassIdentifier: 
+  active: 0
+  renderPassEvent:
+    m_OverrideState: 1
+    m_Value: 550
+  strength:
+    m_OverrideState: 1
+    m_Value: 1
+  blurStepSize:
+    m_OverrideState: 1
+    m_Value: 12
+  blurType:
+    m_OverrideState: 1
+    m_Value: 0
+--- !u!114 &-6009583995492162746
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc21f2b6116669c4f9bd87971305b83c, type: 3}
+  m_Name: FilmBarsSettings
+  m_EditorClassIdentifier: 
+  active: 1
+  renderPassEvent:
+    m_OverrideState: 1
+    m_Value: 600
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  aspect:
+    m_OverrideState: 1
+    m_Value: 2
 --- !u!114 &-4491274928641573729
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -14,7 +61,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 1
   renderPassEvent:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 550
   strength:
     m_OverrideState: 1
@@ -25,6 +72,61 @@ MonoBehaviour:
   downsampleAmount:
     m_OverrideState: 1
     m_Value: 5
+--- !u!114 &-446470113263100115
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8aa93400644208f4ab8d1d749a42c8d4, type: 3}
+  m_Name: FancyNeonSettings
+  m_EditorClassIdentifier: 
+  active: 0
+  renderPassEvent:
+    m_OverrideState: 1
+    m_Value: 550
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  colorSensitivity:
+    m_OverrideState: 1
+    m_Value: 0
+  colorStrength:
+    m_OverrideState: 1
+    m_Value: 0.5
+  depthSensitivity:
+    m_OverrideState: 1
+    m_Value: 0.01
+  depthStrength:
+    m_OverrideState: 1
+    m_Value: 0.75
+  normalSensitivity:
+    m_OverrideState: 1
+    m_Value: 0.094
+  normalStrength:
+    m_OverrideState: 1
+    m_Value: 0.257
+  depthThreshold:
+    m_OverrideState: 1
+    m_Value: 0.434
+  saturationFloor:
+    m_OverrideState: 1
+    m_Value: 0.75
+  lightnessFloor:
+    m_OverrideState: 1
+    m_Value: 0.75
+  backgroundColor:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+  emissiveEdgeColor:
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  useSceneColor:
+    m_OverrideState: 1
+    m_Value: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40,6 +142,10 @@ MonoBehaviour:
   components:
   - {fileID: -4491274928641573729}
   - {fileID: 2837537973815853588}
+  - {fileID: -7230809979979181493}
+  - {fileID: -446470113263100115}
+  - {fileID: 6887426221271322997}
+  - {fileID: -6009583995492162746}
 --- !u!114 &2837537973815853588
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -52,25 +158,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6c796a3d3c33ef4391f17ede5f45534, type: 3}
   m_Name: GameBoySettings
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   renderPassEvent:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 550
   enabled:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 1
   darkestColor:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: {r: 0.11, g: 0.21, b: 0.08, a: 1}
   darkColor:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: {r: 0.24, g: 0.38, b: 0.21, a: 1}
   lightColor:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: {r: 0.57, g: 0.67, b: 0.21, a: 1}
   lightestColor:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: {r: 0.75, g: 0.82, b: 0.46, a: 1}
   powerRamp:
-    m_OverrideState: 0
+    m_OverrideState: 1
+    m_Value: 0.46
+--- !u!114 &6887426221271322997
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c3991c19c4754145b9e37e0c956bdd2, type: 3}
+  m_Name: CutoutSettings
+  m_EditorClassIdentifier: 
+  active: 0
+  renderPassEvent:
+    m_OverrideState: 1
+    m_Value: 550
+  enabled:
+    m_OverrideState: 1
     m_Value: 1
+  cutoutTexture:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
+    dimension: 1
+  borderColor:
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  stretch:
+    m_OverrideState: 1
+    m_Value: 0
+  zoom:
+    m_OverrideState: 1
+    m_Value: 1.06
+  offset:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 0}
+  rotation:
+    m_OverrideState: 1
+    m_Value: 107

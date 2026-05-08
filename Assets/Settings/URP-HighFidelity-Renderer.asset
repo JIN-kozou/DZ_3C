@@ -20,6 +20,32 @@ MonoBehaviour:
   passIndex: 0
   bindDepthStencilAttachment: 0
   m_Version: 1
+--- !u!114 &-8024720251401016091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbc5ecaac2b941147bf1260176d37b4d, type: 3}
+  m_Name: Fancy Neon
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-6915492055071612519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68b5457e8e9a34a47979f4e8c4fed8b5, type: 3}
+  m_Name: Halftone
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &-6709916427266186221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31,6 +57,19 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a17c0ba7597b9349b685f585401e149, type: 3}
   m_Name: Light Streaks
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-2168426387385348316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b27439882d016c7408ea0cc711bea445, type: 3}
+  m_Name: Colorize
   m_EditorClassIdentifier: 
   m_Active: 1
 --- !u!114 &-1878332245247344467
@@ -91,6 +130,15 @@ MonoBehaviour:
   - {fileID: 851016759127556532}
   - {fileID: 4624421488217171320}
   - {fileID: -6709916427266186221}
+  - {fileID: 2784483597640039054}
+  - {fileID: 3548870343975502225}
+  - {fileID: -8024720251401016091}
+  - {fileID: -2168426387385348316}
+  - {fileID: 1636816138845351982}
+  - {fileID: 1184667011471266066}
+  - {fileID: -6915492055071612519}
+  - {fileID: 7657486331668331859}
+  - {fileID: 7257494503185593354}
   m_RendererFeatureMap: adc0de57c6d2eee51ed5f273d86b790c5e052bd57414b083b4c1b3c93b6bcf0b7825dea0d73e2d40
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -174,6 +222,58 @@ MonoBehaviour:
   passIndex: 0
   bindDepthStencilAttachment: 0
   m_Version: 1
+--- !u!114 &1184667011471266066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f6d887d1cad5f44eabb34c7e203c189, type: 3}
+  m_Name: Film Bars
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &1636816138845351982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc0b5a488cb186f4fa3d4f4bacb7b655, type: 3}
+  m_Name: Cutout
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &2784483597640039054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a19035aaa47e5954da5737133e5d9d17, type: 3}
+  m_Name: Game Boy
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &3548870343975502225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52b950965898f3040a19914c7ed54d82, type: 3}
+  m_Name: Blur
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &4624421488217171320
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -194,3 +294,29 @@ MonoBehaviour:
   passIndex: 0
   bindDepthStencilAttachment: 0
   m_Version: 1
+--- !u!114 &7257494503185593354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6755a047d31b424380a30e141e21490, type: 3}
+  m_Name: Kaleidoscope
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &7657486331668331859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e331a186ce4d6e549a5a00b88fc6b945, type: 3}
+  m_Name: Invert
+  m_EditorClassIdentifier: 
+  m_Active: 1
