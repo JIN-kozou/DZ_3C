@@ -12,4 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af0f28f704bf42f98e7c08990994c1d5, type: 3}
   m_Name: Buff Fullscreen Vfx Bindings SO
   m_EditorClassIdentifier: 
-  bindings: []
+  bindings:
+  - buffId: buff.reverse.battery
+    features:
+    - {fileID: 898868178039526686, guid: c40be3174f62c4acf8c1216858c64956, type: 2}
+    delayAfterApplySec: 0
+    delayAfterRemoveSec: 0
+    minHoldSec: 0
+    triggerOnRefresh: 0
+  - buffId: buff.HurtVisual
+    features:
+    - {fileID: -8957637166814788258, guid: c40be3174f62c4acf8c1216858c64956, type: 2}
+    - {fileID: 851016759127556532, guid: c40be3174f62c4acf8c1216858c64956, type: 2}
+    delayAfterApplySec: 0
+    delayAfterRemoveSec: 0
+    minHoldSec: 0
+    triggerOnRefresh: 0
+  - buffId: buff.LowHealthVisual
+    features:
+    - {fileID: 4624421488217171320, guid: c40be3174f62c4acf8c1216858c64956, type: 2}
+    delayAfterApplySec: 0
+    delayAfterRemoveSec: 0
+    minHoldSec: 0
+    triggerOnRefresh: 0
