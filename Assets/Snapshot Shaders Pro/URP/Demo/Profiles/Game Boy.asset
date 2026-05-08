@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7712214935280148494
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6c796a3d3c33ef4391f17ede5f45534, type: 3}
+  m_Name: GameBoySettings
+  m_EditorClassIdentifier: 
+  active: 1
+  renderPassEvent:
+    m_OverrideState: 1
+    m_Value: 550
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  darkestColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.11, g: 0.21, b: 0.08, a: 1}
+  darkColor:
+    m_OverrideState: 0
+    m_Value: {r: 0.24, g: 0.38, b: 0.21, a: 1}
+  lightColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.57, g: 0.67, b: 0.21, a: 1}
+  lightestColor:
+    m_OverrideState: 0
+    m_Value: {r: 0.75, g: 0.82, b: 0.46, a: 1}
+  powerRamp:
+    m_OverrideState: 1
+    m_Value: 0.5
+--- !u!114 &-2685489506783090179
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b52e5c16327dbe943b312dcaf1208cc3, type: 3}
+  m_Name: PixelateSettings
+  m_EditorClassIdentifier: 
+  active: 1
+  renderPassEvent:
+    m_OverrideState: 0
+    m_Value: 550
+  pixelSize:
+    m_OverrideState: 1
+    m_Value: 4
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
+  m_Name: Game Boy
+  m_EditorClassIdentifier: 
+  components:
+  - {fileID: -2685489506783090179}
+  - {fileID: -7712214935280148494}

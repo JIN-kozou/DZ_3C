@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7148840632540923223
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 006ce891136d906459fe975eaf6787f0, type: 3}
+  m_Name: HalftoneSettings
+  m_EditorClassIdentifier: 
+  active: 1
+  renderPassEvent:
+    m_OverrideState: 0
+    m_Value: 550
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  halftoneTexture:
+    m_OverrideState: 1
+    m_Value: {fileID: 2800000, guid: 400bdb02bf53bc34ab6d1f275c28d9ce, type: 3}
+    dimension: 1
+  softness:
+    m_OverrideState: 0
+    m_Value: 0.5
+  textureSize:
+    m_OverrideState: 1
+    m_Value: 4
+  minMaxLuminance:
+    m_OverrideState: 0
+    m_Value: {x: 0, y: 1}
+  darkColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.019607844, g: 0.019607844, b: 0.019607844, a: 1}
+  lightColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+  useSceneColor:
+    m_OverrideState: 0
+    m_Value: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
+  m_Name: Halftone
+  m_EditorClassIdentifier: 
+  components:
+  - {fileID: -7148840632540923223}

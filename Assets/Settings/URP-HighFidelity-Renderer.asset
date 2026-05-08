@@ -20,6 +20,19 @@ MonoBehaviour:
   passIndex: 0
   bindDepthStencilAttachment: 0
   m_Version: 1
+--- !u!114 &-6709916427266186221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a17c0ba7597b9349b685f585401e149, type: 3}
+  m_Name: Light Streaks
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &-1878332245247344467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -77,6 +90,7 @@ MonoBehaviour:
   - {fileID: -8957637166814788258}
   - {fileID: 851016759127556532}
   - {fileID: 4624421488217171320}
+  - {fileID: -6709916427266186221}
   m_RendererFeatureMap: adc0de57c6d2eee51ed5f273d86b790c5e052bd57414b083b4c1b3c93b6bcf0b7825dea0d73e2d40
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
