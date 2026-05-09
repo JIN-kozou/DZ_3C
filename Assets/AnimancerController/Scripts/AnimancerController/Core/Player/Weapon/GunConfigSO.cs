@@ -12,6 +12,8 @@ public class GunConfigSO : ScriptableObject
     [Tooltip("单次 Update 内最多发射几发，防止卡帧/切窗后一次性补射过多；高射速全自动可适当调大。")]
     [Min(1)] public int maxShotsPerTick = 6;
     [Min(1)] public int magazineSize = 30;
+    [Tooltip("被动回弹：每满该秒数增加 1 发弹药，不超过弹夹容量。填 0 或负数表示关闭。")]
+    public float ammoRegenIntervalSeconds = 2f;
 
     [Header("Projectile")]
     public Projectile bulletPrefab;

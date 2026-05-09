@@ -1,3 +1,4 @@
+using DZ_3C.Reverse;
 using UnityEngine;
 
 /// <summary>
@@ -27,10 +28,35 @@ public class PlayerWeaponRuntime : MonoBehaviour
     private float _timeSinceLastShot = 100f;
     private float _recoilRecoveryTimer;
     private bool _adsHeld;
+    private float _ammoRegenAccumulator;
+    private ReverseCoreStack _reverseCoreStack;
 
     public GunConfigSO GunConfig => gunConfig;
     public bool IsAds => _adsHeld;
     public int CurrentAmmo => _ammo;
+
+    /// <summary>
+    /// 0~1：当前这一发被动回弹的进度（未满弹且开启间隔回弹时）；满弹或未配置回弹为 0。
+    /// UI 可用来画下一格将恢复的填充动画。
+    /// </summary>
+    public float AmmoRegenProgressNormalized
+    {
+        get
+        {
+            if (gunConfig == null || gunConfig.ammoRegenIntervalSeconds <= 0f)
+            {
+                return 0f;
+            }
+
+            if (_ammo >= gunConfig.magazineSize)
+            {
+                return 0f;
+            }
+
+            float interval = Mathf.Max(0.0001f, gunConfig.ammoRegenIntervalSeconds);
+            return Mathf.Clamp01(_ammoRegenAccumulator / interval);
+        }
+    }
 
     /// <summary>本帧 <see cref="Tick"/> 内 <see cref="TryFireOneShot"/> 成功次数；在 <see cref="Tick"/> 开头归零，供 ADS 开火动画等与真实击发对齐。</summary>
     public int SuccessfulShotsLastTick { get; private set; }
@@ -62,6 +88,29 @@ public class PlayerWeaponRuntime : MonoBehaviour
         RefreshOwnerColliders();
     }
 
+    private void OnEnable()
+    {
+        _reverseCoreStack = GetComponent<ReverseCoreStack>();
+        if (_reverseCoreStack != null)
+        {
+            _reverseCoreStack.OnRespawned += OnReverseRespawned;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (_reverseCoreStack != null)
+        {
+            _reverseCoreStack.OnRespawned -= OnReverseRespawned;
+            _reverseCoreStack = null;
+        }
+    }
+
+    private void OnReverseRespawned(Vector3 _)
+    {
+        RefillMagazine();
+    }
+
     private void RefreshOwnerColliders()
     {
         if (_player != null)
@@ -87,6 +136,8 @@ public class PlayerWeaponRuntime : MonoBehaviour
             _adsHeld = false;
             return;
         }
+
+        TickAmmoRegen(deltaTime);
 
         bool fireHeld = input.FireHeld;
         bool firePressedThisFrame = input.FireWasPressedThisFrame;
@@ -224,6 +275,30 @@ public class PlayerWeaponRuntime : MonoBehaviour
 
         _ammo = gunConfig.magazineSize;
         _nextFireTime = float.NegativeInfinity;
+        _ammoRegenAccumulator = 0f;
+    }
+
+    private void TickAmmoRegen(float deltaTime)
+    {
+        if (gunConfig.ammoRegenIntervalSeconds <= 0f)
+        {
+            return;
+        }
+
+        int cap = gunConfig.magazineSize;
+        if (_ammo >= cap)
+        {
+            _ammoRegenAccumulator = 0f;
+            return;
+        }
+
+        float interval = gunConfig.ammoRegenIntervalSeconds;
+        _ammoRegenAccumulator += deltaTime;
+        while (_ammo < cap && _ammoRegenAccumulator >= interval)
+        {
+            _ammoRegenAccumulator -= interval;
+            _ammo++;
+        }
     }
 
     private bool CanProcessWeapon(PlayerReusableData rd)
