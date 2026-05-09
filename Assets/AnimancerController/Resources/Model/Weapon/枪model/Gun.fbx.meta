@@ -3,7 +3,12 @@ guid: 3dde9a2b403eb6347b31cf8ef32942f6
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: gravitygun
+    second: {fileID: 2100000, guid: dc97b7a9280498b439dee247dfe04793, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
