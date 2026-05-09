@@ -128,13 +128,53 @@ public class PlayerMovementState : StateBase
         reusableData.lockTarget.Value = cam;
     }
 
+    /// <summary>键位配置：true 为长按保持蹲，false 为按一次切换蹲/站。</summary>
+    protected bool UseHoldForCrouch()
+    {
+        return numericConfig != null && numericConfig.useHoldForCrouch;
+    }
+
     protected void OnCrouch(InputAction.CallbackContext context)
     {
         reusableData.pendingStandWhenCrouchCeilingClears = false;
+        if (UseHoldForCrouch())
+        {
+            if (player.TryBeginHolsterThenCrouchFromArmedLocomotion())
+            {
+                return;
+            }
+
+            reusableData.standValueParameter.TargetValue = 0;
+            return;
+        }
+
+        // 切换蹲：已处于蹲意图则再按一次站起；否则收枪蹲或进入蹲。
+        if (reusableData.standValueParameter.TargetValue < 0.99f)
+        {
+            TryStandFromCrouchInput();
+            return;
+        }
+
+        if (player.TryBeginHolsterThenCrouchFromArmedLocomotion())
+        {
+            return;
+        }
+
         reusableData.standValueParameter.TargetValue = 0;
     }
 
     protected void OnCrouchRelease(InputAction.CallbackContext context)
+    {
+        if (!UseHoldForCrouch())
+        {
+            return;
+        }
+
+        TryStandFromCrouchInput();
+    }
+
+    /// <summary>玩家主动站起（长按松键或切换模式下再按蹲键），含头顶挡时 pending 净空。</summary>
+    protected void TryStandFromCrouchInput()
     {
         if (reusableData.standValueParameter.CurrentValue >= 0.99f)
         {
@@ -210,8 +250,25 @@ public class PlayerMovementState : StateBase
        float walkSpeed = numericConfig != null ? numericConfig.walkSpeedParameter : 1f;
        float runSpeed = numericConfig != null ? numericConfig.runSpeedParameter : 2f;
        float baseSpeed = inputServer.Shift ? runSpeed : walkSpeed;
-       float finalSpeed = (baseSpeed + reusableData.buffSnapshot.moveSpeedAdditive) * reusableData.buffSnapshot.moveSpeedMultiplier;
-       return reusableData.speedValueParameter.TargetValue = Mathf.Max(0f, finalSpeed);
+       float weaponLocomotionMul = 1f;
+       bool snapSpeedToAnimation = false;
+       if (player.ArmedPresentation != null)
+       {
+           weaponLocomotionMul = player.ArmedPresentation.EvaluateLocomotionSpeedMultiplier(numericConfig, player.WeaponRuntime);
+           snapSpeedToAnimation = player.ArmedPresentation.LocomotionSpeedDrivenByWeaponAnimation;
+       }
+
+       float finalSpeed = (baseSpeed + reusableData.buffSnapshot.moveSpeedAdditive) *
+                          reusableData.buffSnapshot.moveSpeedMultiplier *
+                          weaponLocomotionMul;
+       finalSpeed = Mathf.Max(0f, finalSpeed);
+       reusableData.speedValueParameter.TargetValue = finalSpeed;
+       if (snapSpeedToAnimation)
+       {
+           reusableData.speedValueParameter.CurrentValue = finalSpeed;
+       }
+
+       return finalSpeed;
     }
     /// <summary>
     /// 进入跑循环/持枪位移等 locomotion 时，避免把 <see cref="PlayerReusableData.rotationValueParameter"/> 打成 0 导致 blend tree 第一帧与 Idle 姿态硬切。

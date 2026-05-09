@@ -311,11 +311,6 @@ public class PlayerReusableLogic
             climbConfirmCounter = 0;
             reusableData.ObstructHeight = ObstructHeight.medium;
             reusableData.ClimbType = ClimbType.Climb;
-            if (player.ReusableData.armedModeActive)
-            {
-                player.ReusableData.resumeArmedAfterBreak = true;
-            }
-
             player.StateMachine.ChangeState(player.StateMachine.climbState);
             return true;
         }
@@ -330,11 +325,6 @@ public class PlayerReusableLogic
             climbConfirmCounter = 0;
             reusableData.ObstructHeight = ObstructHeight.lowMedium;
             reusableData.ClimbType = ClimbType.Climb;
-            if (player.ReusableData.armedModeActive)
-            {
-                player.ReusableData.resumeArmedAfterBreak = true;
-            }
-
             player.StateMachine.ChangeState(player.StateMachine.climbState);
             return true;
         }
@@ -349,11 +339,6 @@ public class PlayerReusableLogic
             climbConfirmCounter = 0;
             reusableData.ObstructHeight = ObstructHeight.low;
             reusableData.ClimbType = ClimbType.Climb;
-            if (player.ReusableData.armedModeActive)
-            {
-                player.ReusableData.resumeArmedAfterBreak = true;
-            }
-
             player.StateMachine.ChangeState(player.StateMachine.climbState);
             return true;
         }

@@ -109,7 +109,7 @@ public class PlayerReusableData
     /// 收枪、攀爬打断或 <see cref="PlayerArmedPresentation"/> 强制复位时会清零。
     /// </summary>
     public bool resumeArmedPresentationWithoutDraw;
-    /// <summary>自 PlayerArmedState 因攀爬/死亡/下蹲互斥被踢出时置 true，占用结束后回到持枪。</summary>
+    /// <summary>遗留/其它流程使用；持枪下蹲站起自动掏枪已改为 <see cref="pendingAutoDrawWeaponAfterCrouchHolsterStand"/> + 收枪协程。</summary>
     public bool resumeArmedAfterBreak;
 
     /// <summary>主动收枪动画结束后进入 Idle 时覆写 Layer0 淡入（秒）；&lt;0 表示不覆写。</summary>
@@ -121,8 +121,12 @@ public class PlayerReusableData
         pendingHolsterExitToIdleLocomotionFadeSeconds = -1f;
         return v;
     }
-    /// <summary>自持枪因下蹲互斥退出后，站起前禁止武器 Tick（与 <see cref="AllowsArmedWeaponActions"/> 一起用于恢复持枪）。</summary>
+    /// <summary>遗留/其它流程使用；持枪下蹲站起自动掏枪已改为 <see cref="pendingAutoDrawWeaponAfterCrouchHolsterStand"/>。</summary>
     public bool weaponSuppressedUntilStandFromCrouch;
+    /// <summary>
+    /// 持枪 Idle/位移中经收枪协程再下蹲时置 true：站起空手且 <see cref="AllowsArmedWeaponActions"/> 满足后由 <see cref="Player.TryResumeArmedAfterCrouchStand"/> 调用与 ToggleWeapon 相同的掏枪入口。
+    /// </summary>
+    public bool pendingAutoDrawWeaponAfterCrouchHolsterStand;
     /// <summary>松开蹲键或自动低矮探头下蹲时因头顶阻挡保持下蹲；头顶按站起射线净空后由状态机自动设回站立。</summary>
     public bool pendingStandWhenCrouchCeilingClears;
     /// <summary>遗留：收枪流程中曾用于「先站直再蹲」；持枪下蹲已改为直接下蹲。若仍被置位，由 Player 每帧逻辑消费。</summary>

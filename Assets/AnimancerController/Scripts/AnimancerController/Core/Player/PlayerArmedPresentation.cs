@@ -60,6 +60,12 @@ public class PlayerArmedPresentation : MonoBehaviour
     /// <summary>1＝持枪本地位移 X 全额；收枪片段播放中由 1 线性减到 0；片段结束后保持 0 直至复位。</summary>
     private float _holsterArmedOffsetXMultiplier = 1f;
 
+    /// <summary>无 holster 片段时，收枪协程内 Layer1 权重淡出进度 0→1，用于移速与淡出同步。</summary>
+    private float _holsterLocomotionLayerFadeT01;
+
+    /// <summary>无 holster 时仅在 <see cref="CoArmedExit"/> 的 Layer1 淡出循环内置 true。</summary>
+    private bool _holsterExitLocomotionLayerFadeDriving;
+
     /// <summary>上半身基类层（索引 1）：仅 armedIdle / adsIdle。</summary>
     private AnimancerLayer UpperBodyBaseLayer =>
         _animancer != null && _animancer.Layers.Count > 1 ? _animancer.Layers[1] : null;
@@ -128,6 +134,131 @@ public class PlayerArmedPresentation : MonoBehaviour
     /// 收枪协程未占用时可开始新一轮持枪分层（掏枪）；防止收枪未播完就再次掏枪。
     /// </summary>
     public bool CanBeginArmedPresentation => !IsExiting;
+
+    /// <summary>
+    /// 上一帧 <see cref="EvaluateLocomotionSpeedMultiplier"/> 是否按掏枪/收枪/ADS enter·exit 片段进度驱动；
+    /// 为 true 时 <see cref="PlayerMovementState.UpdateSpeed"/> 应将 <c>speedValueParameter.CurrentValue</c> 与 Target 对齐以免 SmoothDamp 滞后。
+    /// </summary>
+    public bool LocomotionSpeedDrivenByWeaponAnimation { get; private set; }
+
+    /// <summary>
+    /// 地面 walk/run 目标速度乘数：空手为 1；持枪/收枪/开镜与对应动画时间轴对齐（见配置 <see cref="PlayerNumericConfig.armedLocomotionSpeedMultiplier"/> 等）。
+    /// </summary>
+    public float EvaluateLocomotionSpeedMultiplier(PlayerNumericConfig cfg, PlayerWeaponRuntime weaponRuntime)
+    {
+        LocomotionSpeedDrivenByWeaponAnimation = false;
+
+        if (_player?.ReusableData == null)
+        {
+            return 1f;
+        }
+
+        bool armedMode = _player.ReusableData.armedModeActive;
+        float armedMult = cfg != null ? Mathf.Max(0.01f, cfg.armedLocomotionSpeedMultiplier) : 1f;
+        float adsMult = cfg != null ? Mathf.Max(0.01f, cfg.adsLocomotionSpeedMultiplier) : 1f;
+
+        if (!armedMode && !IsExiting)
+        {
+            return 1f;
+        }
+
+        if (IsExiting)
+        {
+            if (_data == null)
+            {
+                return 1f;
+            }
+
+            if (_data.HasHolsterTransition &&
+                _drawOrHolsterState != null &&
+                _drawOrHolsterState.IsPlaying &&
+                _data.holster != null &&
+                _data.holster.IsValid &&
+                _drawOrHolsterState.Clip == _data.holster.Clip)
+            {
+                float p = GetUpperLayerClipProgress01(_drawOrHolsterState);
+                LocomotionSpeedDrivenByWeaponAnimation = true;
+                return Mathf.Lerp(armedMult, 1f, p);
+            }
+
+            if (!_data.HasHolsterTransition && _holsterExitLocomotionLayerFadeDriving)
+            {
+                LocomotionSpeedDrivenByWeaponAnimation = true;
+                return Mathf.Lerp(armedMult, 1f, _holsterLocomotionLayerFadeT01);
+            }
+
+            return 1f;
+        }
+
+        if (_simpleMoveLoopOnly || !_layeredArmedActive)
+        {
+            float m = armedMult;
+            if (weaponRuntime != null && weaponRuntime.IsAds)
+            {
+                m *= adsMult;
+            }
+
+            return m;
+        }
+
+        if (_data == null)
+        {
+            return 1f;
+        }
+
+        if (!_readyForUpperBodyGameplay &&
+            _data.draw != null &&
+            _data.draw.IsValid &&
+            _drawOrHolsterState != null &&
+            _drawOrHolsterState.IsPlaying &&
+            _drawOrHolsterState.Clip == _data.draw.Clip)
+        {
+            float p = GetUpperLayerClipProgress01(_drawOrHolsterState);
+            LocomotionSpeedDrivenByWeaponAnimation = true;
+            return Mathf.Lerp(1f, armedMult, p);
+        }
+
+        if (_data.HasAdsAnimationPack)
+        {
+            if (_adsEntering &&
+                _adsEventState != null &&
+                _data.adsEnter != null &&
+                _data.adsEnter.IsValid &&
+                _adsEventState.Clip == _data.adsEnter.Clip &&
+                _adsEventState.IsPlaying)
+            {
+                float p = GetUpperLayerClipProgress01(_adsEventState);
+                LocomotionSpeedDrivenByWeaponAnimation = true;
+                return Mathf.Lerp(armedMult, armedMult * adsMult, p);
+            }
+
+            if (_adsExiting &&
+                _adsEventState != null &&
+                _data.adsExit != null &&
+                _data.adsExit.IsValid &&
+                _adsEventState.Clip == _data.adsExit.Clip &&
+                _adsEventState.IsPlaying)
+            {
+                float p = GetUpperLayerClipProgress01(_adsEventState);
+                LocomotionSpeedDrivenByWeaponAnimation = true;
+                return Mathf.Lerp(armedMult * adsMult, armedMult, p);
+            }
+
+            if (_adsInPose)
+            {
+                return armedMult * adsMult;
+            }
+
+            return armedMult;
+        }
+
+        if (weaponRuntime != null && weaponRuntime.IsAds)
+        {
+            return armedMult * adsMult;
+        }
+
+        return armedMult;
+    }
 
     public void Init(Player player)
     {
@@ -1249,6 +1380,18 @@ public class PlayerArmedPresentation : MonoBehaviour
 
     private void ReapplyWeaponModelVisibilityAfterCrouchStand()
     {
+        // 站起后若新一轮掏枪已在播：_weaponShownForCurrentDraw 尚未置 true，不应按「未掏过枪」强制隐藏，否则打断显隐时间轴。
+        if (_data != null &&
+            _data.draw != null &&
+            _data.draw.IsValid &&
+            _drawOrHolsterState != null &&
+            _drawOrHolsterState.IsPlaying &&
+            _drawOrHolsterState.Clip == _data.draw.Clip &&
+            !_readyForUpperBodyGameplay)
+        {
+            return;
+        }
+
         if (!_weaponShownForCurrentDraw || _weaponHiddenForCurrentHolster)
         {
             ApplyWeaponModelVisible(false);
@@ -1338,6 +1481,8 @@ public class PlayerArmedPresentation : MonoBehaviour
     private void ResetHolsterArmedOffsetXMultiplier()
     {
         _holsterArmedOffsetXMultiplier = 1f;
+        _holsterLocomotionLayerFadeT01 = 0f;
+        _holsterExitLocomotionLayerFadeDriving = false;
     }
 
     /// <summary>收枪或离开持枪：协程内先播可选 holster；收枪片段结束后再收 IK、淡出 Layer1；Layer2 权重与 Layer0 idle 淡入同步淡出，最后回调与复位。</summary>
@@ -1489,11 +1634,29 @@ public class PlayerArmedPresentation : MonoBehaviour
         float layerOut = Mathf.Max(0.0001f, _data.layerFadeOutSeconds);
         float startW = baseL.Weight;
         float t = 0f;
+        bool noHolsterLayerFade = !_data.HasHolsterTransition;
+        if (noHolsterLayerFade)
+        {
+            _holsterExitLocomotionLayerFadeDriving = true;
+            _holsterLocomotionLayerFadeT01 = 0f;
+        }
+
         while (t < 1f)
         {
             t += Time.deltaTime / layerOut;
-            baseL.Weight = Mathf.Lerp(startW, 0f, Mathf.Clamp01(t));
+            float tc = Mathf.Clamp01(t);
+            baseL.Weight = Mathf.Lerp(startW, 0f, tc);
+            if (noHolsterLayerFade)
+            {
+                _holsterLocomotionLayerFadeT01 = tc;
+            }
+
             yield return null;
+        }
+
+        if (noHolsterLayerFade)
+        {
+            _holsterExitLocomotionLayerFadeDriving = false;
         }
 
         baseL.Weight = 0f;

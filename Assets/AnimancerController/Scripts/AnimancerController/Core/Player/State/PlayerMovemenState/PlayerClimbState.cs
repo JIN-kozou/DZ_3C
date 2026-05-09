@@ -35,9 +35,17 @@ public class PlayerClimbState : PlayerMovementState
             return;
         }
         float footWorldY = player.GetCapsuleFootWorldY();
+        if (reusableData.armedModeActive)
+        {
+            reusableData.armedModeActive = false;
+            reusableData.resumeArmedAfterBreak = false;
+            reusableData.weaponSuppressedUntilStandFromCrouch = false;
+            reusableData.resumeArmedPresentationWithoutDraw = false;
+            reusableData.pendingCrouchAfterStandHolster = false;
+            reusableData.pendingAutoDrawWeaponAfterCrouchHolsterStand = false;
+        }
+
         player.ArmedPresentation?.NotifyArmedStateForceQuit();
-        reusableData.resumeArmedPresentationWithoutDraw =
-            reusableData.resumeArmedAfterBreak && reusableData.armedModeActive;
         player.disEnableGravity = true;
         player.controller.enabled = false;
         player.applyFullRootMotion = true;
@@ -119,11 +127,7 @@ public class PlayerClimbState : PlayerMovementState
     {
         Debug.Log("完成取消攀爬");
         ResetCC();
-        if (TryResumeArmedAfterClimb())
-        {
-            return;
-        }
-
+        reusableData.resumeArmedAfterBreak = false;
         playerStateMachine.ChangeState(playerStateMachine.idleState);
     }
 
@@ -148,11 +152,7 @@ public class PlayerClimbState : PlayerMovementState
     {
         // Ensure movement systems are restored even if the timing event is missed.
         ResetCC();
-
-        if (TryResumeArmedAfterClimb())
-        {
-            return;
-        }
+        reusableData.resumeArmedAfterBreak = false;
 
         if (inputServer.MoveDiscrete != Vector2.zero)
         {
@@ -170,23 +170,6 @@ public class PlayerClimbState : PlayerMovementState
         OnStateDefaultEnd();
     }
 
-    private bool TryResumeArmedAfterClimb()
-    {
-        if (reusableData.resumeArmedAfterBreak && reusableData.armedModeActive)
-        {
-            if (!player.CanBeginArmedPresentationNow())
-            {
-                return false;
-            }
-
-            playerStateMachine.ChangeState(playerStateMachine.armedState);
-            return true;
-        }
-
-        reusableData.resumeArmedAfterBreak = false;
-        return false;
-    }
-   
     public ClipTransition GetClimbAnimation()
     {
         int index = (int)reusableData.ObstructHeight;

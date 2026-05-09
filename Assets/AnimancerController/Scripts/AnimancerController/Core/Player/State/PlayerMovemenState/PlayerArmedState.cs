@@ -20,6 +20,7 @@ public class PlayerArmedState : PlayerMovementState
         reusableData.suppressCameraArmedLocalOffset = false;
         reusableData.resumeArmedAfterBreak = false;
         reusableData.weaponSuppressedUntilStandFromCrouch = false;
+        reusableData.pendingAutoDrawWeaponAfterCrouchHolsterStand = false;
         var armedAnim = playerSO.playerMovementData.PlayerArmedAnimationData;
         bool resumeLayers = reusableData.resumeArmedPresentationWithoutDraw;
         reusableData.resumeArmedPresentationWithoutDraw = false;
@@ -77,15 +78,9 @@ public class PlayerArmedState : PlayerMovementState
 
     private void OnCrouchFromArmed(InputAction.CallbackContext context)
     {
-        if (player.ArmedPresentation == null)
-        {
-            return;
-        }
-
         reusableData.pendingStandWhenCrouchCeilingClears = false;
         reusableData.pendingCrouchAfterStandHolster = false;
-        reusableData.standValueParameter.TargetValue = 0;
-        playerStateMachine.ChangeState(playerStateMachine.idleState);
+        player.TryBeginHolsterThenCrouchFromArmedLocomotion();
     }
 
     /// <summary>

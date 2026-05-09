@@ -62,21 +62,7 @@ public class PlayerMoveStartState : PlayerMovementState
 
     private void OnToggleWeapon(InputAction.CallbackContext context)
     {
-        if (!reusableData.AllowsArmedWeaponActions())
-        {
-            return;
-        }
-
-        if (!player.CanBeginArmedPresentationNow())
-        {
-            return;
-        }
-
-        reusableData.armedModeActive = true;
-        reusableData.resumeArmedAfterBreak = false;
-        reusableData.weaponSuppressedUntilStandFromCrouch = false;
-        reusableData.pendingCrouchAfterStandHolster = false;
-        playerStateMachine.ChangeState(playerStateMachine.armedState);
+        player.TryEnterArmedStateSameAsToggleWeaponInput();
     }
 
     private void OnCheckMoveEnd(InputAction.CallbackContext context)

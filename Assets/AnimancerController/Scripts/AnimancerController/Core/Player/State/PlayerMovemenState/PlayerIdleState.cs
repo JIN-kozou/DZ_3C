@@ -58,7 +58,31 @@ public class PlayerIdleState : PlayerMovementState
         {
             reusableLogic.PlayNextState();
         }
+
+        // 与 <see cref="PlayerArmedState.TryEnterLocomotionIfMoveAlreadyHeld"/> 一致：收枪等切入 Idle 时若方向键一直按住，<see cref="InputAction.started"/> 不会再触发。
+        TryEnterLocomotionIfMoveAlreadyHeld();
     }
+
+    /// <summary>
+    /// 键已按住时 <see cref="InputAction.started"/> 不会触发；否则收枪后进 Idle 会一直停到松键再按。
+    /// </summary>
+    private void TryEnterLocomotionIfMoveAlreadyHeld()
+    {
+        if (!player.isOnGround.Value || inputServer.MoveDiscrete == Vector2.zero)
+        {
+            return;
+        }
+
+        if (inputServer.Shift)
+        {
+            playerStateMachine.ChangeState(playerStateMachine.moveLoopState);
+        }
+        else
+        {
+            playerStateMachine.ChangeState(playerStateMachine.moveStartState);
+        }
+    }
+
     protected override void AddEventListening()
     {
         base.AddEventListening();
@@ -92,21 +116,7 @@ public class PlayerIdleState : PlayerMovementState
 
     private void OnToggleWeapon(InputAction.CallbackContext context)
     {
-        if (!reusableData.AllowsArmedWeaponActions())
-        {
-            return;
-        }
-
-        if (!player.CanBeginArmedPresentationNow())
-        {
-            return;
-        }
-
-        reusableData.armedModeActive = true;
-        reusableData.resumeArmedAfterBreak = false;
-        reusableData.weaponSuppressedUntilStandFromCrouch = false;
-        reusableData.pendingCrouchAfterStandHolster = false;
-        playerStateMachine.ChangeState(playerStateMachine.armedState);
+        player.TryEnterArmedStateSameAsToggleWeaponInput();
     }
     private void MoveStart(InputAction.CallbackContext context)
     {

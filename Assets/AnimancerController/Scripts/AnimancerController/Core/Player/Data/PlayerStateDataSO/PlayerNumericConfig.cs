@@ -28,6 +28,9 @@ public class PlayerNumericConfig
     [Tooltip("下蹲时 CharacterController 中心（本地空间）。")]
     public Vector3 crouchControllerCenter = new Vector3(0f, 0.6f, 0f);
 
+    [Tooltip("勾选为长按保持下蹲，松键站起；不勾选为按下在蹲/站之间切换（与多数 FPS 一致）。")]
+    public bool useHoldForCrouch = false;
+
     [Header("Character — Ceiling Check")]
     [Tooltip("从当前 CharacterController 胶囊顶部向上的射线长度（米），用于：松蹲站起 / pending 净空站起 / 阻挡起跳 / 阻挡空中触发攀爬。命中 whatIsGround 视为有顶。≤0 关闭该组头顶检测。")]
     [Min(0f)] public float crouchStandCeilingCheckRayLength = 1.2f;
@@ -102,4 +105,10 @@ public class PlayerNumericConfig
     [Header("Weapon / ADS (动画)")]
     [Tooltip("开镜进入动画播放速度倍率；越大开镜动画越快（乘在持枪上半身 adsEnter 片段的播放速度上）。")]
     [Min(0.05f)] public float adsEnterAnimationSpeedScale = 1f;
+
+    [Header("Weapon / Locomotion speed")]
+    [Tooltip("持枪稳态（掏枪结束、收枪开始前）相对空手 walk/run 的速度系数；1 表示不降速，0.8 表示降低 20%。")]
+    [Min(0.01f)] public float armedLocomotionSpeedMultiplier = 0.8f;
+    [Tooltip("开镜稳态在持枪稳态速度上再乘的系数（与 armed 连乘）；1 表示开镜不再额外降速。")]
+    [Min(0.01f)] public float adsLocomotionSpeedMultiplier = 0.8f;
 }

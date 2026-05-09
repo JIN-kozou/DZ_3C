@@ -30,6 +30,114 @@ public class Player : CharacterBase
     public bool CanBeginArmedPresentationNow() =>
         ArmedPresentation == null || ArmedPresentation.CanBeginArmedPresentation;
 
+    /// <summary>
+    /// 与地面 Idle / MoveStart / MoveLoop / Land 中 ToggleWeapon 输入时相同：校验站立可持枪与可掏枪后，置位复用数据并切到 <see cref="PlayerStateMachine.armedState"/>。
+    /// 站起自动掏枪在 <see cref="Player.TryResumeArmedAfterCrouchStand"/> 中设置 <see cref="PlayerReusableData.resumeArmedPresentationWithoutDraw"/> 后调用本方法，与手动掏枪一致。
+    /// </summary>
+    /// <returns>是否已通过校验并发起 <see cref="PlayerStateMachine.ChangeState"/>。</returns>
+    public bool TryEnterArmedStateSameAsToggleWeaponInput()
+    {
+        if (ReusableData == null || StateMachine == null)
+        {
+            return false;
+        }
+
+        if (!ReusableData.AllowsArmedWeaponActions())
+        {
+            return false;
+        }
+
+        if (!CanBeginArmedPresentationNow())
+        {
+            return false;
+        }
+
+        ReusableData.pendingAutoDrawWeaponAfterCrouchHolsterStand = false;
+        ReusableData.armedModeActive = true;
+        ReusableData.resumeArmedAfterBreak = false;
+        ReusableData.weaponSuppressedUntilStandFromCrouch = false;
+        ReusableData.pendingCrouchAfterStandHolster = false;
+        StateMachine.ChangeState(StateMachine.armedState);
+        return true;
+    }
+
+    /// <summary>
+    /// 持枪模式下由下蹲触发：先 <see cref="PlayerArmedPresentation.BeginArmedExit"/> 收枪，回调内再空手并下蹲。
+    /// 返回 true 表示已消费本次下蹲输入（已开收枪协程，或持枪但当前不可收枪故不下蹲）；false 表示非持枪模式，由调用方照常设蹲姿。
+    /// </summary>
+    public bool TryBeginHolsterThenCrouchFromArmedLocomotion()
+    {
+        if (ReusableData == null || StateMachine == null || InputService == null)
+        {
+            return false;
+        }
+
+        if (!ReusableData.armedModeActive)
+        {
+            return false;
+        }
+
+        if (ArmedPresentation == null)
+        {
+            return true;
+        }
+
+        if (!ArmedPresentation.IsHolsterInputAllowed || !CanBeginArmedPresentationNow())
+        {
+            return true;
+        }
+
+        ArmedPresentation.BeginArmedExit(() => ApplyArmedHolsterExitToUnarmedLocomotion(enterCrouchAndQueueAutoDrawOnStand: true));
+        return true;
+    }
+
+    /// <param name="enterCrouchAndQueueAutoDrawOnStand">true：收枪后下蹲并排队站起自动掏枪；false：收枪键同款，站立空手 Idle。</param>
+    private void ApplyArmedHolsterExitToUnarmedLocomotion(bool enterCrouchAndQueueAutoDrawOnStand)
+    {
+        if (ReusableData == null || StateMachine == null || InputService == null)
+        {
+            return;
+        }
+
+        if (enterCrouchAndQueueAutoDrawOnStand)
+        {
+            ReusableData.pendingAutoDrawWeaponAfterCrouchHolsterStand = true;
+            ReusableData.pendingStandWhenCrouchCeilingClears = false;
+            ReusableData.standValueParameter.TargetValue = 0f;
+
+            if (isOnGround.Value && InputService.MoveDiscrete != UnityEngine.Vector2.zero)
+            {
+                if (InputService.Shift)
+                {
+                    StateMachine.ChangeState(StateMachine.moveLoopState);
+                }
+                else
+                {
+                    StateMachine.ChangeState(StateMachine.moveStartState);
+                }
+            }
+            else
+            {
+                StateMachine.ChangeState(StateMachine.idleState);
+            }
+
+            ReusableData.armedModeActive = false;
+            ReusableData.resumeArmedAfterBreak = false;
+            ReusableData.weaponSuppressedUntilStandFromCrouch = false;
+            ReusableData.pendingCrouchAfterStandHolster = false;
+        }
+        else
+        {
+            ReusableData.pendingAutoDrawWeaponAfterCrouchHolsterStand = false;
+            // 先切 Idle（armed 仍为 true）再关 armed，避免 Idle.OnEnter 里 NotifyArmedStateForceQuit 打断收枪协程末尾的 Layer2 淡出。
+            StateMachine.ChangeState(StateMachine.idleState);
+            ReusableData.armedModeActive = false;
+            ReusableData.resumeArmedAfterBreak = false;
+            ReusableData.weaponSuppressedUntilStandFromCrouch = false;
+            ReusableData.pendingCrouchAfterStandHolster = false;
+        }
+    }
+
     [Header("Player Resources")]
     [SerializeField, Min(1f)] private float maxHealth = 100f;
     [SerializeField, Min(1f)] private float maxStamina = 100f;
@@ -185,15 +293,7 @@ public class Player : CharacterBase
             return;
         }
 
-        ArmedPresentation.BeginArmedExit(() =>
-        {
-            // 先切 Idle（armed 仍为 true）再关 armed，避免 Idle.OnEnter 里 NotifyArmedStateForceQuit 打断收枪协程末尾的 Layer2 淡出。
-            StateMachine.ChangeState(StateMachine.idleState);
-            ReusableData.armedModeActive = false;
-            ReusableData.resumeArmedAfterBreak = false;
-            ReusableData.weaponSuppressedUntilStandFromCrouch = false;
-            ReusableData.pendingCrouchAfterStandHolster = false;
-        });
+        ArmedPresentation.BeginArmedExit(() => ApplyArmedHolsterExitToUnarmedLocomotion(enterCrouchAndQueueAutoDrawOnStand: false));
     }
 
     /// <summary>
@@ -264,7 +364,8 @@ public class Player : CharacterBase
             return;
         }
 
-        if (!InputService.CrouchHeld)
+        var num = playerSO?.playerMovementData?.PlayerNumericConfig;
+        if (num != null && num.useHoldForCrouch && !InputService.CrouchHeld)
         {
             ReusableData.pendingCrouchAfterStandHolster = false;
             return;
@@ -282,27 +383,31 @@ public class Player : CharacterBase
             return;
         }
 
-        if (!ReusableData.weaponSuppressedUntilStandFromCrouch)
+        if (!ReusableData.pendingAutoDrawWeaponAfterCrouchHolsterStand)
         {
             return;
         }
 
-        if (ReusableData.standValueParameter.CurrentValue < 0.99f)
+        // Current 在设 Target=蹲 后仍会短暂保持「站立」；必须同时看 Target，否则会刚进蹲就误判站起并自动掏枪。
+        if (ReusableData.standValueParameter.CurrentValue < 0.99f ||
+            ReusableData.standValueParameter.TargetValue < 0.99f)
         {
             return;
         }
 
-        ReusableData.weaponSuppressedUntilStandFromCrouch = false;
-        if (ReusableData.resumeArmedAfterBreak && ReusableData.armedModeActive)
+        if (ReusableData.armedModeActive)
         {
-            if (!CanBeginArmedPresentationNow())
-            {
-                return;
-            }
-
-            ReusableData.resumeArmedAfterBreak = false;
-            StateMachine.ChangeState(StateMachine.armedState);
+            ReusableData.pendingAutoDrawWeaponAfterCrouchHolsterStand = false;
+            return;
         }
+
+        if (!ReusableData.AllowsArmedWeaponActions() || !CanBeginArmedPresentationNow())
+        {
+            return;
+        }
+
+        ReusableData.resumeArmedPresentationWithoutDraw = false;
+        TryEnterArmedStateSameAsToggleWeaponInput();
     }
 
     private void LateUpdate()

@@ -63,32 +63,14 @@ public class PlayerLandState : PlayerMovementState
 
     private void OnToggleWeapon(InputAction.CallbackContext context)
     {
-        if (!reusableData.AllowsArmedWeaponActions())
-        {
-            return;
-        }
-
-        if (!player.CanBeginArmedPresentationNow())
-        {
-            return;
-        }
-
-        reusableData.armedModeActive = true;
-        reusableData.resumeArmedAfterBreak = false;
-        reusableData.weaponSuppressedUntilStandFromCrouch = false;
-        reusableData.pendingCrouchAfterStandHolster = false;
-        playerStateMachine.ChangeState(playerStateMachine.armedState);
+        player.TryEnterArmedStateSameAsToggleWeaponInput();
     }
 
     private void OnLandAnimationEnd()
     {
-        if (reusableData.armedModeActive && reusableData.AllowsArmedWeaponActions())
+        if (reusableData.armedModeActive && player.TryEnterArmedStateSameAsToggleWeaponInput())
         {
-            if (player.CanBeginArmedPresentationNow())
-            {
-                playerStateMachine.ChangeState(playerStateMachine.armedState);
-                return;
-            }
+            return;
         }
 
         OnStateDefaultEnd();
@@ -99,13 +81,9 @@ public class PlayerLandState : PlayerMovementState
         base.OnUpdate();
         if (player.isOnGround.Value && inputServer.MoveDiscrete != UnityEngine.Vector2.zero)
         {
-            if (reusableData.armedModeActive && reusableData.AllowsArmedWeaponActions())
+            if (reusableData.armedModeActive && player.TryEnterArmedStateSameAsToggleWeaponInput())
             {
-                if (player.CanBeginArmedPresentationNow())
-                {
-                    playerStateMachine.ChangeState(playerStateMachine.armedState);
-                    return;
-                }
+                return;
             }
 
             if (inputServer.Shift)

@@ -154,31 +154,31 @@ MonoBehaviour:
     m_Value: 1
   colorSensitivity:
     m_OverrideState: 1
-    m_Value: 0.05
+    m_Value: 0.1
   colorStrength:
     m_OverrideState: 1
-    m_Value: 0.25
+    m_Value: 0.4
   depthSensitivity:
     m_OverrideState: 1
-    m_Value: 0.01
+    m_Value: 0.516
   depthStrength:
     m_OverrideState: 1
     m_Value: 0.75
   normalSensitivity:
     m_OverrideState: 1
-    m_Value: 0.094
+    m_Value: 0.3
   normalStrength:
     m_OverrideState: 1
-    m_Value: 0.257
+    m_Value: 0.7
   depthThreshold:
     m_OverrideState: 1
     m_Value: 0.434
   saturationFloor:
     m_OverrideState: 1
-    m_Value: 0.75
+    m_Value: 0.7
   lightnessFloor:
     m_OverrideState: 1
-    m_Value: 0.75
+    m_Value: 0.7
   backgroundColor:
     m_OverrideState: 1
     m_Value: {r: 0, g: 0, b: 0, a: 1}
@@ -258,7 +258,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b52e5c16327dbe943b312dcaf1208cc3, type: 3}
   m_Name: PixelateSettings
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   renderPassEvent:
     m_OverrideState: 1
     m_Value: 550
