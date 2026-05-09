@@ -21,7 +21,7 @@ Material:
   - _OCCLUSIONMAP
   - _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
   m_LightmapFlags: 1
-  m_EnableInstancingVariants: 0
+  m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
@@ -116,6 +116,7 @@ Material:
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
+    - _Noise_Speed: 0.005
     - _OcclusionStrength: 0.88
     - _Parallax: 0.02
     - _QueueControl: 0
@@ -136,6 +137,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 1.12, g: 1.1040974, b: 1.037647, a: 1.12}
     - _EmissionColorUI: {r: 1, g: 0.9858012, b: 0.9264706, a: 1}
+    - _MainColor: {r: 1, g: 1, b: 1, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &7011001822093187595
