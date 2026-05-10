@@ -47,3 +47,8 @@ MonoBehaviour:
   bulletMuzzleSpeed: 20
   bulletGravityScale: 0.2
   bulletLifetime: 3
+  damageableTags:
+  - Monster
+  hurtBuffId: 
+  destroyOnHit: 0
+  maxHitDistance: 2

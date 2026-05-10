@@ -14,6 +14,7 @@ namespace DZ_3C.AI.HTN
         [SerializeField] private MonoBehaviour attackHandler;
 
         private IMonsterAttack attackHandlerInterface;
+        private MonsterHurtReceiver _hurtReceiver;
 
         private enum AtomicTask
         {
@@ -105,6 +106,7 @@ namespace DZ_3C.AI.HTN
             if (selector == null) selector = GetComponent<HTNMethodSelector>();
             if (character == null) character = GetComponent<MonsterCharacter>();
             attackHandlerInterface = attackHandler as IMonsterAttack;
+            _hurtReceiver = GetComponent<MonsterHurtReceiver>();
 
             if (character != null && monsterStat != null)
             {
@@ -123,6 +125,11 @@ namespace DZ_3C.AI.HTN
 
         private void Update()
         {
+            if (_hurtReceiver != null && _hurtReceiver.IsDead)
+            {
+                return;
+            }
+
             if (monsterStat == null || blackboard == null || selector == null || character == null) return;
 
             BeginFrame();

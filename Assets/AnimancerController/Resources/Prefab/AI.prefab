@@ -29,9 +29,11 @@ GameObject:
   - component: {fileID: 6257144858818071011}
   - component: {fileID: 7566732114713936834}
   - component: {fileID: 6376422797534665853}
+  - component: {fileID: 782234560001}
+  - component: {fileID: 782234560002}
   m_Layer: 0
   m_Name: AI
-  m_TagString: Untagged
+  m_TagString: Monster
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -325,7 +327,7 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 3
   m_Height: 0
-  m_Radius: 0.024329834
+  m_Radius: 0.03
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
@@ -430,8 +432,47 @@ MonoBehaviour:
   selector: {fileID: 8359702207137834310}
   runtime: {fileID: 7661055565804320591}
   driver: {fileID: 6257144858818071011}
+  hurtReceiver: {fileID: 782234560002}
   worldOffset: {x: 0, y: 1, z: 0}
   textScale: 0.02
+--- !u!114 &782234560001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5737582618028807084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15bfaa66805bdb7448f70650f6d9e555, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animatorOverride: {fileID: 2838638217364791616}
+  useBoolForHit: 1
+  hitBoolParameterName: hitted
+  hitBoolResetDelay: 0.08
+  hitTriggerName: Hit
+  deathTriggerName: 
+  deathStateName: Died
+  clearHitTriggerOnDeath: 0
+--- !u!114 &782234560002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5737582618028807084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d447dbc9a7bcdf4e91a1a33c2169b45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  character: {fileID: 2415126630310859549}
+  hitPresentationBehaviour: {fileID: 782234560001}
+  fallbackMaxHealth: 100
+  destroyGameObjectOnDeath: 1
+  destroyDelaySeconds: 2
+  disableCharacterControllerOnDeath: 1
 --- !u!1 &5967168280176440551
 GameObject:
   m_ObjectHideFlags: 0
@@ -450,7 +491,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4790153666621101351
 Transform:
   m_ObjectHideFlags: 0
@@ -720,17 +761,77 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -8616714306119514353, guid: a43791e83c3775a409ae955a3c65039e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cd372d93f79bc79469ca5028d67e7c42, type: 2}
+    - target: {fileID: -5731929328413656321, guid: a43791e83c3775a409ae955a3c65039e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cd372d93f79bc79469ca5028d67e7c42, type: 2}
     - target: {fileID: -3887185075125053422, guid: a43791e83c3775a409ae955a3c65039e,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: f27ae27d8c8d30044a04534ecf120996, type: 2}
+      objectReference: {fileID: 2100000, guid: cd372d93f79bc79469ca5028d67e7c42, type: 2}
+    - target: {fileID: -3617012822177458565, guid: a43791e83c3775a409ae955a3c65039e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cd372d93f79bc79469ca5028d67e7c42, type: 2}
+    - target: {fileID: -3298993204326956990, guid: a43791e83c3775a409ae955a3c65039e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cd372d93f79bc79469ca5028d67e7c42, type: 2}
+    - target: {fileID: -2875706009725999340, guid: a43791e83c3775a409ae955a3c65039e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cd372d93f79bc79469ca5028d67e7c42, type: 2}
+    - target: {fileID: -2558341540041297148, guid: a43791e83c3775a409ae955a3c65039e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cd372d93f79bc79469ca5028d67e7c42, type: 2}
+    - target: {fileID: -1414021037240037767, guid: a43791e83c3775a409ae955a3c65039e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cd372d93f79bc79469ca5028d67e7c42, type: 2}
+    - target: {fileID: -792570630973560120, guid: a43791e83c3775a409ae955a3c65039e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cd372d93f79bc79469ca5028d67e7c42, type: 2}
     - target: {fileID: 919132149155446097, guid: a43791e83c3775a409ae955a3c65039e,
         type: 3}
       propertyPath: m_Name
       value: Drone_Sketchfab
       objectReference: {fileID: 0}
+    - target: {fileID: 2098612306798159067, guid: a43791e83c3775a409ae955a3c65039e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cd372d93f79bc79469ca5028d67e7c42, type: 2}
+    - target: {fileID: 2634900885729524772, guid: a43791e83c3775a409ae955a3c65039e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cd372d93f79bc79469ca5028d67e7c42, type: 2}
+    - target: {fileID: 4478399592442898055, guid: a43791e83c3775a409ae955a3c65039e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cd372d93f79bc79469ca5028d67e7c42, type: 2}
     - target: {fileID: 7813153562459417032, guid: a43791e83c3775a409ae955a3c65039e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cd372d93f79bc79469ca5028d67e7c42, type: 2}
+    - target: {fileID: 8156308991478716672, guid: a43791e83c3775a409ae955a3c65039e,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 

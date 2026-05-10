@@ -390,7 +390,11 @@ public class PlayerWeaponRuntime : MonoBehaviour
             aimDir * gunConfig.bulletMuzzleSpeed,
             gunConfig.damage,
             gunConfig.bulletGravityScale,
-            gunConfig.bulletLifetime);
+            gunConfig.bulletLifetime,
+            gunConfig.damageableTags,
+            gunConfig.hurtBuffId,
+            gunConfig.destroyOnHit,
+            gunConfig.maxHitDistance);
 
         if (gunConfig.recoilPattern != null && gunConfig.recoilPattern.Length > 0)
         {

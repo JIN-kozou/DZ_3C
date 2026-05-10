@@ -1,7 +1,9 @@
+using System.Collections.Generic;
+using DZ_3C.AI.Core;
 using UnityEngine;
 
 /// <summary>
-/// Physical bullet: hit detection via collision callbacks only (no hitscan ray).
+/// Physical bullet: hit detection via trigger and collision callbacks (no hitscan ray).
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
 public class Projectile : MonoBehaviour
@@ -14,8 +16,19 @@ public class Projectile : MonoBehaviour
     private float _damage;
     private float _gravityScale;
     private float _despawnAt;
+    private bool _infiniteLifetime;
     private Collider[] _ownerColliders;
     private Transform _ownerRoot;
+    private string[] _damageableTags;
+    private string _hurtBuffId;
+    private bool _destroyOnHit;
+    private float _maxHitDistanceSqr;
+
+    /// <summary>their Collider instance id -> receiver root GameObject instance id</summary>
+    private readonly Dictionary<int, int> _otherColliderToReceiverKey = new Dictionary<int, int>();
+
+    /// <summary>receiver root instance id -> how many of their colliders are overlapping (valid hit)</summary>
+    private readonly Dictionary<int, int> _receiverOverlapDepth = new Dictionary<int, int>();
 
     private void Awake()
     {
@@ -30,13 +43,28 @@ public class Projectile : MonoBehaviour
         Vector3 worldVelocity,
         float damage,
         float gravityScale,
-        float lifetime)
+        float lifetime,
+        string[] damageableTags,
+        string hurtBuffId,
+        bool destroyOnHit,
+        float maxHitDistance)
     {
         _ownerRoot = ownerRoot;
         _ownerColliders = ownerColliders;
         _damage = damage;
         _gravityScale = gravityScale;
-        _despawnAt = Time.time + lifetime;
+        _damageableTags = damageableTags;
+        _hurtBuffId = hurtBuffId ?? string.Empty;
+        _destroyOnHit = destroyOnHit;
+        var maxDist = Mathf.Max(0.01f, maxHitDistance);
+        _maxHitDistanceSqr = maxDist * maxDist;
+
+        _infiniteLifetime = lifetime <= 0f;
+        _despawnAt = _infiniteLifetime ? float.PositiveInfinity : Time.time + lifetime;
+
+        _otherColliderToReceiverKey.Clear();
+        _receiverOverlapDepth.Clear();
+
         _rb.velocity = worldVelocity;
 
         if (_ownerColliders != null)
@@ -58,21 +86,180 @@ public class Projectile : MonoBehaviour
     private void FixedUpdate()
     {
         _rb.velocity += Physics.gravity * (_gravityScale * Time.fixedDeltaTime);
-        if (Time.time >= _despawnAt)
+        if (!_infiniteLifetime && Time.time >= _despawnAt)
         {
             Destroy(gameObject);
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        NotifyOverlapEnter(other);
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        NotifyOverlapExit(other);
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
-        if (IsOwnerHierarchy(collision.collider))
+        if (collision.collider != null)
+        {
+            NotifyOverlapEnter(collision.collider);
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.collider != null)
+        {
+            NotifyOverlapExit(collision.collider);
+        }
+    }
+
+    private void NotifyOverlapEnter(Collider other)
+    {
+        if (IsOwnerHierarchy(other))
         {
             return;
         }
 
-        Debug.Log($"Projectile hit {collision.collider.name} damage={_damage:F1}", collision.collider);
-        Destroy(gameObject);
+        if (!TryResolveValidHit(other, useDistanceFilter: true, out var receiver))
+        {
+            return;
+        }
+
+        if (receiver is not Component receiverComponent)
+        {
+            return;
+        }
+
+        var otherId = other.GetInstanceID();
+        if (_otherColliderToReceiverKey.ContainsKey(otherId))
+        {
+            return;
+        }
+
+        var receiverKey = receiverComponent.gameObject.GetInstanceID();
+        _otherColliderToReceiverKey[otherId] = receiverKey;
+
+        if (!_receiverOverlapDepth.TryGetValue(receiverKey, out var depth))
+        {
+            depth = 0;
+        }
+
+        if (depth == 0)
+        {
+            receiver.ReceiveAIDamage(_damage, _hurtBuffId, gameObject);
+            if (_destroyOnHit)
+            {
+                Destroy(gameObject);
+                return;
+            }
+        }
+
+        _receiverOverlapDepth[receiverKey] = depth + 1;
+    }
+
+    private void NotifyOverlapExit(Collider other)
+    {
+        if (IsOwnerHierarchy(other))
+        {
+            return;
+        }
+
+        var otherId = other.GetInstanceID();
+        if (!_otherColliderToReceiverKey.TryGetValue(otherId, out var receiverKey))
+        {
+            return;
+        }
+
+        _otherColliderToReceiverKey.Remove(otherId);
+
+        if (!_receiverOverlapDepth.TryGetValue(receiverKey, out var depth))
+        {
+            return;
+        }
+
+        depth--;
+        if (depth <= 0)
+        {
+            _receiverOverlapDepth.Remove(receiverKey);
+        }
+        else
+        {
+            _receiverOverlapDepth[receiverKey] = depth;
+        }
+    }
+
+    private bool TryResolveValidHit(Collider other, bool useDistanceFilter, out IAIHurtReceiver receiver)
+    {
+        receiver = null;
+        if (other == null || _damage <= 0f)
+        {
+            return false;
+        }
+
+        if (!PassesTagFilter(other))
+        {
+            return false;
+        }
+
+        if (useDistanceFilter && !PassesProximityFilter(other))
+        {
+            return false;
+        }
+
+        receiver = FindHurtReceiver(other);
+        return receiver != null;
+    }
+
+    private bool PassesTagFilter(Collider other)
+    {
+        if (_damageableTags == null || _damageableTags.Length == 0)
+        {
+            return false;
+        }
+
+        for (var t = other.transform; t != null; t = t.parent)
+        {
+            for (var i = 0; i < _damageableTags.Length; i++)
+            {
+                var tag = _damageableTags[i];
+                if (string.IsNullOrEmpty(tag))
+                {
+                    continue;
+                }
+
+                if (t.CompareTag(tag))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private bool PassesProximityFilter(Collider other)
+    {
+        var closest = other.ClosestPoint(transform.position);
+        return (closest - transform.position).sqrMagnitude <= _maxHitDistanceSqr;
+    }
+
+    private static IAIHurtReceiver FindHurtReceiver(Collider other)
+    {
+        var behaviours = other.GetComponentsInParent<MonoBehaviour>(true);
+        for (var i = 0; i < behaviours.Length; i++)
+        {
+            if (behaviours[i] is IAIHurtReceiver hr)
+            {
+                return hr;
+            }
+        }
+
+        return null;
     }
 
     private bool IsOwnerHierarchy(Collider c)

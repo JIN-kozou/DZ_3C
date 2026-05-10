@@ -92,6 +92,9 @@ namespace DZ_3C.AI.Config
         public bool usePhysicsAoeDamage = true;
         public string buffId = string.Empty;
 
+        [Header("Vitality")]
+        [Min(1f)] public float maxHealth = 100f;
+
         [Header("Optional Character Numeric")]
         public PlayerNumericConfig playerNumericConfig;
     }
