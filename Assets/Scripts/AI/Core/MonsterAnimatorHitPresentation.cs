@@ -4,18 +4,26 @@ using UnityEngine;
 namespace DZ_3C.AI.Core
 {
     /// <summary>
-    /// 默认受击表现：支持 Animator <b>Trigger</b> 或 <b>Bool</b>（如 AIcontroller 的 <c>hitted</c>），
-    /// 死亡可用 Trigger 或 <see cref="CrossFadeInFixedTime"/> 切入指定状态名（如 <c>Died</c>）。
+    /// 默认受击表现：优先用 <see cref="CrossFadeInFixedTime"/> 切入 Hit 状态（最稳），
+    /// 可选 Bool/Trigger；死亡可用 Trigger 或 CrossFade 到 Died。
     /// </summary>
     [DisallowMultipleComponent]
     public class MonsterAnimatorHitPresentation : MonoBehaviour, IMonsterHitPresentation
     {
         [SerializeField] private Animator animatorOverride;
 
+        [Header("Hit — Direct state (recommended)")]
+        [Tooltip("为 true 时每次受击直接 CrossFade 到 Hit，不依赖状态机里 Bool 过渡。")]
+        [SerializeField] private bool playHitByCrossFade = true;
+        [SerializeField] private string hitStateName = "Hit";
+        [Min(0.01f)] [SerializeField] private float hitCrossFadeDuration = 0.12f;
+        [Tooltip("避免被摄像机视锥剔除时不更新 Animator。")]
+        [SerializeField] private bool forceAlwaysAnimate = true;
+
         [Header("Hit — Bool (e.g. hitted)")]
         [SerializeField] private bool useBoolForHit;
         [SerializeField] private string hitBoolParameterName = "hitted";
-        [Min(0.01f)] [SerializeField] private float hitBoolResetDelay = 0.08f;
+        [Min(0.01f)] [SerializeField] private float hitBoolResetDelay = 0.2f;
 
         [Header("Hit — Trigger (optional if useBoolForHit)")]
         [SerializeField] private string hitTriggerName = "Hit";
@@ -34,6 +42,7 @@ namespace DZ_3C.AI.Core
         private bool _hasDeathTrigger;
         private bool _hasHitBool;
         private Coroutine _hitBoolRoutine;
+        private bool _loggedMissingController;
 
         private void Awake()
         {
@@ -41,6 +50,11 @@ namespace DZ_3C.AI.Core
             if (_animator == null)
             {
                 _animator = GetComponentInChildren<Animator>();
+            }
+
+            if (_animator != null && forceAlwaysAnimate)
+            {
+                _animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
             }
 
             CacheHashes();
@@ -63,8 +77,27 @@ namespace DZ_3C.AI.Core
 
         public void OnDamaged(in MonsterDamageContext context)
         {
-            if (_animator == null)
+            if (_animator == null || !_animator.isActiveAndEnabled)
             {
+                return;
+            }
+
+            if (_animator.runtimeAnimatorController == null)
+            {
+                if (!_loggedMissingController)
+                {
+                    _loggedMissingController = true;
+                    Debug.LogWarning(
+                        "[MonsterAnimatorHitPresentation] Animator has no RuntimeAnimatorController; hit animation will not play.",
+                        this);
+                }
+
+                return;
+            }
+
+            if (playHitByCrossFade && !string.IsNullOrEmpty(hitStateName))
+            {
+                _animator.CrossFadeInFixedTime(hitStateName, hitCrossFadeDuration, 0, 0f);
                 return;
             }
 

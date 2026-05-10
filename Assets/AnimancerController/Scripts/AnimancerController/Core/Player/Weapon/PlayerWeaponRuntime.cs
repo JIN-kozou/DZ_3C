@@ -86,6 +86,7 @@ public class PlayerWeaponRuntime : MonoBehaviour
         }
 
         RefreshOwnerColliders();
+        RefillMagazine();
     }
 
     private void OnEnable()
@@ -123,12 +124,23 @@ public class PlayerWeaponRuntime : MonoBehaviour
     {
         SuccessfulShotsLastTick = 0;
 
-        if (_player == null || _player.ReusableData == null || _player.InputService == null)
+        if (_player == null || _player.ReusableData == null)
         {
             return;
         }
 
         var rd = _player.ReusableData;
+
+        if (gunConfig != null)
+        {
+            TickAmmoRegen(deltaTime);
+        }
+
+        if (_player.InputService == null)
+        {
+            return;
+        }
+
         var input = _player.InputService;
 
         if (gunConfig == null)
@@ -136,8 +148,6 @@ public class PlayerWeaponRuntime : MonoBehaviour
             _adsHeld = false;
             return;
         }
-
-        TickAmmoRegen(deltaTime);
 
         bool fireHeld = input.FireHeld;
         bool firePressedThisFrame = input.FireWasPressedThisFrame;

@@ -12,6 +12,17 @@ namespace DZ_3C.AI.Core
         public MonsterStatConfigSO StatConfig => statConfig;
 
         private float yawVelocity;
+        private float lastRequestedTargetYaw;
+        private bool hasLastRequestedTargetYaw;
+
+        /// <summary>
+        /// 在 HTN 根行为 / 子方法切换时调用，避免 SmoothDamp 角速度把上一段行为的转向惯性带到新行为。
+        /// </summary>
+        public void ResetTurnAssistState()
+        {
+            yawVelocity = 0f;
+            hasLastRequestedTargetYaw = false;
+        }
 
         protected override void Awake()
         {
@@ -53,6 +64,17 @@ namespace DZ_3C.AI.Core
 
             float targetYaw = Quaternion.LookRotation(planar.normalized, Vector3.up).eulerAngles.y;
             float currentYaw = transform.eulerAngles.y;
+
+            if (hasLastRequestedTargetYaw && statConfig != null && statConfig.turnSmoothTime > 0.001f)
+            {
+                if (Mathf.Abs(Mathf.DeltaAngle(lastRequestedTargetYaw, targetYaw)) > 25f)
+                {
+                    yawVelocity = 0f;
+                }
+            }
+
+            hasLastRequestedTargetYaw = true;
+            lastRequestedTargetYaw = targetYaw;
 
             if (statConfig == null || statConfig.turnSmoothTime <= 0.001f)
             {

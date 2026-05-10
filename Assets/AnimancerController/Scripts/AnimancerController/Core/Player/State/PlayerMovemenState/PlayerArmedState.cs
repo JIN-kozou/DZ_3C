@@ -27,8 +27,6 @@ public class PlayerArmedState : PlayerMovementState
         bool crouchIntent = reusableData.standValueParameter.TargetValue < 0.99f;
         player.ArmedPresentation.BeginArmedEnter(_moveLoopData.ResolveMoveLoop(crouchIntent), armedAnim, resumeLayers);
         SyncRotationParameterToLocomotionEntry();
-        var weapon = player.GetComponent<PlayerWeaponRuntime>();
-        weapon?.RefillMagazine();
         TryEnterLocomotionIfMoveAlreadyHeld();
     }
 
