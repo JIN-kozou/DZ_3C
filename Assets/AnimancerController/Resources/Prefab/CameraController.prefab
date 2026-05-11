@@ -289,7 +289,7 @@ MonoBehaviour:
   m_MaximumEffort: 1
   m_SmoothingTime: 0.1
   m_Damping: 1
-  m_DampingWhenOccluded: 2
+  m_DampingWhenOccluded: 0.25
   m_OptimalTargetDistance: 0
 --- !u!114 &1368109126529906950
 MonoBehaviour:
@@ -320,5 +320,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f9a8e7d6c5b4a39281726354a291b0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  overShoulderScreenX: 0.65
+  overShoulderScreenX: 0.7
   smoothTime: 0.2
