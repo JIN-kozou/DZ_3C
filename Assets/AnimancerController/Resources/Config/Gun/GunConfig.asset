@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 10
   fireRate: 1
-  fullAuto: 0
+  fullAuto: 1
   maxShotsPerTick: 1
   magazineSize: 8
   ammoRegenIntervalSeconds: 3
@@ -47,3 +47,8 @@ MonoBehaviour:
   bulletMuzzleSpeed: 20
   bulletGravityScale: 0.2
   bulletLifetime: 3
+  damageableTags:
+  - Monster
+  hurtBuffId: 
+  destroyOnHit: 0
+  maxHitDistance: 2

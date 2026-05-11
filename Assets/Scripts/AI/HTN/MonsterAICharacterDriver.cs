@@ -1,3 +1,4 @@
+using System.Collections;
 using DZ_3C.AI.Config;
 using DZ_3C.AI.Core;
 using UnityEngine;
@@ -13,7 +14,18 @@ namespace DZ_3C.AI.HTN
         [SerializeField] private MonsterCharacter character;
         [SerializeField] private MonoBehaviour attackHandler;
 
+        [Header("Attack ray visual")]
+        [SerializeField] private bool showAttackRayVisual = true;
+        [SerializeField] private float attackRayVisualSeconds = 0.12f;
+        [SerializeField] private Color attackRayDamageColor = new Color(1f, 0.15f, 0.1f, 0.95f);
+        [SerializeField] private Color attackRayBlockedColor = new Color(1f, 0.55f, 0.1f, 0.75f);
+        [SerializeField] private Color attackRayMissColor = new Color(0.6f, 0.6f, 0.65f, 0.5f);
+        [SerializeField] private float attackRayLineWidth = 0.045f;
+
         private IMonsterAttack attackHandlerInterface;
+        private MonsterHurtReceiver _hurtReceiver;
+        private LineRenderer _attackRayLine;
+        private Coroutine _attackRayHideRoutine;
 
         private enum AtomicTask
         {
@@ -66,6 +78,8 @@ namespace DZ_3C.AI.HTN
 
         private float patrolPauseUntil;
         private float nextAttackTime;
+        /// <summary>Assault 战前悬停结束时刻（与 Time.time 比较）；负值表示未进入悬停。</summary>
+        private float assaultPreAttackHoverEndTime = -1f;
         private float nextDashTime;
         private float nextStrafeTime;
         private float orbitAngle;
@@ -105,6 +119,7 @@ namespace DZ_3C.AI.HTN
             if (selector == null) selector = GetComponent<HTNMethodSelector>();
             if (character == null) character = GetComponent<MonsterCharacter>();
             attackHandlerInterface = attackHandler as IMonsterAttack;
+            _hurtReceiver = GetComponent<MonsterHurtReceiver>();
 
             if (character != null && monsterStat != null)
             {
@@ -123,6 +138,11 @@ namespace DZ_3C.AI.HTN
 
         private void Update()
         {
+            if (_hurtReceiver != null && _hurtReceiver.IsDead)
+            {
+                return;
+            }
+
             if (monsterStat == null || blackboard == null || selector == null || character == null) return;
 
             BeginFrame();
@@ -428,6 +448,7 @@ namespace DZ_3C.AI.HTN
 
             if (distance > attackDistance)
             {
+                assaultPreAttackHoverEndTime = -1f;
                 SetDominant(AtomicTask.HorizontalMove);
                 PlanarSeekWorld(target.transform.position, monsterStat.moveSpeed);
                 SetLook(target.transform.position - transform.position);
@@ -444,14 +465,31 @@ namespace DZ_3C.AI.HTN
 
                 if (Time.time < nextAttackTime)
                 {
+                    assaultPreAttackHoverEndTime = -1f;
                     TickAttackIntervalManeuver(target);
                 }
                 else
                 {
+                    if (monsterStat.assaultPreAttackHoverSeconds > 0.0001f)
+                    {
+                        if (assaultPreAttackHoverEndTime < 0f)
+                        {
+                            assaultPreAttackHoverEndTime = Time.time + monsterStat.assaultPreAttackHoverSeconds;
+                        }
+
+                        if (Time.time < assaultPreAttackHoverEndTime)
+                        {
+                            SetDominant(AtomicTask.Hover);
+                            AccumulateHoverDrift(monsterStat.hoverRadius);
+                            return;
+                        }
+                    }
+
+                    assaultPreAttackHoverEndTime = -1f;
                     SetDominant(AtomicTask.Attack);
                     nextAttackTime = Time.time + monsterStat.attackInterval;
                     attackHandlerInterface?.PerformAttack(target, monsterStat.baseDamage, monsterStat.aoeRadius, monsterStat.buffId);
-                    ApplyPhysicsAoeDamage(target.transform.position);
+                    TryApplyAttackRayDamageToPlayer(target);
                     postAttackBackoffUntil = Time.time + monsterStat.postAttackBackoffSeconds;
                 }
             }
@@ -608,6 +646,8 @@ namespace DZ_3C.AI.HTN
 
             if (!changed) return;
 
+            character.ResetTurnAssistState();
+
             methodEnterTime = Time.time;
             if (selector.CurrentIdleMethod == IdleMethod.Checkpoint)
             {
@@ -693,27 +733,132 @@ namespace DZ_3C.AI.HTN
             SetLook(target.transform.position - transform.position);
         }
 
-        private void ApplyPhysicsAoeDamage(Vector3 center)
+        /// <summary>
+        /// 朝仇恨目标瞄准点（目标位置 + <see cref="MonsterStatConfigSO.attackRayTargetYOffset"/>）方向打射线；
+        /// 若命中玩家（且与仇恨目标一致）则造成伤害并传入 buffId（由 <see cref="IAIHurtReceiver"/> 处理）。
+        /// </summary>
+        private void TryApplyAttackRayDamageToPlayer(AITargetable target)
         {
-            if (!monsterStat.usePhysicsAoeDamage || monsterStat.aoeRadius <= 0f) return;
-
-            Collider[] hits = Physics.OverlapSphere(center, monsterStat.aoeRadius, monsterStat.attackTargetMask, QueryTriggerInteraction.Collide);
-            for (int i = 0; i < hits.Length; i++)
+            if (monsterStat == null || target == null)
             {
-                var targetable = hits[i].GetComponentInParent<AITargetable>();
-                if (targetable == null || targetable.gameObject == gameObject) continue;
-                if (blackboard.HateTarget != null && targetable != blackboard.HateTarget) continue;
+                return;
+            }
 
-                var receivers = targetable.GetComponentsInParent<MonoBehaviour>(true);
-                for (int r = 0; r < receivers.Length; r++)
+            Vector3 origin = transform.position + Vector3.up * monsterStat.attackRayOriginYOffset;
+            Vector3 aimPoint = target.transform.position + Vector3.up * monsterStat.attackRayTargetYOffset;
+            Vector3 toTarget = aimPoint - origin;
+            float maxDist = Mathf.Max(0.5f, monsterStat.attackRayMaxDistance);
+            if (toTarget.sqrMagnitude < 0.000001f)
+            {
+                return;
+            }
+
+            Vector3 direction = toTarget.normalized;
+            int mask = monsterStat.attackTargetMask.value != 0
+                ? monsterStat.attackTargetMask
+                : Physics.DefaultRaycastLayers;
+
+            Vector3 beamEnd = origin + direction * maxDist;
+            Color visualColor = attackRayMissColor;
+            bool dealtDamage = false;
+
+            if (Physics.Raycast(origin, direction, out RaycastHit hit, maxDist, mask, QueryTriggerInteraction.Collide))
+            {
+                beamEnd = hit.point;
+                var hitTargetable = hit.collider.GetComponentInParent<AITargetable>();
+                if (hitTargetable != null && hitTargetable.IsPlayer && hitTargetable.gameObject != gameObject)
                 {
-                    if (receivers[r] is IAIHurtReceiver hurtReceiver)
+                    if (blackboard.HateTarget == null || hitTargetable == blackboard.HateTarget)
                     {
-                        hurtReceiver.ReceiveAIDamage(monsterStat.baseDamage, monsterStat.buffId, this);
-                        break;
+                        var receivers = hit.collider.GetComponentsInParent<MonoBehaviour>(true);
+                        for (int r = 0; r < receivers.Length; r++)
+                        {
+                            if (receivers[r] is IAIHurtReceiver hurtReceiver)
+                            {
+                                hurtReceiver.ReceiveAIDamage(monsterStat.baseDamage, monsterStat.buffId, this);
+                                dealtDamage = true;
+                                break;
+                            }
+                        }
+
+                        visualColor = dealtDamage ? attackRayDamageColor : attackRayBlockedColor;
+                    }
+                    else
+                    {
+                        visualColor = attackRayBlockedColor;
                     }
                 }
+                else
+                {
+                    visualColor = attackRayBlockedColor;
+                }
             }
+
+            ShowAttackRayVisual(origin, beamEnd, visualColor);
+        }
+
+        private void EnsureAttackRayLineRenderer()
+        {
+            if (_attackRayLine != null)
+            {
+                return;
+            }
+
+            var holder = new GameObject("AttackRayVisual");
+            holder.transform.SetParent(transform, false);
+            _attackRayLine = holder.AddComponent<LineRenderer>();
+            _attackRayLine.useWorldSpace = true;
+            _attackRayLine.loop = false;
+            _attackRayLine.positionCount = 2;
+            _attackRayLine.numCapVertices = 4;
+            _attackRayLine.startWidth = attackRayLineWidth;
+            _attackRayLine.endWidth = attackRayLineWidth * 0.35f;
+            _attackRayLine.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            _attackRayLine.receiveShadows = false;
+            var shader = Shader.Find("Sprites/Default");
+            if (shader != null)
+            {
+                _attackRayLine.material = new Material(shader);
+            }
+
+            _attackRayLine.enabled = false;
+        }
+
+        private void ShowAttackRayVisual(Vector3 from, Vector3 to, Color color)
+        {
+            if (!showAttackRayVisual)
+            {
+                return;
+            }
+
+            EnsureAttackRayLineRenderer();
+            if (_attackRayLine == null)
+            {
+                return;
+            }
+
+            _attackRayLine.enabled = true;
+            _attackRayLine.startColor = _attackRayLine.endColor = color;
+            _attackRayLine.SetPosition(0, from);
+            _attackRayLine.SetPosition(1, to);
+
+            if (_attackRayHideRoutine != null)
+            {
+                StopCoroutine(_attackRayHideRoutine);
+            }
+
+            _attackRayHideRoutine = StartCoroutine(HideAttackRayLineAfterDelay(attackRayVisualSeconds));
+        }
+
+        private IEnumerator HideAttackRayLineAfterDelay(float seconds)
+        {
+            yield return new WaitForSeconds(seconds);
+            if (_attackRayLine != null)
+            {
+                _attackRayLine.enabled = false;
+            }
+
+            _attackRayHideRoutine = null;
         }
     }
 }

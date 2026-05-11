@@ -143,6 +143,8 @@ MonoBehaviour:
   patrolPauseSecondsMax: 1.2
   checkpointOrbitDuration: 2
   combatAttackDistance: 10
+  attackRayMaxDistance: 40
+  attackRayOriginYOffset: 0.35
   aoeRadius: 0.5
   baseDamage: 10
   attackInterval: 6
@@ -156,8 +158,9 @@ MonoBehaviour:
   attackTargetMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  usePhysicsAoeDamage: 1
+  usePhysicsAoeDamage: 0
   buffId: 
+  maxHealth: 100
   playerNumericConfig:
     moveSpeedMultiplier: 1
     walkSpeedParameter: 1

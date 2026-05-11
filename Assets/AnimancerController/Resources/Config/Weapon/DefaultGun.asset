@@ -37,3 +37,10 @@ MonoBehaviour:
   bulletMuzzleSpeed: 80
   bulletGravityScale: 1
   bulletLifetime: 6
+  damageableTags:
+  - Player
+  - Enemy
+  - Monster
+  hurtBuffId: 
+  destroyOnHit: 0
+  maxHitDistance: 2

@@ -1,3 +1,4 @@
+using DZ_3C.AI.Core;
 using DZ_3C.AI.HTN;
 using TMPro;
 using UnityEngine;
@@ -10,6 +11,7 @@ namespace DZ_3C.AI.Debugging
         [SerializeField] private HTNMethodSelector selector;
         [SerializeField] private AIBehaviorRuntime runtime;
         [SerializeField] private MonsterAICharacterDriver driver;
+        [SerializeField] private MonsterHurtReceiver hurtReceiver;
         [SerializeField] private Vector3 worldOffset = new Vector3(0f, 2.2f, 0f);
         [SerializeField] private float textScale = 0.12f;
 
@@ -21,6 +23,7 @@ namespace DZ_3C.AI.Debugging
             if (selector == null) selector = GetComponent<HTNMethodSelector>();
             if (runtime == null) runtime = GetComponent<AIBehaviorRuntime>();
             if (driver == null) driver = GetComponent<MonsterAICharacterDriver>();
+            if (hurtReceiver == null) hurtReceiver = GetComponent<MonsterHurtReceiver>();
             EnsureTMPText();
         }
 
@@ -53,8 +56,24 @@ namespace DZ_3C.AI.Debugging
                 ? driver.CurrentAtomicTaskDebug
                 : (string.IsNullOrEmpty(runtime.CurrentAtomicTask) ? "None" : runtime.CurrentAtomicTask);
 
-            string content = $"Root: {root}\nMethod: {method}\nAtomic: {atomic}";
+            string hpLine = BuildHealthLine();
+            string content = $"Root: {root}\nMethod: {method}\nAtomic: {atomic}\n{hpLine}";
             if (textMeshPro != null) textMeshPro.text = content;
+        }
+
+        private string BuildHealthLine()
+        {
+            if (hurtReceiver == null)
+            {
+                return "HP: —";
+            }
+
+            if (hurtReceiver.IsDead)
+            {
+                return $"HP: 0 / {hurtReceiver.MaxHealth:0} (dead)";
+            }
+
+            return $"HP: {hurtReceiver.CurrentHealth:0} / {hurtReceiver.MaxHealth:0}";
         }
 
         private void EnsureTMPText()

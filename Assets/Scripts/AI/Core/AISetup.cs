@@ -46,6 +46,7 @@ namespace DZ_3C.AI.Core
             MonsterCharacter monsterCharacter = GetOrAdd<MonsterCharacter>();
             MonsterAICharacterDriver driver = GetOrAdd<MonsterAICharacterDriver>();
             MonsterAttackRelay attackRelay = GetOrAdd<MonsterAttackRelay>();
+            GetOrAdd<MonsterHurtReceiver>();
 
             VisionPerceptor vision = GetOrAdd<VisionPerceptor>();
             HearingPerceptor hearing = GetOrAdd<HearingPerceptor>();

@@ -45,5 +45,16 @@ public class GunConfigSO : ScriptableObject
     [Header("Bullet physics (if prefab does not override)")]
     public float bulletMuzzleSpeed = 80f;
     public float bulletGravityScale = 1f;
+    [Tooltip("秒。0 或负数表示子弹不因时间销毁（仍可被 destroyOnHit 销毁）。")]
     public float bulletLifetime = 6f;
+
+    [Header("Bullet hit (trigger / collision)")]
+    [Tooltip("仅当对方碰撞体所在层级（从自身到根）上某一 GameObject 的 Tag 命中其一才结算伤害；为空则不会对任何目标造成伤害。")]
+    public string[] damageableTags;
+    [Tooltip("传给 IAIHurtReceiver.ReceiveAIDamage 的 buffId；空串表示无 Buff。")]
+    public string hurtBuffId = "";
+    [Tooltip("命中并造成伤害后是否销毁子弹。")]
+    public bool destroyOnHit = false;
+    [Tooltip("命中几何判定：对方 Collider 上距子弹 transform.position 最近点须在此距离内，用于忽略同一刚体上过大 Trigger（如重力范围）的误触。")]
+    [Min(0.01f)] public float maxHitDistance = 2f;
 }
