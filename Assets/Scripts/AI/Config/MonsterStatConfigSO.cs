@@ -10,7 +10,7 @@ namespace DZ_3C.AI.Config
         public bool aerialMode = true;
         [Min(0f)] public float moveSpeed = 3.5f;
         [Min(0f)] public float turnSpeed = 540f;
-        [Tooltip("转向平滑时间（秒）。0 表示不阻尼，仅用 turnSpeed 硬限幅。")]
+        [Tooltip("转向平滑时间（秒）。大于 0 时在 MonsterCharacter 内用 SmoothDampAngle；0 表示不阻尼，仅用 turnSpeed 限幅。HTN 根行为/子方法切换时会重置角速度辅助量。")]
         [Min(0f)] public float turnSmoothTime = 0.12f;
         [Min(0.05f)] public float arriveRadius = 0.8f;
         [Min(0f)] public float startTurnWindowSeconds = 0.25f;
@@ -78,6 +78,16 @@ namespace DZ_3C.AI.Config
 
         [Header("Combat")]
         [Min(0.1f)] public float combatAttackDistance = 2f;
+        [Tooltip("Assault：进入攻击距离且攻击冷却结束后，先悬停该秒数再执行攻击；0 表示不悬停。")]
+        [Min(0f)] public float assaultPreAttackHoverSeconds = 0f;
+        [Tooltip("Assault 攻击：从怪物指向仇恨目标发射射线，命中玩家则结算伤害与 buffId；最大长度（米）。")]
+        [Min(0.5f)] public float attackRayMaxDistance = 40f;
+        [Tooltip("射线起点相对 transform.position 的世界向上偏移（米）。")]
+        public float attackRayOriginYOffset = 0.35f;
+        [Tooltip("射线瞄准点：在仇恨目标 transform.position 上沿世界 Y 轴抬高（米），例如对准胸口/头；与起点偏移独立可调。")]
+        [Min(0f)] public float attackRayTargetYOffset = 0.65f;
+        [Tooltip("Assault：打出射线后仅悬停（Hover）的时长（秒），之后再进入后撤/攻击间隔机动等；0 表示不额外悬停。")]
+        [Min(0f)] public float attackRayPostHoverSeconds = 1f;
         [Min(0f)] public float aoeRadius = 1.5f;
         [Min(0f)] public float baseDamage = 10f;
         [Min(0f)] public float attackInterval = 1f;
@@ -89,7 +99,8 @@ namespace DZ_3C.AI.Config
         [Min(0f)] public float postAttackBackoffSeconds = 0.6f;
         [Min(0f)] public float postAttackBackoffSpeed = 4f;
         public LayerMask attackTargetMask = ~0;
-        public bool usePhysicsAoeDamage = true;
+        [Tooltip("已废弃：伤害改为射线检测，见 attackRayMaxDistance。保留字段以免旧资源反序列化丢失。")]
+        public bool usePhysicsAoeDamage = false;
         public string buffId = string.Empty;
 
         [Header("Vitality")]

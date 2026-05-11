@@ -29,7 +29,8 @@ GameObject:
   - component: {fileID: 6257144858818071011}
   - component: {fileID: 7566732114713936834}
   - component: {fileID: 6376422797534665853}
-  - component: {fileID: 782234560001}
+  - component: {fileID: 882234560012}
+  - component: {fileID: 882234560013}
   - component: {fileID: 782234560002}
   m_Layer: 0
   m_Name: AI
@@ -354,6 +355,40 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &882234560012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5737582618028807084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ad50f81b1d25c441943c37a89ba23f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _Animator: {fileID: 2838638217364791616}
+  _Transitions: {fileID: 0}
+  _ActionOnDisable: 0
+--- !u!114 &882234560013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5737582618028807084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7e8c91a2b4d5e6f708192a3b4c5d6e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animancer: {fileID: 882234560012}
+  idleClip: {fileID: 7400000, guid: 7c1fcd4c71be8d04ca783bda2b05ea75, type: 2}
+  hitClip: {fileID: 7400000, guid: 39e81f1ffd6ec21458d9fb32cc1e659f, type: 2}
+  deathClip: {fileID: 0}
+  hitFadeSeconds: 0.12
+  idleFadeSeconds: 0.12
+  deathFadeSeconds: 0.15
 --- !u!114 &2415126630310859549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -435,26 +470,6 @@ MonoBehaviour:
   hurtReceiver: {fileID: 782234560002}
   worldOffset: {x: 0, y: 1, z: 0}
   textScale: 0.02
---- !u!114 &782234560001
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5737582618028807084}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15bfaa66805bdb7448f70650f6d9e555, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animatorOverride: {fileID: 2838638217364791616}
-  useBoolForHit: 1
-  hitBoolParameterName: hitted
-  hitBoolResetDelay: 0.08
-  hitTriggerName: Hit
-  deathTriggerName: 
-  deathStateName: Died
-  clearHitTriggerOnDeath: 0
 --- !u!114 &782234560002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -468,7 +483,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   character: {fileID: 2415126630310859549}
-  hitPresentationBehaviour: {fileID: 782234560001}
+  hitPresentationBehaviour: {fileID: 882234560013}
   fallbackMaxHealth: 100
   destroyGameObjectOnDeath: 1
   destroyDelaySeconds: 2

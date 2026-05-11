@@ -15,7 +15,7 @@ MonoBehaviour:
   aerialMode: 1
   moveSpeed: 2
   turnSpeed: 720
-  turnSmoothTime: 0.05
+  turnSmoothTime: 0.2
   arriveRadius: 5
   startTurnWindowSeconds: 0.25
   cruiseHeight: 3.5
@@ -156,6 +156,11 @@ MonoBehaviour:
   patrolPauseSecondsMax: 1.2
   checkpointOrbitDuration: 2
   combatAttackDistance: 8
+  assaultPreAttackHoverSeconds: 3
+  attackRayMaxDistance: 40
+  attackRayOriginYOffset: 0
+  attackRayTargetYOffset: 0.65
+  attackRayPostHoverSeconds: 1
   aoeRadius: 0.5
   baseDamage: 10
   attackInterval: 10
@@ -169,7 +174,7 @@ MonoBehaviour:
   attackTargetMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  usePhysicsAoeDamage: 1
+  usePhysicsAoeDamage: 0
   buffId: 
   maxHealth: 100
   playerNumericConfig:
@@ -177,6 +182,18 @@ MonoBehaviour:
     walkSpeedParameter: 1
     runSpeedParameter: 2
     inAirMoveSpeed: 2
+    keyboardMoveInputSmoothing: 1
+    keyboardMoveSmoothTime: 0.12
+    standControllerRadius: 0.5
+    standControllerHeight: 2
+    standControllerCenter: {x: 0, y: 1, z: 0}
+    crouchControllerRadius: 0.5
+    crouchControllerHeight: 1.2
+    crouchControllerCenter: {x: 0, y: 0.6, z: 0}
+    useHoldForCrouch: 0
+    crouchStandCeilingCheckRayLength: 1.2
+    lowCeilingAutoCrouchCheckRayLength: 1.2
+    lowCeilingAutoCrouchPostStandPredictRayLength: 1.2
     gravity: -12
     velocityLimit: {x: -20, y: 60}
     groundDetectedOffset: -0.06
@@ -192,6 +209,7 @@ MonoBehaviour:
     slideMaxSpeed: 8
     slideControlDamping: 4
     minGroundNormalY: 0.1
+    coyoteJumpTimeSeconds: 0.12
     defaultJumpHeight: 0.8
     outPlaceJumpHeight: 0.8
     platformerJumpHeight: 15
@@ -200,9 +218,8 @@ MonoBehaviour:
     inAirSpeedDecay: 3.5
     inAirInputMaintainAcceleration: 8
     climbDetectionAngle: 45
-    climbDetectionDistance: 1
-    wallProbeRadius: 0.2
     wallProbeDistance: 1
+    wallProbeRadius: 0.2
     canClimbMaxHeight: 3.2
     canClimbMinHeight: 0.3
     climbDetectionSamplingCount: 30
@@ -213,3 +230,6 @@ MonoBehaviour:
     mediumHighClimbMinHeight: 2
     mediumHighClimbMaxHeight: 2.5
     stateSwitchCooldown: 0.1
+    adsEnterAnimationSpeedScale: 1
+    armedLocomotionSpeedMultiplier: 0.8
+    adsLocomotionSpeedMultiplier: 0.8

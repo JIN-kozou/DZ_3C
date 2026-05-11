@@ -9,8 +9,10 @@ public class GunConfigSO : ScriptableObject
     [Min(0.01f)] public float fireRate = 8f;
     [Tooltip("勾选：按住开火键按射速连发。不勾选：点射，每次按下左键只会在该次按压的首帧尝试一发（按住不放不会连发）。")]
     public bool fullAuto = false;
-    [Tooltip("单次 Update 内最多发射几发，防止卡帧/切窗后一次性补射过多；高射速全自动可适当调大。")]
-    [Min(1)] public int maxShotsPerTick = 6;
+    [Tooltip("单次 Tick 内「补射」上限：射速时钟已欠账时，本帧最多结算几发。默认 1 可避免掉帧/门控恢复后一帧瞬发多弹；高射速全自动可略增。")]
+    [Min(1)] public int maxCatchUpShotsPerTick = 1;
+    [Tooltip("半自动：开火键按下瞬间若上半身尚未允许开火（掏枪/收枪过渡），在该秒数内保留一次「待击发」；允许开火且射速冷却就绪时自动补打一枪。")]
+    [Min(0f)] public float semiAutoPressBufferSeconds = 0.08f;
     [Min(1)] public int magazineSize = 30;
     [Tooltip("被动回弹：每满该秒数增加 1 发弹药，不超过弹夹容量。填 0 或负数表示关闭。")]
     public float ammoRegenIntervalSeconds = 2f;

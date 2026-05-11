@@ -20,7 +20,10 @@ public class PlayerWeaponRuntime : MonoBehaviour
     private Player _player;
     private int _ammo;
     private Collider[] _ownerColliders;
-    private float _nextFireTime = float.NegativeInfinity;
+    /// <summary>射速时钟：&lt;=0 表示允许击发；每帧减去 deltaTime。未想开火时不应累积负值「欠账」，否则半自动快速点击会快于配置射速。</summary>
+    private float _fireCooldown;
+    /// <summary>半自动待击发截止时间（<see cref="Time.unscaledTime"/>）；&lt;0 表示无缓冲。</summary>
+    private float _semiBufferDeadlineUnscaled = -1f;
     private int _recoilShotIndex;
     private Vector2 _recoilScreenOffset;
     private Vector2 _recoilScreenOffsetSmoothed;
@@ -58,7 +61,7 @@ public class PlayerWeaponRuntime : MonoBehaviour
         }
     }
 
-    /// <summary>本帧 <see cref="Tick"/> 内 <see cref="TryFireOneShot"/> 成功次数；在 <see cref="Tick"/> 开头归零，供 ADS 开火动画等与真实击发对齐。</summary>
+    /// <summary>本帧 <see cref="Tick"/> 内 <see cref="TryFireOneShot"/> 成功次数；在 <see cref="Tick"/> 末尾（开火逻辑之后）写入，供 ADS 开火动画等与真实击发对齐。</summary>
     public int SuccessfulShotsLastTick { get; private set; }
 
     /// <summary>Smoothed viewport offset for camera (eases toward recoil target each frame).</summary>
@@ -86,6 +89,7 @@ public class PlayerWeaponRuntime : MonoBehaviour
         }
 
         RefreshOwnerColliders();
+        RefillMagazine();
     }
 
     private void OnEnable()
@@ -121,116 +125,142 @@ public class PlayerWeaponRuntime : MonoBehaviour
 
     public void Tick(float deltaTime)
     {
-        SuccessfulShotsLastTick = 0;
-
-        if (_player == null || _player.ReusableData == null || _player.InputService == null)
+        int shotsThisTick = 0;
+        try
         {
-            return;
-        }
-
-        var rd = _player.ReusableData;
-        var input = _player.InputService;
-
-        if (gunConfig == null)
-        {
-            _adsHeld = false;
-            return;
-        }
-
-        TickAmmoRegen(deltaTime);
-
-        bool fireHeld = input.FireHeld;
-        bool firePressedThisFrame = input.FireWasPressedThisFrame;
-        bool wantFire = gunConfig.fullAuto ? fireHeld : firePressedThisFrame;
-
-        if (!CanProcessWeapon(rd))
-        {
-            _adsHeld = false;
-            if (!rd.armedModeActive)
+            if (_player == null || _player.ReusableData == null)
             {
-                ResetRecoilState();
+                return;
+            }
+
+            var rd = _player.ReusableData;
+
+            if (gunConfig != null)
+            {
+                TickAmmoRegen(deltaTime);
+            }
+
+            if (_player.InputService == null)
+            {
+                return;
+            }
+
+            var input = _player.InputService;
+
+            if (gunConfig == null)
+            {
+                _adsHeld = false;
+                return;
+            }
+
+            bool fireHeld = input.FireHeld;
+            bool firePressedThisFrame = input.FireWasPressedThisFrame;
+            bool wantFire = gunConfig.fullAuto ? fireHeld : firePressedThisFrame;
+
+            if (!CanProcessWeapon(rd))
+            {
+                _adsHeld = false;
+                if (!rd.armedModeActive)
+                {
+                    ResetRecoilState();
+                }
+
+                SmoothRecoilVisual(deltaTime);
+                return;
+            }
+
+            bool adsFromInput = input.ADSHeld;
+            if (_player.ArmedPresentation != null && !_player.ArmedPresentation.IsAdsInputAllowed)
+            {
+                adsFromInput = false;
+            }
+
+            _adsHeld = adsFromInput;
+
+            bool presentationReady = _player.ArmedPresentation == null || _player.ArmedPresentation.IsWeaponFireAllowed;
+
+            _timeSinceLastShot += deltaTime;
+            if (_timeSinceLastShot > gunConfig.recoilRecoveryDelay)
+            {
+                _recoilRecoveryTimer += deltaTime;
+                while (_recoilRecoveryTimer >= gunConfig.recoilRecoveryInterval && _recoilScreenOffset.sqrMagnitude > 1e-8f)
+                {
+                    _recoilRecoveryTimer -= gunConfig.recoilRecoveryInterval;
+                    _recoilScreenOffset = Vector2.Lerp(_recoilScreenOffset, Vector2.zero, gunConfig.recoilRecoveryStep);
+                }
+            }
+
+            float interval = GetSecondsPerShot(gunConfig.fireRate);
+            _fireCooldown -= deltaTime;
+            // 未按住/未点下开火时不要把冷却扣成大额负值；负值只应在全自动同帧补射循环内短暂出现。
+            if (!wantFire && _fireCooldown < 0f)
+            {
+                _fireCooldown = 0f;
+            }
+
+            if (!wantFire)
+            {
+                SmoothRecoilVisual(deltaTime);
+                return;
+            }
+
+            if (!presentationReady)
+            {
+                if (!gunConfig.fullAuto &&
+                    firePressedThisFrame &&
+                    gunConfig.semiAutoPressBufferSeconds > 0f)
+                {
+                    _semiBufferDeadlineUnscaled = Time.unscaledTime + gunConfig.semiAutoPressBufferSeconds;
+                }
+
+                SmoothRecoilVisual(deltaTime);
+                return;
+            }
+
+            int maxCatchUp = Mathf.Max(1, gunConfig.maxCatchUpShotsPerTick);
+            if (gunConfig.fullAuto)
+            {
+                int firedThisTick = 0;
+                while (_ammo > 0 && firedThisTick < maxCatchUp && wantFire)
+                {
+                    if (_fireCooldown > 0f)
+                    {
+                        break;
+                    }
+
+                    if (!TryFireOneShot())
+                    {
+                        break;
+                    }
+
+                    shotsThisTick++;
+                    firedThisTick++;
+                    _fireCooldown += interval;
+                }
+            }
+            else
+            {
+                bool buffered = gunConfig.semiAutoPressBufferSeconds > 0f &&
+                                _semiBufferDeadlineUnscaled >= Time.unscaledTime;
+                bool semiTrigger = firePressedThisFrame || buffered;
+                if (semiTrigger && _ammo > 0 && _fireCooldown <= 0f)
+                {
+                    if (TryFireOneShot())
+                    {
+                        shotsThisTick++;
+                        // 半自动：整格间隔，不沿用「欠账」；避免快速连点快于 fireRate。
+                        _fireCooldown = interval;
+                        _semiBufferDeadlineUnscaled = -1f;
+                    }
+                }
             }
 
             SmoothRecoilVisual(deltaTime);
-            return;
         }
-
-        bool adsFromInput = input.ADSHeld;
-        if (_player.ArmedPresentation != null && !_player.ArmedPresentation.IsAdsInputAllowed)
+        finally
         {
-            adsFromInput = false;
+            SuccessfulShotsLastTick = shotsThisTick;
         }
-
-        _adsHeld = adsFromInput;
-
-        bool presentationReady = _player.ArmedPresentation == null || _player.ArmedPresentation.IsWeaponFireAllowed;
-
-        _timeSinceLastShot += deltaTime;
-        if (_timeSinceLastShot > gunConfig.recoilRecoveryDelay)
-        {
-            _recoilRecoveryTimer += deltaTime;
-            while (_recoilRecoveryTimer >= gunConfig.recoilRecoveryInterval && _recoilScreenOffset.sqrMagnitude > 1e-8f)
-            {
-                _recoilRecoveryTimer -= gunConfig.recoilRecoveryInterval;
-                _recoilScreenOffset = Vector2.Lerp(_recoilScreenOffset, Vector2.zero, gunConfig.recoilRecoveryStep);
-            }
-        }
-
-        if (!wantFire)
-        {
-            SmoothRecoilVisual(deltaTime);
-            return;
-        }
-
-        if (!presentationReady)
-        {
-            SmoothRecoilVisual(deltaTime);
-            return;
-        }
-
-        float interval = GetSecondsPerShot(gunConfig.fireRate);
-        if (gunConfig.fullAuto)
-        {
-            int cap = Mathf.Max(1, gunConfig.maxShotsPerTick);
-            int firedThisTick = 0;
-            while (_ammo > 0 && Time.time >= _nextFireTime && firedThisTick < cap)
-            {
-                if (!TryFireOneShot())
-                {
-                    break;
-                }
-
-                SuccessfulShotsLastTick++;
-                firedThisTick++;
-
-                // NegativeInfinity + interval is still -Infinity (IEEE754); RefillMagazine resets to -Infinity, which would drain the whole mag in one frame.
-                if (float.IsInfinity(_nextFireTime) || float.IsNaN(_nextFireTime))
-                {
-                    _nextFireTime = Time.time + interval;
-                }
-                else
-                {
-                    _nextFireTime += interval;
-                }
-            }
-        }
-        else if (_ammo > 0 && Time.time >= _nextFireTime && firePressedThisFrame)
-        {
-            if (TryFireOneShot())
-            {
-                SuccessfulShotsLastTick++;
-                if (float.IsInfinity(_nextFireTime) || float.IsNaN(_nextFireTime))
-                {
-                    _nextFireTime = Time.time + interval;
-                }
-                else
-                {
-                    _nextFireTime += interval;
-                }
-            }
-        }
-
-        SmoothRecoilVisual(deltaTime);
     }
 
     private void ResetRecoilState()
@@ -274,7 +304,8 @@ public class PlayerWeaponRuntime : MonoBehaviour
         }
 
         _ammo = gunConfig.magazineSize;
-        _nextFireTime = float.NegativeInfinity;
+        _fireCooldown = 0f;
+        _semiBufferDeadlineUnscaled = -1f;
         _ammoRegenAccumulator = 0f;
     }
 

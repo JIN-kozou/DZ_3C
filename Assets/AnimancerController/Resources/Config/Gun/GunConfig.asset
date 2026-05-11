@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 10
   fireRate: 1
-  fullAuto: 0
-  maxShotsPerTick: 1
+  fullAuto: 1
+  maxCatchUpShotsPerTick: 1
+  semiAutoPressBufferSeconds: 0.08
   magazineSize: 8
   ammoRegenIntervalSeconds: 3
   bulletPrefab: {fileID: 1729074314731889512, guid: 21d73a7e645db184cb508f0009ed154e,
@@ -45,7 +46,7 @@ MonoBehaviour:
   recoilRecoveryInterval: 0.04
   recoilRecoveryStep: 0.35
   bulletMuzzleSpeed: 20
-  bulletGravityScale: 0.2
+  bulletGravityScale: 0
   bulletLifetime: 3
   damageableTags:
   - Monster

@@ -11,6 +11,7 @@ Shader "Custom/Blackhole"
         _Iterations ("迭代次数", int) = 150
         _DmdtMulti ("吸积率", Range(0.00000001, 0.1)) = 0.000002
         _NoiseLUT("Noise LUT", 2D) = "white" {}
+        _OcclusionSphereRadius ("遮挡参考球半径(世界单位)", Float) = 40
     }
 
     SubShader
@@ -32,6 +33,7 @@ Shader "Custom/Blackhole"
             #pragma fragment frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
             #include "3DNoiseCore.hlsl"
 
             CBUFFER_START(UnityPerMaterial)
@@ -40,6 +42,7 @@ Shader "Custom/Blackhole"
                 float _DmdtMulti;
                 uint _Iterations;
                 int _Speed;
+                float _OcclusionSphereRadius;
             CBUFFER_END
 
             #define SPEED_OF_LIGHT 2.99792458e8
@@ -246,8 +249,65 @@ Shader "Custom/Blackhole"
                 return hclipPos;
             }
 
+            float3 WorldPositionFromScreenDepth(float2 uv01, float deviceDepth)
+            {
+                float4 positionCS = float4(uv01 * 2.0 - 1.0, deviceDepth, 1.0);
+#if UNITY_UV_STARTS_AT_TOP
+                positionCS.y = -positionCS.y;
+#endif
+                float4 hWS = mul(UNITY_MATRIX_I_VP, positionCS);
+                return hWS.xyz * rcp(hWS.w);
+            }
+
+            void OccludeBySceneDepth(float4 positionHCS, float3 dirUnormObject)
+            {
+                float3 roWS = GetCameraPositionWS();
+                float3 rdWS = normalize(TransformObjectToWorldDir(normalize(dirUnormObject)));
+
+                float2 uv = GetNormalizedScreenSpaceUV(positionHCS);
+#if UNITY_REVERSED_Z
+                float rawDepth = SampleSceneDepth(uv);
+#else
+                float rawDepth = lerp(UNITY_NEAR_CLIP_VALUE, 1, SampleSceneDepth(uv));
+#endif
+                float3 hitWS = WorldPositionFromScreenDepth(uv, rawDepth);
+                float distScene = distance(roWS, hitWS);
+
+                float3 centerWS = TransformObjectToWorld(float4(0.0, 0.0, 0.0, 1.0)).xyz;
+                float3 oc = roWS - centerWS;
+                float R = max(_OcclusionSphereRadius, 1e-3);
+                float b = dot(oc, rdWS);
+                float c = dot(oc, oc) - R * R;
+                float disc = b * b - c;
+                if (disc < 0.0)
+                    return;
+
+                float sd = sqrt(disc);
+                float ta = -b - sd;
+                float tb = -b + sd;
+                bool inside = dot(oc, oc) < R * R * 0.999;
+
+                float tLimit;
+                if (inside)
+                    tLimit = max(tb, 0.0);
+                else {
+                    if (ta > 1e-4)
+                        tLimit = ta;
+                    else if (tb > 1e-4)
+                        tLimit = tb;
+                    else
+                        return;
+                }
+
+                const float kBias = 0.12;
+                if (distScene + kBias < tLimit)
+                    clip(-1);
+            }
+
             half4 frag(float4 positionHCS : SV_POSITION, float3 dirUnorm : TexCoord0) : SV_Target
             {
+                OccludeBySceneDepth(positionHCS, dirUnorm);
+
                 float4 fragColor = float4(0, 0, 0, 0);
                 float TimeRate = _Speed; //旋转速度
                 float a0 = 0.0; // 无量纲自旋系数                                                                          // 无量纲自旋系数 本部分在实际使用时uniform输入

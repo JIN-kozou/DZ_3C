@@ -484,7 +484,8 @@ public class Player : CharacterBase
     }
 
     /// <summary>
-    /// 按站立/下蹲混合值（standValueParameter：1=站立，0=下蹲）插值更新 CharacterController 尺寸。
+    /// 按站立/下蹲混合值（standValueParameter：1=站立，0=下蹲）插值更新 CharacterController 尺寸；
+    /// <see cref="CharacterBase.isOnGround"/> 为 false 时（起跳后整段空中至再次接地前）使用 <see cref="PlayerNumericConfig"/> 中的空中专用尺寸。
     /// </summary>
     private void UpdateCharacterControllerStance()
     {
@@ -503,10 +504,22 @@ public class Player : CharacterBase
             return;
         }
 
-        float standBlend = Mathf.Clamp01(ReusableData.standValueParameter.CurrentValue);
-        float radius = Mathf.Lerp(cfg.crouchControllerRadius, cfg.standControllerRadius, standBlend);
-        float height = Mathf.Lerp(cfg.crouchControllerHeight, cfg.standControllerHeight, standBlend);
-        Vector3 center = Vector3.Lerp(cfg.crouchControllerCenter, cfg.standControllerCenter, standBlend);
+        float radius;
+        float height;
+        Vector3 center;
+        if (!isOnGround.Value)
+        {
+            radius = cfg.fallControllerRadius;
+            height = cfg.fallControllerHeight;
+            center = cfg.fallControllerCenter;
+        }
+        else
+        {
+            float standBlend = Mathf.Clamp01(ReusableData.standValueParameter.CurrentValue);
+            radius = Mathf.Lerp(cfg.crouchControllerRadius, cfg.standControllerRadius, standBlend);
+            height = Mathf.Lerp(cfg.crouchControllerHeight, cfg.standControllerHeight, standBlend);
+            center = Vector3.Lerp(cfg.crouchControllerCenter, cfg.standControllerCenter, standBlend);
+        }
 
         height = Mathf.Max(height, radius * 2f + 0.001f);
         float maxRadius = height * 0.5f - 0.0005f;
