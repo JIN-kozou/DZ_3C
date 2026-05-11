@@ -188,8 +188,8 @@ MonoBehaviour:
       crouchControllerHeight: 0.6
       crouchControllerCenter: {x: 0, y: 0.3, z: 0}
       fallControllerRadius: 0.2
-      fallControllerHeight: 0.8
-      fallControllerCenter: {x: 0, y: 0.8, z: 0}
+      fallControllerHeight: 0.7
+      fallControllerCenter: {x: 0, y: 0.6, z: 0}
       useHoldForCrouch: 0
       crouchStandCeilingCheckRayLength: 0.6
       lowCeilingAutoCrouchCheckRayLength: 0.3
@@ -197,7 +197,7 @@ MonoBehaviour:
       gravity: -12
       velocityLimit: {x: -20, y: 60}
       groundDetectedOffset: -0.06
-      groundRadius: 0.1
+      groundRadius: 0.2
       groundProbeDistance: 1.5
       groundNormalSmoothFrames: 3
       groundNormalRayStartHeight: 0.2
