@@ -151,7 +151,9 @@ public class Projectile : MonoBehaviour
 
         if (depth == 0)
         {
-            receiver.ReceiveAIDamage(_damage, _hurtBuffId, gameObject);
+            // 使用玩家根物体作为 attacker，便于怪物 HitPerceptor 解析 AITargetable 并写入 Attackers 仇恨桶（弹丸自身通常无 AITargetable）。
+            object attackerForAggro = _ownerRoot != null ? _ownerRoot.gameObject : gameObject;
+            receiver.ReceiveAIDamage(_damage, _hurtBuffId, attackerForAggro);
             if (_destroyOnHit)
             {
                 Destroy(gameObject);

@@ -80,6 +80,8 @@ namespace DZ_3C.AI.HTN
         private float nextAttackTime;
         /// <summary>Assault 战前悬停结束时刻（与 Time.time 比较）；负值表示未进入悬停。</summary>
         private float assaultPreAttackHoverEndTime = -1f;
+        /// <summary>Assault 射线射出后的悬停结束时刻；负值表示未在射后悬停中。</summary>
+        private float assaultPostRayHoverEndTime = -1f;
         private float nextDashTime;
         private float nextStrafeTime;
         private float orbitAngle;
@@ -112,6 +114,8 @@ namespace DZ_3C.AI.HTN
         private Vector3 lookDirection;
         private bool hasLookDirection;
         private Transform cachedPlayerStandoffTransform;
+        /// <summary>本帧 Assault 射后悬停：仅转向，不产生任何主动位移。</summary>
+        private bool _frameAssaultPostRayHoverLock;
 
         private void Awake()
         {
@@ -147,10 +151,22 @@ namespace DZ_3C.AI.HTN
 
             BeginFrame();
 
-            DetectMethodTransition();
-            ConsumeBurstMovement();
+            _frameAssaultPostRayHoverLock =
+                assaultPostRayHoverEndTime > 0f
+                && Time.time < assaultPostRayHoverEndTime
+                && selector.CurrentRoot == RootBehavior.Combat
+                && selector.CurrentCombatMethod == CombatMethod.Assault;
 
-            ApplyPostCombatAscendVertical();
+            DetectMethodTransition();
+            if (!_frameAssaultPostRayHoverLock)
+            {
+                ConsumeBurstMovement();
+            }
+
+            if (!_frameAssaultPostRayHoverLock)
+            {
+                ApplyPostCombatAscendVertical();
+            }
 
             switch (selector.CurrentRoot)
             {
@@ -167,7 +183,7 @@ namespace DZ_3C.AI.HTN
 
             TrackAssaultTaskDuration();
 
-            if (monsterStat.aerialMode)
+            if (monsterStat.aerialMode && !_frameAssaultPostRayHoverLock)
             {
                 MaintainCruiseHeight();
             }
@@ -185,11 +201,14 @@ namespace DZ_3C.AI.HTN
 
         private void ApplyFrameMotion()
         {
-            Vector3 planar = Vector3.ProjectOnPlane(framePlanarDelta, Vector3.up);
-            character.MoveBy(planar + Vector3.up * frameVerticalDelta);
+            if (!_frameAssaultPostRayHoverLock)
+            {
+                Vector3 planar = Vector3.ProjectOnPlane(framePlanarDelta, Vector3.up);
+                character.MoveBy(planar + Vector3.up * frameVerticalDelta);
 
-            EnforceAerialFloorConstraint();
-            EnforcePlayerHorizontalStandoff();
+                EnforceAerialFloorConstraint();
+                EnforcePlayerHorizontalStandoff();
+            }
 
             if (hasLookDirection)
             {
@@ -299,10 +318,15 @@ namespace DZ_3C.AI.HTN
         private void TickCombat()
         {
             AITargetable target = blackboard.HateTarget;
-            if (target == null) return;
+            if (target == null)
+            {
+                assaultPostRayHoverEndTime = -1f;
+                return;
+            }
 
             if (selector.CurrentCombatMethod == CombatMethod.Interfere)
             {
+                assaultPostRayHoverEndTime = -1f;
                 TickInterfere(target);
             }
             else
@@ -435,6 +459,18 @@ namespace DZ_3C.AI.HTN
 
         private void TickAssault(AITargetable target)
         {
+            if (assaultPostRayHoverEndTime > 0f && Time.time < assaultPostRayHoverEndTime)
+            {
+                SetDominant(AtomicTask.Hover);
+                SetLook(target.transform.position - transform.position);
+                return;
+            }
+
+            if (Time.time >= assaultPostRayHoverEndTime && assaultPostRayHoverEndTime > 0f)
+            {
+                assaultPostRayHoverEndTime = -1f;
+            }
+
             if (Time.time < postAttackBackoffUntil)
             {
                 SetDominant(AtomicTask.Dash);
@@ -490,7 +526,20 @@ namespace DZ_3C.AI.HTN
                     nextAttackTime = Time.time + monsterStat.attackInterval;
                     attackHandlerInterface?.PerformAttack(target, monsterStat.baseDamage, monsterStat.aoeRadius, monsterStat.buffId);
                     TryApplyAttackRayDamageToPlayer(target);
-                    postAttackBackoffUntil = Time.time + monsterStat.postAttackBackoffSeconds;
+
+                    float postHover = Mathf.Max(0f, monsterStat.attackRayPostHoverSeconds);
+                    if (postHover > 0.0001f)
+                    {
+                        dashBurst.active = false;
+                        strafeBurst.active = false;
+                        assaultPostRayHoverEndTime = Time.time + postHover;
+                        postAttackBackoffUntil = assaultPostRayHoverEndTime + monsterStat.postAttackBackoffSeconds;
+                    }
+                    else
+                    {
+                        assaultPostRayHoverEndTime = -1f;
+                        postAttackBackoffUntil = Time.time + monsterStat.postAttackBackoffSeconds;
+                    }
                 }
             }
         }

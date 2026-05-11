@@ -254,4 +254,7 @@ public class InputService : MonoSingleton<InputService>
     public bool HolsterWeaponWasPressedThisFrame =>
         inputMap != null && inputMap.Player.HolsterWeapon.WasPressedThisFrame();
 
+    public bool ToggleOverShoulderWasPressedThisFrame =>
+        inputMap != null && inputMap.Player.ToggleOverShoulder.WasPressedThisFrame();
+
 }

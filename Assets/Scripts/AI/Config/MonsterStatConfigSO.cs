@@ -86,6 +86,8 @@ namespace DZ_3C.AI.Config
         public float attackRayOriginYOffset = 0.35f;
         [Tooltip("射线瞄准点：在仇恨目标 transform.position 上沿世界 Y 轴抬高（米），例如对准胸口/头；与起点偏移独立可调。")]
         [Min(0f)] public float attackRayTargetYOffset = 0.65f;
+        [Tooltip("Assault：打出射线后仅悬停（Hover）的时长（秒），之后再进入后撤/攻击间隔机动等；0 表示不额外悬停。")]
+        [Min(0f)] public float attackRayPostHoverSeconds = 1f;
         [Min(0f)] public float aoeRadius = 1.5f;
         [Min(0f)] public float baseDamage = 10f;
         [Min(0f)] public float attackInterval = 1f;

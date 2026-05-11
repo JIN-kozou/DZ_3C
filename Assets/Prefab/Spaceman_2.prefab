@@ -343,7 +343,7 @@ Transform:
   m_GameObject: {fileID: 3573490755109795823}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.8, z: 1.5}
+  m_LocalPosition: {x: 0, y: 0.5, z: 1.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -875,7 +875,7 @@ MonoBehaviour:
     m_MaintainOffset: 0
     m_ConstrainedAxes:
       x: 0
-      y: 1
+      y: 0
       z: 0
 --- !u!1 &7055546323934621589
 GameObject:
@@ -887,6 +887,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6110417126725515511}
   - component: {fileID: 2889344865330074185}
+  - component: {fileID: 114823942312241610}
   m_Layer: 7
   m_Name: Ghost
   m_TagString: Untagged
@@ -903,7 +904,7 @@ Transform:
   m_GameObject: {fileID: 7055546323934621589}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.006554961, y: 1, z: 0.098997384}
+  m_LocalPosition: {x: 0, y: 1, z: 0.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -923,6 +924,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radius: 2
   offset: {x: 0, y: 0, z: 0}
+--- !u!114 &114823942312241610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7055546323934621589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 822c9df1b04091d46b45fb61883e1a6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 8241220909394436553}
+  crouchOffsetY: -0.5
+  smoothSpeed: 10
 --- !u!1 &7341049272512339174
 GameObject:
   m_ObjectHideFlags: 0
@@ -1000,7 +1016,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -47.2
+      value: -94.74
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
@@ -1277,8 +1293,8 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
-  groundDetectedOffset: -0.06
-  groundRadius: 0.1
+  groundDetectedOffset: 0.1
+  groundRadius: 0.2
   groundProbeDistance: 1.5
   groundNormalRayStartHeight: 0.35
   groundNormalRayDistance: 4
