@@ -72,7 +72,9 @@ namespace DZ_3C.AI.Config
         [Min(0f)] public float alertDescendHoldSeconds = 0.8f;
 
         [Header("Patrol Idle")]
+        [Tooltip("已不使用：巡逻点旁改为环绕 orbitRadius。保留以免旧资源反序列化丢字段。")]
         [Min(0f)] public float patrolPauseSecondsMin = 0.3f;
+        [Tooltip("已不使用：同上。")]
         [Min(0f)] public float patrolPauseSecondsMax = 1.2f;
         [Min(0f)] public float checkpointOrbitDuration = 2f;
 

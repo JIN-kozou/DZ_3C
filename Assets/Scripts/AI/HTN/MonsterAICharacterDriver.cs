@@ -76,7 +76,6 @@ namespace DZ_3C.AI.HTN
                     ? "RetreatMove"
                     : selector.CurrentIdleMethod.ToString();
 
-        private float patrolPauseUntil;
         private float nextAttackTime;
         /// <summary>Assault 战前悬停结束时刻（与 Time.time 比较）；负值表示未进入悬停。</summary>
         private float assaultPreAttackHoverEndTime = -1f;
@@ -370,24 +369,15 @@ namespace DZ_3C.AI.HTN
             if (target == null) return;
 
             float distance = Vector3.Distance(transform.position, target.position);
-            if (distance <= monsterStat.arriveRadius)
+            if (distance > monsterStat.orbitRadius + monsterStat.arriveRadius)
             {
-                if (Time.time < patrolPauseUntil)
-                {
-                    SetDominant(AtomicTask.Hover);
-                    AccumulateHoverDrift(monsterStat.hoverRadius);
-                    return;
-                }
-
-                float pause = Random.Range(monsterStat.patrolPauseSecondsMin, Mathf.Max(monsterStat.patrolPauseSecondsMin, monsterStat.patrolPauseSecondsMax));
-                patrolPauseUntil = Time.time + pause;
-                SetDominant(AtomicTask.Hover);
-                AccumulateHoverDrift(monsterStat.hoverRadius);
+                SetDominant(AtomicTask.HorizontalMove);
+                PlanarSeekWorld(target.position, monsterStat.moveSpeed);
                 return;
             }
 
-            SetDominant(AtomicTask.HorizontalMove);
-            PlanarSeekWorld(target.position, monsterStat.moveSpeed);
+            SetDominant(AtomicTask.Orbit);
+            AccumulateOrbitAround(target, true);
         }
 
         private void TickAlertPatrol()
