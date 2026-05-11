@@ -86,6 +86,8 @@ namespace DZ_3C.AI.Core
             SetField(gizmos, "blackboard", blackboard);
             SetField(overheadUI, "selector", selector);
             SetField(overheadUI, "runtime", runtime);
+            SetField(overheadUI, "blackboard", blackboard);
+            SetField(overheadUI, "aiConfig", config);
 
             // Patrol links.
             SetField(patrol, "config", config);
