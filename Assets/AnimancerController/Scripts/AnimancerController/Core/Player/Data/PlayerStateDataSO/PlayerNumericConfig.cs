@@ -28,6 +28,14 @@ public class PlayerNumericConfig
     [Tooltip("下蹲时 CharacterController 中心（本地空间）。")]
     public Vector3 crouchControllerCenter = new Vector3(0f, 0.6f, 0f);
 
+    [Header("Character Controller — In air")]
+    [Tooltip("离地未接地时（起跳上升、下落、滑落等整段空中）CharacterController 使用的半径；接地后仍按站立/下蹲插值。")]
+    [Min(0.01f)] public float fallControllerRadius = 0.5f;
+    [Tooltip("离地未接地时 CharacterController 高度。")]
+    [Min(0.01f)] public float fallControllerHeight = 2f;
+    [Tooltip("离地未接地时 CharacterController 中心（本地空间）。")]
+    public Vector3 fallControllerCenter = new Vector3(0f, 1f, 0f);
+
     [Tooltip("勾选为长按保持下蹲，松键站起；不勾选为按下在蹲/站之间切换（与多数 FPS 一致）。")]
     public bool useHoldForCrouch = false;
 

@@ -15,7 +15,7 @@ MonoBehaviour:
   aerialMode: 1
   moveSpeed: 2
   turnSpeed: 720
-  turnSmoothTime: 0.05
+  turnSmoothTime: 0.2
   arriveRadius: 5
   startTurnWindowSeconds: 0.25
   cruiseHeight: 3.5
@@ -158,7 +158,9 @@ MonoBehaviour:
   combatAttackDistance: 8
   assaultPreAttackHoverSeconds: 3
   attackRayMaxDistance: 40
-  attackRayOriginYOffset: 0.35
+  attackRayOriginYOffset: 0
+  attackRayTargetYOffset: 0.65
+  attackRayPostHoverSeconds: 1
   aoeRadius: 0.5
   baseDamage: 10
   attackInterval: 10

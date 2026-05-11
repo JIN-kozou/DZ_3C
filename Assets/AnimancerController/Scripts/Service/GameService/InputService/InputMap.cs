@@ -152,6 +152,15 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleOverShoulder"",
+                    ""type"": ""Button"",
+                    ""id"": ""8f3c2e10-5a4b-4c1d-9e2f-001122334499"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -715,6 +724,28 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
                     ""action"": ""HolsterWeapon"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a1000001-0001-4001-8001-000000000009"",
+                    ""path"": ""<Keyboard>/x"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleOverShoulder"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a1000001-0001-4001-8001-00000000000a"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleOverShoulder"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -949,6 +980,7 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
         m_Player_ADS = m_Player.FindAction("ADS", throwIfNotFound: true);
         m_Player_ToggleWeapon = m_Player.FindAction("ToggleWeapon", throwIfNotFound: true);
         m_Player_HolsterWeapon = m_Player.FindAction("HolsterWeapon", throwIfNotFound: true);
+        m_Player_ToggleOverShoulder = m_Player.FindAction("ToggleOverShoulder", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_ESC = m_UI.FindAction("ESC", throwIfNotFound: true);
@@ -1040,6 +1072,7 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_ADS;
     private readonly InputAction m_Player_ToggleWeapon;
     private readonly InputAction m_Player_HolsterWeapon;
+    private readonly InputAction m_Player_ToggleOverShoulder;
     public struct PlayerActions
     {
         private @InputMap m_Wrapper;
@@ -1058,6 +1091,7 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
         public InputAction @ADS => m_Wrapper.m_Player_ADS;
         public InputAction @ToggleWeapon => m_Wrapper.m_Player_ToggleWeapon;
         public InputAction @HolsterWeapon => m_Wrapper.m_Player_HolsterWeapon;
+        public InputAction @ToggleOverShoulder => m_Wrapper.m_Player_ToggleOverShoulder;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1109,6 +1143,9 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
             @HolsterWeapon.started += instance.OnHolsterWeapon;
             @HolsterWeapon.performed += instance.OnHolsterWeapon;
             @HolsterWeapon.canceled += instance.OnHolsterWeapon;
+            @ToggleOverShoulder.started += instance.OnToggleOverShoulder;
+            @ToggleOverShoulder.performed += instance.OnToggleOverShoulder;
+            @ToggleOverShoulder.canceled += instance.OnToggleOverShoulder;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1155,6 +1192,9 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
             @HolsterWeapon.started -= instance.OnHolsterWeapon;
             @HolsterWeapon.performed -= instance.OnHolsterWeapon;
             @HolsterWeapon.canceled -= instance.OnHolsterWeapon;
+            @ToggleOverShoulder.started -= instance.OnToggleOverShoulder;
+            @ToggleOverShoulder.performed -= instance.OnToggleOverShoulder;
+            @ToggleOverShoulder.canceled -= instance.OnToggleOverShoulder;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1290,6 +1330,7 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
         void OnADS(InputAction.CallbackContext context);
         void OnToggleWeapon(InputAction.CallbackContext context);
         void OnHolsterWeapon(InputAction.CallbackContext context);
+        void OnToggleOverShoulder(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
