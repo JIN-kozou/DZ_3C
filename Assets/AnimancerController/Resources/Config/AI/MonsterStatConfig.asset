@@ -30,7 +30,7 @@ MonoBehaviour:
   orbitVerticalSpeed: 1
   hoverVerticalAmplitude: 1
   hoverVerticalSpeed: 1
-  orbitRadius: 10
+  orbitRadius: 20
   orbitAngularSpeed: 30
   faceCenter: 1
   interfereDuration: 20
@@ -71,7 +71,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   orbitVerticalBurstCooldown: 3
-  dashDistance: 5
+  dashDistance: 8
   dashSpeedMultiplier: 3
   dashAccelTime: 0.3
   dashDecelTime: 0.3
@@ -151,10 +151,12 @@ MonoBehaviour:
   hoverRadius: 2
   hoverSpeed: 1.5
   energyAvoidDashTrigger: 3
+  energyAvoidPanicMoveSpeedMultiplier: 1.35
   alertDescendHoldSeconds: 0.8
   patrolPauseSecondsMin: 0.3
   patrolPauseSecondsMax: 1.2
   checkpointOrbitDuration: 2
+  patrolPointDwellSeconds: 5
   combatAttackDistance: 8
   assaultPreAttackHoverSeconds: 3
   attackRayMaxDistance: 40
@@ -190,6 +192,9 @@ MonoBehaviour:
     crouchControllerRadius: 0.5
     crouchControllerHeight: 1.2
     crouchControllerCenter: {x: 0, y: 0.6, z: 0}
+    fallControllerRadius: 0.5
+    fallControllerHeight: 2
+    fallControllerCenter: {x: 0, y: 1, z: 0}
     useHoldForCrouch: 0
     crouchStandCeilingCheckRayLength: 1.2
     lowCeilingAutoCrouchCheckRayLength: 1.2

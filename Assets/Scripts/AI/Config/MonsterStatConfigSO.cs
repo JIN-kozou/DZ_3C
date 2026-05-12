@@ -69,6 +69,8 @@ namespace DZ_3C.AI.Config
         [Min(0f)] public float hoverRadius = 0.8f;
         [Min(0f)] public float hoverSpeed = 1.5f;
         [Min(0f)] public float energyAvoidDashTrigger = 3f;
+        [Tooltip("EnergyAvoid 状态下沿排斥方向移动的移速倍率（快速脱离高能量区）。")]
+        [Min(0.1f)] public float energyAvoidPanicMoveSpeedMultiplier = 1.35f;
         [Min(0f)] public float alertDescendHoldSeconds = 0.8f;
 
         [Header("Patrol Idle")]
@@ -77,6 +79,8 @@ namespace DZ_3C.AI.Config
         [Tooltip("已不使用：同上。")]
         [Min(0f)] public float patrolPauseSecondsMax = 1.2f;
         [Min(0f)] public float checkpointOrbitDuration = 2f;
+        [Tooltip("到达巡逻点（进入环绕带）后，停留并环绕的秒数；之后才标记该点已访问并选下一点。0 表示到达后立即换点。")]
+        [Min(0f)] public float patrolPointDwellSeconds = 0f;
 
         [Header("Combat")]
         [Min(0.1f)] public float combatAttackDistance = 2f;

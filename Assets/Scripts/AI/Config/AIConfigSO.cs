@@ -29,6 +29,8 @@ namespace DZ_3C.AI.Config
         [Header("Hearing")]
         [Min(0.1f)] public float hearingDistance = 15f;
         [Min(0f)] public float hearingThreshold = 0.1f;
+        [Tooltip("听到声音后优先警觉巡航的最长秒数；超时后若仍有 HeardTargets，则不再强制警觉巡航，空闲子状态按检查点 / 能量恐慌 / 巡逻选择。为 0 表示在仍有声音目标时始终优先警觉巡航。")]
+        [Min(0f)] public float alertPatrolPrioritySeconds = 8f;
         public LayerMask hearingTargetMask = ~0;
 
         [Header("Distance Contact")]
@@ -39,6 +41,10 @@ namespace DZ_3C.AI.Config
         [Min(0.1f)] public float energyDetectRadius = 10f;
         [Min(0f)] public float energyFalloff = 1f;
         [Min(0f)] public float energyMinForAvoid = 1f;
+        [Tooltip("当前位置总能量达到或超过该值时进入 EnergyAvoid（快速沿排斥方向脱离）；应大于 energyMinForAvoid。低于该值且高于 energyMinForAvoid 时巡逻仍可绕路。")]
+        [Min(0f)] public float energyPanicThreshold = 3f;
+        [Tooltip("巡逻朝目标前进时，排斥项相对寻路方向的最大权重（在 energyMinForAvoid 与 panic 之间随能量插值）。")]
+        [Min(0f)] public float energyPatrolRepelBlendMax = 2.5f;
         [Min(0f)] public float energyMaxForDash = 3f;
         public LayerMask energyTargetMask = ~0;
 

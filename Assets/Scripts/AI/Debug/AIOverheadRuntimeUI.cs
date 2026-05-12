@@ -76,7 +76,8 @@ namespace DZ_3C.AI.Debugging
             float e = blackboard.CurrentPositionEnergy;
             if (aiConfig != null)
             {
-                return $"Energy: {e:0.###}  (avoid if > {aiConfig.energyMinForAvoid:0.###})";
+                float panic = Mathf.Max(aiConfig.energyPanicThreshold, aiConfig.energyMinForAvoid + 0.01f);
+                return $"Energy: {e:0.###}  (detour > {aiConfig.energyMinForAvoid:0.###}, panic >= {panic:0.###})";
             }
 
             return $"Energy: {e:0.###}";

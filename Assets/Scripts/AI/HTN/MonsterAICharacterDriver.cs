@@ -1,6 +1,7 @@
 using System.Collections;
 using DZ_3C.AI.Config;
 using DZ_3C.AI.Core;
+using DZ_3C.AI.Perception;
 using UnityEngine;
 
 namespace DZ_3C.AI.HTN
@@ -9,6 +10,7 @@ namespace DZ_3C.AI.HTN
     public class MonsterAICharacterDriver : MonoBehaviour
     {
         [SerializeField] private MonsterStatConfigSO monsterStat;
+        [SerializeField] private AIConfigSO aiConfig;
         [SerializeField] private AIBlackboard blackboard;
         [SerializeField] private HTNMethodSelector selector;
         [SerializeField] private MonsterCharacter character;
@@ -366,13 +368,17 @@ namespace DZ_3C.AI.HTN
         private void TickPatrol()
         {
             Transform target = blackboard.PatrolTarget;
-            if (target == null) return;
+            if (target == null)
+            {
+                SetDominant(AtomicTask.Hover);
+                return;
+            }
 
             float distance = Vector3.Distance(transform.position, target.position);
             if (distance > monsterStat.orbitRadius + monsterStat.arriveRadius)
             {
                 SetDominant(AtomicTask.HorizontalMove);
-                PlanarSeekWorld(target.position, monsterStat.moveSpeed);
+                PlanarSeekWorldWithOptionalEnergyAvoid(target.position, monsterStat.moveSpeed);
                 return;
             }
 
@@ -425,14 +431,46 @@ namespace DZ_3C.AI.HTN
         private void TickEnergyAvoid()
         {
             SetDominant(AtomicTask.HorizontalMove);
-            if (blackboard.CurrentPositionEnergy >= monsterStat.energyAvoidDashTrigger)
+            float panicMult = Mathf.Max(0.1f, monsterStat.energyAvoidPanicMoveSpeedMultiplier);
+            float moveSpeed = monsterStat.moveSpeed * panicMult;
+
+            if (aiConfig == null)
             {
-                QueueDash(-transform.forward);
+                if (blackboard.CurrentPositionEnergy >= monsterStat.energyAvoidDashTrigger && Time.time >= nextDashTime)
+                {
+                    nextDashTime = Time.time + monsterStat.dashCooldown;
+                    QueueDash(-transform.forward);
+                }
+
+                Vector3 direction = Quaternion.Euler(0f, energyAvoidTurnSign * Random.Range(60f, 90f), 0f) * transform.forward;
+                SetLook(direction);
+                AccumulatePlanar(transform.forward * moveSpeed * Time.deltaTime);
+                return;
             }
 
-            Vector3 direction = Quaternion.Euler(0f, energyAvoidTurnSign * Random.Range(60f, 90f), 0f) * transform.forward;
-            SetLook(direction);
-            AccumulatePlanar(transform.forward * monsterStat.moveSpeed * Time.deltaTime);
+            Vector3 repelRaw = EnergyPerceptor.ComputePlanarEnergyRepel(transform.position, blackboard.EnergyTargets, aiConfig);
+            Vector3 repelPlanar = Vector3.ProjectOnPlane(repelRaw, Vector3.up);
+
+            Vector3 moveDir;
+            if (repelPlanar.sqrMagnitude > 0.0001f)
+            {
+                moveDir = repelPlanar.normalized;
+            }
+            else
+            {
+                moveDir = Quaternion.Euler(0f, energyAvoidTurnSign * Random.Range(60f, 90f), 0f) * transform.forward;
+                moveDir = GetPlanarDirection(moveDir);
+                if (moveDir.sqrMagnitude <= 0.000001f) return;
+            }
+
+            if (blackboard.CurrentPositionEnergy >= monsterStat.energyAvoidDashTrigger && Time.time >= nextDashTime)
+            {
+                nextDashTime = Time.time + monsterStat.dashCooldown;
+                QueueDash(moveDir);
+            }
+
+            SetLook(moveDir);
+            AccumulatePlanar(moveDir * moveSpeed * Time.deltaTime);
         }
 
         private void TickInterfere(AITargetable target)
@@ -546,6 +584,41 @@ namespace DZ_3C.AI.HTN
             if (direction.sqrMagnitude <= 0.000001f) return;
             SetLook(direction);
             AccumulatePlanar(direction * speed * Time.deltaTime);
+        }
+
+        private void PlanarSeekWorldWithOptionalEnergyAvoid(Vector3 worldTarget, float speed)
+        {
+            if (aiConfig == null || blackboard.CurrentPositionEnergy <= aiConfig.energyMinForAvoid)
+            {
+                PlanarSeekWorld(worldTarget, speed);
+                return;
+            }
+
+            float panic = Mathf.Max(aiConfig.energyPanicThreshold, aiConfig.energyMinForAvoid + 0.01f);
+            Vector3 seekDir = GetPlanarDirection(worldTarget - transform.position);
+            if (seekDir.sqrMagnitude <= 0.000001f)
+            {
+                PlanarSeekWorld(worldTarget, speed);
+                return;
+            }
+
+            Vector3 repelRaw = EnergyPerceptor.ComputePlanarEnergyRepel(transform.position, blackboard.EnergyTargets, aiConfig);
+            Vector3 repelPlanar = Vector3.ProjectOnPlane(repelRaw, Vector3.up);
+            Vector3 repelDir = repelPlanar.sqrMagnitude > 0.0001f ? repelPlanar.normalized : Vector3.zero;
+
+            float energyBlendT = Mathf.Clamp01(Mathf.InverseLerp(aiConfig.energyMinForAvoid, panic, blackboard.CurrentPositionEnergy));
+            float repelWeight = energyBlendT * aiConfig.energyPatrolRepelBlendMax;
+
+            Vector3 combined = seekDir + repelDir * repelWeight;
+            if (combined.sqrMagnitude <= 0.000001f)
+            {
+                PlanarSeekWorld(worldTarget, speed);
+                return;
+            }
+
+            Vector3 dir = combined.normalized;
+            SetLook(dir);
+            AccumulatePlanar(dir * speed * Time.deltaTime);
         }
 
         private void AccumulateOrbitAround(Transform center, bool addVerticalNoise)

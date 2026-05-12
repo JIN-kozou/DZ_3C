@@ -40,6 +40,8 @@ namespace DZ_3C.AI.HTN
         private RootBehavior lastRoot = RootBehavior.Idle;
         private float nextCombatRollTime;
         private float combatMethodHoldUntil;
+        /// <summary>进入「有声音目标」状态的起始时刻；无声音时为 -1。</summary>
+        private float alertPatrolPhaseStartTime = -1f;
 
         private void Awake()
         {
@@ -70,6 +72,7 @@ namespace DZ_3C.AI.HTN
         {
             if (blackboard.HateTarget != null)
             {
+                alertPatrolPhaseStartTime = -1f;
                 CurrentRoot = RootBehavior.Combat;
                 if (lastRoot != RootBehavior.Combat)
                 {
@@ -95,10 +98,28 @@ namespace DZ_3C.AI.HTN
 
         private void SelectIdleMethod()
         {
-            if (blackboard.HeardTargets.Count > 0)
+            bool hasHeard = blackboard.HeardTargets.Count > 0;
+            if (!hasHeard)
             {
-                CurrentIdleMethod = IdleMethod.AlertPatrol;
-                return;
+                alertPatrolPhaseStartTime = -1f;
+            }
+            else
+            {
+                if (alertPatrolPhaseStartTime < 0f)
+                {
+                    alertPatrolPhaseStartTime = Time.time;
+                }
+
+                bool alertPriorityUnlimited = config.alertPatrolPrioritySeconds <= 0f;
+                bool withinAlertPriorityWindow =
+                    alertPriorityUnlimited ||
+                    Time.time - alertPatrolPhaseStartTime < config.alertPatrolPrioritySeconds;
+
+                if (withinAlertPriorityWindow)
+                {
+                    CurrentIdleMethod = IdleMethod.AlertPatrol;
+                    return;
+                }
             }
 
             if (blackboard.DesignatedCheckpoint != null)
@@ -107,7 +128,8 @@ namespace DZ_3C.AI.HTN
                 return;
             }
 
-            if (blackboard.CurrentPositionEnergy > config.energyMinForAvoid)
+            float panicThreshold = Mathf.Max(config.energyPanicThreshold, config.energyMinForAvoid + 0.01f);
+            if (blackboard.CurrentPositionEnergy >= panicThreshold)
             {
                 CurrentIdleMethod = IdleMethod.EnergyAvoid;
                 return;

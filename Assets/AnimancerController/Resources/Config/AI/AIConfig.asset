@@ -31,6 +31,7 @@ MonoBehaviour:
     m_Bits: 4294967295
   hearingDistance: 16
   hearingThreshold: 0.1
+  alertPatrolPrioritySeconds: 8
   hearingTargetMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -38,10 +39,12 @@ MonoBehaviour:
   contactTargetMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  energyDetectRadius: 20
+  energyDetectRadius: 10
   energyFalloff: 1
-  energyMinForAvoid: 1
-  energyMaxForDash: 3
+  energyMinForAvoid: 6
+  energyPanicThreshold: 10
+  energyPatrolRepelBlendMax: 2.5
+  energyMaxForDash: 10
   energyTargetMask:
     serializedVersion: 2
     m_Bits: 4294967295
