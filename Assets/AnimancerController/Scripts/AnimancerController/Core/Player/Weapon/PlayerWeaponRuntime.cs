@@ -434,7 +434,8 @@ public class PlayerWeaponRuntime : MonoBehaviour
             gunConfig.damageableTags,
             gunConfig.hurtBuffId,
             gunConfig.destroyOnHit,
-            gunConfig.maxHitDistance);
+            gunConfig.maxHitDistance,
+            gunConfig.bulletVisualTeardownDelay);
 
         if (gunConfig.recoilPattern != null && gunConfig.recoilPattern.Length > 0)
         {

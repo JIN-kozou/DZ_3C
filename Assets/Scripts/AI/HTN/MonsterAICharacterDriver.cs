@@ -1,4 +1,3 @@
-using System.Collections;
 using DZ_3C.AI.Config;
 using DZ_3C.AI.Core;
 using DZ_3C.AI.Perception;
@@ -16,18 +15,17 @@ namespace DZ_3C.AI.HTN
         [SerializeField] private MonsterCharacter character;
         [SerializeField] private MonoBehaviour attackHandler;
 
-        [Header("Attack ray visual")]
+        [Header("Laser attack visual (prefab)")]
+        [Tooltip("若为 true 且指定了 Prefab，则在攻击时沿射线方向实例化视觉并作为本物体子级，寿命结束后销毁。")]
         [SerializeField] private bool showAttackRayVisual = true;
-        [SerializeField] private float attackRayVisualSeconds = 0.12f;
-        [SerializeField] private Color attackRayDamageColor = new Color(1f, 0.15f, 0.1f, 0.95f);
-        [SerializeField] private Color attackRayBlockedColor = new Color(1f, 0.55f, 0.1f, 0.75f);
-        [SerializeField] private Color attackRayMissColor = new Color(0.6f, 0.6f, 0.65f, 0.5f);
-        [SerializeField] private float attackRayLineWidth = 0.045f;
+        [SerializeField] private GameObject laserAttackVisualPrefab;
+        [Tooltip("可选。指定时在此 Transform 的世界位置生成；否则使用与射线检测相同的 origin（见 MonsterStat 的 attackRayOriginYOffset）。")]
+        [SerializeField] private Transform laserAttackVisualSpawnPoint;
+        [Min(0.01f)]
+        [SerializeField] private float laserAttackVisualLifetimeSeconds = 0.12f;
 
         private IMonsterAttack attackHandlerInterface;
         private MonsterHurtReceiver _hurtReceiver;
-        private LineRenderer _attackRayLine;
-        private Coroutine _attackRayHideRoutine;
 
         private enum AtomicTask
         {
@@ -870,13 +868,8 @@ namespace DZ_3C.AI.HTN
                 ? monsterStat.attackTargetMask
                 : Physics.DefaultRaycastLayers;
 
-            Vector3 beamEnd = origin + direction * maxDist;
-            Color visualColor = attackRayMissColor;
-            bool dealtDamage = false;
-
             if (Physics.Raycast(origin, direction, out RaycastHit hit, maxDist, mask, QueryTriggerInteraction.Collide))
             {
-                beamEnd = hit.point;
                 var hitTargetable = hit.collider.GetComponentInParent<AITargetable>();
                 if (hitTargetable != null && hitTargetable.IsPlayer && hitTargetable.gameObject != gameObject)
                 {
@@ -888,89 +881,49 @@ namespace DZ_3C.AI.HTN
                             if (receivers[r] is IAIHurtReceiver hurtReceiver)
                             {
                                 hurtReceiver.ReceiveAIDamage(monsterStat.baseDamage, monsterStat.buffId, this);
-                                dealtDamage = true;
                                 break;
                             }
                         }
-
-                        visualColor = dealtDamage ? attackRayDamageColor : attackRayBlockedColor;
-                    }
-                    else
-                    {
-                        visualColor = attackRayBlockedColor;
                     }
                 }
-                else
+            }
+
+            SpawnLaserAttackVisual(origin, direction);
+        }
+
+        /// <summary>
+        /// 沿攻击射线方向在指定生成点（或射线 origin）实例化 Prefab，父级为本怪物，延迟销毁。
+        /// </summary>
+        private void SpawnLaserAttackVisual(Vector3 rayOrigin, Vector3 direction)
+        {
+            if (!showAttackRayVisual || laserAttackVisualPrefab == null)
+            {
+                return;
+            }
+
+            Vector3 worldPos = laserAttackVisualSpawnPoint != null
+                ? laserAttackVisualSpawnPoint.position
+                : rayOrigin;
+
+            Quaternion rotation = GetLaserVisualRotation(direction);
+            GameObject instance = Instantiate(laserAttackVisualPrefab, worldPos, rotation, transform);
+            Destroy(instance, Mathf.Max(0.01f, laserAttackVisualLifetimeSeconds));
+        }
+
+        private Quaternion GetLaserVisualRotation(Vector3 direction)
+        {
+            Vector3 dir = direction.sqrMagnitude > 0.000001f ? direction.normalized : transform.forward;
+            Vector3 up = Vector3.up;
+            if (Mathf.Abs(Vector3.Dot(dir, up)) > 0.98f)
+            {
+                up = transform.up;
+                if (Mathf.Abs(Vector3.Dot(dir, up)) > 0.98f)
                 {
-                    visualColor = attackRayBlockedColor;
+                    up = Vector3.forward;
                 }
             }
 
-            ShowAttackRayVisual(origin, beamEnd, visualColor);
-        }
-
-        private void EnsureAttackRayLineRenderer()
-        {
-            if (_attackRayLine != null)
-            {
-                return;
-            }
-
-            var holder = new GameObject("AttackRayVisual");
-            holder.transform.SetParent(transform, false);
-            _attackRayLine = holder.AddComponent<LineRenderer>();
-            _attackRayLine.useWorldSpace = true;
-            _attackRayLine.loop = false;
-            _attackRayLine.positionCount = 2;
-            _attackRayLine.numCapVertices = 4;
-            _attackRayLine.startWidth = attackRayLineWidth;
-            _attackRayLine.endWidth = attackRayLineWidth * 0.35f;
-            _attackRayLine.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            _attackRayLine.receiveShadows = false;
-            var shader = Shader.Find("Sprites/Default");
-            if (shader != null)
-            {
-                _attackRayLine.material = new Material(shader);
-            }
-
-            _attackRayLine.enabled = false;
-        }
-
-        private void ShowAttackRayVisual(Vector3 from, Vector3 to, Color color)
-        {
-            if (!showAttackRayVisual)
-            {
-                return;
-            }
-
-            EnsureAttackRayLineRenderer();
-            if (_attackRayLine == null)
-            {
-                return;
-            }
-
-            _attackRayLine.enabled = true;
-            _attackRayLine.startColor = _attackRayLine.endColor = color;
-            _attackRayLine.SetPosition(0, from);
-            _attackRayLine.SetPosition(1, to);
-
-            if (_attackRayHideRoutine != null)
-            {
-                StopCoroutine(_attackRayHideRoutine);
-            }
-
-            _attackRayHideRoutine = StartCoroutine(HideAttackRayLineAfterDelay(attackRayVisualSeconds));
-        }
-
-        private IEnumerator HideAttackRayLineAfterDelay(float seconds)
-        {
-            yield return new WaitForSeconds(seconds);
-            if (_attackRayLine != null)
-            {
-                _attackRayLine.enabled = false;
-            }
-
-            _attackRayHideRoutine = null;
+            return Quaternion.LookRotation(dir, up);
         }
     }
 }

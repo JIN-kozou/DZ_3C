@@ -1,0 +1,78 @@
+----------------------------------------
+POLYGON ARSENAL v2.0
+
+Archanor VFX - Kenneth Foldal Moe
+----------------------------------------
+
+1. Introduction
+2. Scaling effects
+3. Upgrading to URP
+4. Common problems
+5. Asset Extras
+6. Contact
+
+----------------------------------------
+1. Introduction
+----------------------------------------
+
+If you’re ready to dive in, you can find the effects in the 'Polygon Arsenal/Prefabs' folder. Here they are sorted into 3 main categories: Combat, Environment and Interactive.
+
+To view an effect, you can simply drag and drop it into your Scene and the effect will start playing immediately.
+
+You can also more efficiently browse effects directly in Unity by adding all the demo scenes from the ‘Polygon Arsenal/Demo/Scenes’ folder into the Build Settings, open one of the scenes and press Play. Make sure to import the Post Processing package in Package Manager to avoid errors.
+
+While in the Game window you can click through the in-game button row at the bottom to navigate to the different scenes.
+
+----------------------------------------
+2. Scaling Effects
+----------------------------------------
+
+To scale an effect while it is inside a scene, you can simply use the default Scale Tool. You can also select the effect and type in your new Scale in Transform in the Inspector. In most cases you will want to keep the scale uniform. If the scale is not uniform, meshes used for the effects may appear to be skewed.
+
+The effects in Polygon Arsenal consists almost entirely out of Particle Systems which have their Scaling Mode set to Hierarchy. This lets you scale the effects easily without having to change the Start Size values on multiple sub-particle systems.
+
+This does however mean that some parts of the effects such as Point Lights, Trail Renderers and Audio Sources may have to be manually adjusted afterwards if you scale an effect, as Transform does not affect them.
+
+----------------------------------------
+3. Upgrading to URP
+----------------------------------------
+
+When you import Polygon Arsenal for the first time, the asset will be using Shaders for the Built-in Render Pipeline. 
+
+Note that any changes made to Materials in the Polygon Arsenal folder will be lost when upgrading!
+
+To upgrade to URP, locate the 'Polygon Arsenal\Upgrades' folder, then open (double-click) and Import the bundled 'Polygon Arsenal URP' unitypackage to your project. This will replace all of the Materials in the asset folder, and make some minor changes to Scenes and Prefabs in the ‘Polygon Arsenal\Demo’ folder.
+
+You can revert to Standard materials by re-importing the pack from the Asset Store.
+
+----------------------------------------
+4. Common Problems
+----------------------------------------
+
+URP Missing or Invisible Particles
+
+In some cases it may look like there are missing or invisible parts of the effects. This is because certain Materials have Soft Particles enabled. These will not be rendered unless Depth Texture is enabled on the Camera. An alternative would be to disable Soft Particles on each individual Material.
+
+----------------------------------------
+5. ASSET EXTRAS
+----------------------------------------
+
+In the 'Polygon Arsenal/Scripts' folder you can find some neat scripts that may further help you customize the effects.
+
+PolygonStaticBeam - A script for making a quick beam effect.
+
+PolygonLightFade - This lets you fade out lights which are useful for explosions
+
+PolygonPitchRandomizer - Randomizes the pitch of sounds, and can help make repetetive sounds less annoying.
+
+PolygonRotation - A simple script that applies constant rotation to an object
+
+PolygonSoundSpawn - A handy script for playing sounds which destroys itsself after the sound is over
+
+----------------------------------------
+6. CONTACT
+----------------------------------------
+
+Need help? Send a support request here:
+
+https://archanor.com/support.html
