@@ -1,6 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Pushes sphere centers/radii into every Renderer for shaders that read <c>_Position0..3</c> / <c>_Radius0..3</c>.
+/// Runs before <see cref="AppearRevealGate"/> so the gate can append <c>_Reveal</c> on the same <see cref="MaterialPropertyBlock"/>.
+/// </summary>
+[DefaultExecutionOrder(-100)]
 [ExecuteInEditMode]
 public class ShaderPosition : MonoBehaviour
 {
