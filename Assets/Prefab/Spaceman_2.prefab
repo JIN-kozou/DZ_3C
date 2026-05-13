@@ -1555,6 +1555,11 @@ MonoBehaviour:
   hurtVisualBuffConfig: {fileID: 11400000, guid: f430f63f68455924182590443575d6c2,
     type: 2}
   hurtBuffSourceType: 2
+  damageDirectionHintWorldPrefab: {fileID: 100100000, guid: 62d6a51969ebb8246aaf8d6acf717298,
+    type: 3}
+  damageDirectionHintAnchor: {fileID: 0}
+  damageDirectionHintWorldScale: 0.0025
+  damageDirectionHintVisibleSeconds: 1.2
 --- !u!114 &7832582548365574346
 MonoBehaviour:
   m_ObjectHideFlags: 0
