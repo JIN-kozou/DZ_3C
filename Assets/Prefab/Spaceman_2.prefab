@@ -81,7 +81,7 @@ Transform:
   m_GameObject: {fileID: 857330630116614241}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.006554961, y: 0.833, z: 0.38199738}
+  m_LocalPosition: {x: 0.151, y: 0.895, z: 0.39}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -875,7 +875,7 @@ MonoBehaviour:
     m_MaintainOffset: 0
     m_ConstrainedAxes:
       x: 0
-      y: 0
+      y: 1
       z: 0
 --- !u!1 &7055546323934621589
 GameObject:
@@ -1198,7 +1198,11 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 113005333511837015}
+      addedObject: {fileID: 4157397132207371025}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 948b2879297c65b49aca3fdf9c3fbc54,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6388397884314731502}
   m_SourcePrefab: {fileID: 100100000, guid: 948b2879297c65b49aca3fdf9c3fbc54, type: 3}
 --- !u!4 &118841307263048380 stripped
 Transform:
@@ -1297,7 +1301,7 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
-  groundDetectedOffset: 0.1
+  groundDetectedOffset: -0.1
   groundRadius: 0.2
   groundProbeDistance: 1.5
   groundNormalRayStartHeight: 0.35
@@ -1555,11 +1559,11 @@ MonoBehaviour:
   hurtVisualBuffConfig: {fileID: 11400000, guid: f430f63f68455924182590443575d6c2,
     type: 2}
   hurtBuffSourceType: 2
-  damageDirectionHintWorldPrefab: {fileID: 100100000, guid: 62d6a51969ebb8246aaf8d6acf717298,
+  damageDirectionHintWorldPrefab: {fileID: 2621378829725237636, guid: 62d6a51969ebb8246aaf8d6acf717298,
     type: 3}
-  damageDirectionHintAnchor: {fileID: 0}
+  damageDirectionHintAnchor: {fileID: 313008795082299893}
   damageDirectionHintWorldScale: 0.0025
-  damageDirectionHintVisibleSeconds: 1.2
+  damageDirectionHintVisibleSeconds: 5
 --- !u!114 &7832582548365574346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1600,6 +1604,7 @@ MonoBehaviour:
   gunConfig: {fileID: 11400000, guid: 6ffa5b3a4c03755429f3152c3c903338, type: 2}
   viewKickRig: {fileID: 0}
   muzzleSocket: {fileID: 1138963891631827317}
+  aimCrosshairReferenceDistance: 2000
   gripSocket: {fileID: 0}
 --- !u!114 &2097994199674027090
 MonoBehaviour:
@@ -1682,7 +1687,7 @@ MonoBehaviour:
   player: {fileID: 8241220909394436553}
   bindingsConfig: {fileID: 11400000, guid: 6de871ace0f821442bd4f58c4c94515c, type: 2}
   deactivateAllFeaturesOnEnable: 1
---- !u!114 &113005333511837015
+--- !u!114 &4157397132207371025
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1705,6 +1710,23 @@ MonoBehaviour:
   instantKillDamage: 100000
   clearInvincibilityBeforeTestDamage: 1
   logReverseEvents: 1
+--- !u!114 &6388397884314731502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086448861104587599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8bf24929fe1e5048acee6f5df1dc6cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gunConfig: {fileID: 11400000, guid: 6ffa5b3a4c03755429f3152c3c903338, type: 2}
+  viewKickRig: {fileID: 0}
+  muzzleSocket: {fileID: 1138963891631827317}
+  aimCrosshairReferenceDistance: 100
+  gripSocket: {fileID: 0}
 --- !u!4 &1432869090135714326 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8056890861941402616, guid: 948b2879297c65b49aca3fdf9c3fbc54,

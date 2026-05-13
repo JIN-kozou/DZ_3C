@@ -49,6 +49,8 @@ public class GunConfigSO : ScriptableObject
     public float bulletGravityScale = 1f;
     [Tooltip("秒。0 或负数表示子弹不因时间销毁（仍可被 destroyOnHit 销毁）。")]
     public float bulletLifetime = 6f;
+    [Tooltip("自发射起经过该秒数后，对 Projectile 上配置的 IProjectileDespawnVisuals（如 Polygon 桥接）调用一次 teardown；与 bulletLifetime 独立。0 或负数表示不按时间触发。")]
+    [Min(0f)] public float bulletVisualTeardownDelay = 0f;
 
     [Header("Bullet hit (trigger / collision)")]
     [Tooltip("仅当对方碰撞体所在层级（从自身到根）上某一 GameObject 的 Tag 命中其一才结算伤害；为空则不会对任何目标造成伤害。")]
