@@ -1,5 +1,18 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-1914156326346315019
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 7
 --- !u!21 &2100000
 Material:
   serializedVersion: 8
@@ -43,12 +56,12 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Alpha: 0.068
-    - _Mask_Bevel: 0.0535
+    - _Alpha: 0.074
+    - _Mask_Bevel: 0.029
     - _Mask_Feather: 1.478
     - _Mask_Noise: 1.72
-    - _Mask_Size: 0.443
+    - _Mask_Size: 0.054
     - _TYPE: 0
     m_Colors:
-    - _Color: {r: 6.943396, g: 0.49127796, b: 0.49127796, a: 0.74509805}
+    - _Color: {r: 3.9062169, g: 0, b: 0, a: 0.74509805}
   m_BuildTextureStacks: []

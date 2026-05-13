@@ -19,6 +19,7 @@ namespace DZ_3C.AI.Core
 
         [Header("Optional Scene Links")]
         [SerializeField] private Transform spawnCenter;
+        [SerializeField] private List<Transform> spawnCenterCandidates = new();
         [SerializeField] private List<PatrolPoint> patrolPoints = new();
         [SerializeField] private List<CheckpointCounter> checkpoints = new();
 
@@ -75,6 +76,7 @@ namespace DZ_3C.AI.Core
             SetField(selector, "blackboard", blackboard);
             SetField(monsterCharacter, "statConfig", monsterStat);
             SetField(driver, "monsterStat", monsterStat);
+            SetField(driver, "aiConfig", config);
             SetField(driver, "blackboard", blackboard);
             SetField(driver, "selector", selector);
             SetField(driver, "threatResolver", threat);
@@ -86,11 +88,15 @@ namespace DZ_3C.AI.Core
             SetField(gizmos, "blackboard", blackboard);
             SetField(overheadUI, "selector", selector);
             SetField(overheadUI, "runtime", runtime);
+            SetField(overheadUI, "blackboard", blackboard);
+            SetField(overheadUI, "aiConfig", config);
 
             // Patrol links.
             SetField(patrol, "config", config);
             SetField(patrol, "blackboard", blackboard);
+            SetField(patrol, "monsterStat", monsterStat);
             SetField(patrol, "spawnCenter", spawnCenter != null ? spawnCenter : transform);
+            SetField(patrol, "spawnCenterCandidates", spawnCenterCandidates);
             SetField(patrol, "patrolRadius", patrolRadius);
             SetField(patrol, "patrolPrecision", patrolPrecision);
             SetField(patrol, "stayAtSpawnSeconds", stayAtSpawnSeconds);

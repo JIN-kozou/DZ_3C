@@ -1195,6 +1195,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8618299945075475325}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 948b2879297c65b49aca3fdf9c3fbc54,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 113005333511837015}
   m_SourcePrefab: {fileID: 100100000, guid: 948b2879297c65b49aca3fdf9c3fbc54, type: 3}
 --- !u!4 &118841307263048380 stripped
 Transform:
@@ -1551,6 +1555,11 @@ MonoBehaviour:
   hurtVisualBuffConfig: {fileID: 11400000, guid: f430f63f68455924182590443575d6c2,
     type: 2}
   hurtBuffSourceType: 2
+  damageDirectionHintWorldPrefab: {fileID: 100100000, guid: 62d6a51969ebb8246aaf8d6acf717298,
+    type: 3}
+  damageDirectionHintAnchor: {fileID: 0}
+  damageDirectionHintWorldScale: 0.0025
+  damageDirectionHintVisibleSeconds: 1.2
 --- !u!114 &7832582548365574346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1673,6 +1682,29 @@ MonoBehaviour:
   player: {fileID: 8241220909394436553}
   bindingsConfig: {fileID: 11400000, guid: 6de871ace0f821442bd4f58c4c94515c, type: 2}
   deactivateAllFeaturesOnEnable: 1
+--- !u!114 &113005333511837015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086448861104587599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a84014f7ced374ca506374703d804d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coreStack: {fileID: 6129257497694812251}
+  listenKeys: 1
+  stepDamageKey: 45
+  instantKillKey: 290
+  clearInvincibilityKey: 289
+  resetRunKey: 288
+  stepDamage: 20
+  shiftMultiplier: 5
+  instantKillDamage: 100000
+  clearInvincibilityBeforeTestDamage: 1
+  logReverseEvents: 1
 --- !u!4 &1432869090135714326 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8056890861941402616, guid: 948b2879297c65b49aca3fdf9c3fbc54,

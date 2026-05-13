@@ -1,3 +1,4 @@
+using DZ_3C.AI.Config;
 using DZ_3C.AI.Core;
 using DZ_3C.AI.HTN;
 using TMPro;
@@ -10,6 +11,8 @@ namespace DZ_3C.AI.Debugging
     {
         [SerializeField] private HTNMethodSelector selector;
         [SerializeField] private AIBehaviorRuntime runtime;
+        [SerializeField] private AIBlackboard blackboard;
+        [SerializeField] private AIConfigSO aiConfig;
         [SerializeField] private MonsterAICharacterDriver driver;
         [SerializeField] private MonsterHurtReceiver hurtReceiver;
         [SerializeField] private Vector3 worldOffset = new Vector3(0f, 2.2f, 0f);
@@ -22,6 +25,7 @@ namespace DZ_3C.AI.Debugging
         {
             if (selector == null) selector = GetComponent<HTNMethodSelector>();
             if (runtime == null) runtime = GetComponent<AIBehaviorRuntime>();
+            if (blackboard == null) blackboard = GetComponent<AIBlackboard>();
             if (driver == null) driver = GetComponent<MonsterAICharacterDriver>();
             if (hurtReceiver == null) hurtReceiver = GetComponent<MonsterHurtReceiver>();
             EnsureTMPText();
@@ -57,8 +61,26 @@ namespace DZ_3C.AI.Debugging
                 : (string.IsNullOrEmpty(runtime.CurrentAtomicTask) ? "None" : runtime.CurrentAtomicTask);
 
             string hpLine = BuildHealthLine();
-            string content = $"Root: {root}\nMethod: {method}\nAtomic: {atomic}\n{hpLine}";
+            string energyLine = BuildEnergyLine();
+            string content = $"Root: {root}\nMethod: {method}\nAtomic: {atomic}\n{energyLine}\n{hpLine}";
             if (textMeshPro != null) textMeshPro.text = content;
+        }
+
+        private string BuildEnergyLine()
+        {
+            if (blackboard == null)
+            {
+                return "Energy: — (no blackboard)";
+            }
+
+            float e = blackboard.CurrentPositionEnergy;
+            if (aiConfig != null)
+            {
+                float panic = Mathf.Max(aiConfig.energyPanicThreshold, aiConfig.energyMinForAvoid + 0.01f);
+                return $"Energy: {e:0.###}  (detour > {aiConfig.energyMinForAvoid:0.###}, panic >= {panic:0.###})";
+            }
+
+            return $"Energy: {e:0.###}";
         }
 
         private string BuildHealthLine()

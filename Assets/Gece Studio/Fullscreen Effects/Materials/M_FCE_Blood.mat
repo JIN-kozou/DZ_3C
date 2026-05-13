@@ -1,5 +1,18 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-4958306928769754152
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 7
 --- !u!21 &2100000
 Material:
   serializedVersion: 8
@@ -58,16 +71,16 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Alpha: 0.01
+    - _Alpha: 1
     - _Animation: 1
-    - _Mask_Bevel: 0.0214
-    - _Mask_Feather: 1.59
+    - _Mask_Bevel: 0.025
+    - _Mask_Feather: 1.49
     - _Mask_Noise: 1.46
-    - _Mask_Size: 0.301
+    - _Mask_Size: 0.087
     m_Colors:
     - _Blood_A: {r: -1.58, g: -0.37, b: 1, a: 0}
     - _Blood_B: {r: 0.11, g: -0.59, b: 1, a: -16}
     - _Blood_C: {r: 0.23, g: 0.46, b: 1, a: 0}
     - _Blood_D: {r: -1.08, g: 0.58, b: 1, a: 0}
-    - _Color: {r: 1, g: 0, b: 0, a: 0}
+    - _Color: {r: 1, g: 0.035471078, b: 0, a: 0}
   m_BuildTextureStacks: []
