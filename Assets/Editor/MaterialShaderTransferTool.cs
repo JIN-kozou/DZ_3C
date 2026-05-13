@@ -24,7 +24,7 @@ public class MaterialShaderTransferTool : EditorWindow
 
         targetMaterial = (Material)EditorGUILayout.ObjectField("Single Material", targetMaterial, typeof(Material), false);
 
-        if (GUILayout.Button("单个材质测试"))
+        if (GUILayout.Button("\u5355\u4e2a\u6750\u8d28\u6d4b\u8bd5"))
         {
             ChangeShader(targetMaterial);
             AssetDatabase.SaveAssets();
@@ -34,12 +34,12 @@ public class MaterialShaderTransferTool : EditorWindow
 
         folderPath = EditorGUILayout.TextField("Folder Path", folderPath);
 
-        if (GUILayout.Button("批量处理文件夹中的材质"))
+        if (GUILayout.Button("\u6279\u91cf\u5904\u7406\u6587\u4ef6\u5939\u4e2d\u7684\u6750\u8d28"))
         {
             BatchProcessFolder();
         }
 
-        if (GUILayout.Button("处理当前选中的材质/物体"))
+        if (GUILayout.Button("\u5904\u7406\u5f53\u524d\u9009\u4e2d\u7684\u6750\u8d28/\u7269\u4f53"))
         {
             BatchProcessSelection();
         }
@@ -49,13 +49,13 @@ public class MaterialShaderTransferTool : EditorWindow
     {
         if (mat == null || newShader == null)
         {
-            Debug.LogWarning("请先指定 Material 和 Shader");
+            Debug.LogWarning("\u8bf7\u5148\u6307\u5b9a Material \u548c Shader");
             return;
         }
 
         if (EditorApplication.isCompiling || EditorApplication.isUpdating)
         {
-            Debug.LogWarning("Unity 正在编译或更新，请稍后再试！");
+            Debug.LogWarning("Unity \u6b63\u5728\u7f16\u8bd1\u6216\u66f4\u65b0\uff0c\u8bf7\u7a0d\u540e\u518d\u8bd5\uff01");
             return;
         }
 
@@ -74,7 +74,7 @@ public class MaterialShaderTransferTool : EditorWindow
     {
         if (newShader == null)
         {
-            Debug.LogWarning("请先选择 Shader");
+            Debug.LogWarning("\u8bf7\u5148\u9009\u62e9 Shader");
             return;
         }
 
@@ -98,14 +98,14 @@ public class MaterialShaderTransferTool : EditorWindow
 
         EditorUtility.ClearProgressBar();
         AssetDatabase.SaveAssets();
-        Debug.Log("文件夹批量处理完成");
+        Debug.Log("\u6587\u4ef6\u5939\u6279\u91cf\u5904\u7406\u5b8c\u6210");
     }
 
     private void BatchProcessSelection()
     {
         if (newShader == null)
         {
-            Debug.LogWarning("请先选择 Shader");
+            Debug.LogWarning("\u8bf7\u5148\u9009\u62e9 Shader");
             return;
         }
 
@@ -146,7 +146,7 @@ public class MaterialShaderTransferTool : EditorWindow
 
         EditorUtility.ClearProgressBar();
         AssetDatabase.SaveAssets();
-        Debug.Log("选中对象处理完成");
+        Debug.Log("\u9009\u4e2d\u5bf9\u8c61\u5904\u7406\u5b8c\u6210");
     }
 
     private class MaterialData
@@ -220,7 +220,6 @@ public class MaterialShaderTransferTool : EditorWindow
             }
         }
 
-        // 从 HDR Emission Color 里估算 Emission Intensity
         if (mat.HasProperty("_EmissionColor"))
         {
             Color emissionColor = mat.GetColor("_EmissionColor");
@@ -277,8 +276,9 @@ public class MaterialShaderTransferTool : EditorWindow
             new[] { "_Smoothness", "_Glossiness" },
             new[] { "_Smoothness", "_Glossiness" });
 
+        // Prefer _NormalStrength over _BumpScale when both exist (URP can leave _BumpScale at 0 while strength is in _NormalStrength).
         TrySetFloat(mat, data.floats,
-            new[] { "_BumpScale", "_NormalStrength" },
+            new[] { "_NormalStrength", "_BumpScale" },
             new[] { "_BumpScale", "_NormalStrength" });
 
         TrySetFloat(mat, data.floats,
@@ -287,17 +287,47 @@ public class MaterialShaderTransferTool : EditorWindow
 
         TrySetFloat(mat, data.floats,
             new[] { "_SmoothnessTextureChannel" },
-            new[] { "_SmoothnessTextureChannel" });
+            new[] { "_MetallicSource", "_SmoothnessTextureChannel" });
 
         TrySetFloat(mat, data.floats,
             new[] { "_EmissionIntensity" },
             new[] { "_EmissionIntensity" });
 
-        // 确保 Emission keyword 打开
+        FixMetallicMultiplierWhenUsingMap(mat);
+        FixNormalStrengthWhenUsingBumpMap(mat);
+
         if (mat.HasProperty("_EmissionMap") || mat.HasProperty("_EmissionColor"))
         {
             mat.EnableKeyword("_EMISSION");
         }
+    }
+
+    private static void FixMetallicMultiplierWhenUsingMap(Material mat)
+    {
+        if (!mat.HasProperty("_Metallic") || !mat.HasProperty("_MetallicGlossMap"))
+            return;
+
+        if (mat.GetTexture("_MetallicGlossMap") == null)
+            return;
+
+        if (mat.GetFloat("_Metallic") > 0.0001f)
+            return;
+
+        mat.SetFloat("_Metallic", 1f);
+    }
+
+    private static void FixNormalStrengthWhenUsingBumpMap(Material mat)
+    {
+        if (!mat.HasProperty("_BumpMap") || !mat.HasProperty("_BumpScale"))
+            return;
+
+        if (mat.GetTexture("_BumpMap") == null)
+            return;
+
+        if (mat.GetFloat("_BumpScale") > 0.0001f)
+            return;
+
+        mat.SetFloat("_BumpScale", 1f);
     }
 
     private void TrySetTexture(Material mat, Dictionary<string, Texture> saved, string[] oldSlots, string[] newSlots)
