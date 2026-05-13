@@ -115,6 +115,50 @@ public class PlayerArmedPresentation : MonoBehaviour
         !_adsExiting;
 
     /// <summary>
+    /// 腰射十字准心括号：1 = 满间距且不透明；0 = 完全开镜稳态时收拢且透明。
+    /// 与开镜 enter / exit 片段进度及 <see cref="IsAdsCameraAimActive"/> 对齐；<paramref name="adsHeld"/> 应与 <see cref="PlayerWeaponRuntime.IsAds"/> 一致（HUD 可对乘子做 SmoothDamp，使收拢与渐隐同步）。
+    /// </summary>
+    public float EvaluateHipfireBracketDisplayMultiplier(bool adsHeld)
+    {
+        if (!adsHeld)
+        {
+            return 1f;
+        }
+
+        if (!UsesAnimatedAdsCameraGates || _data == null)
+        {
+            return 0f;
+        }
+
+        if (_adsEntering &&
+            _adsEventState != null &&
+            _data.adsEnter != null &&
+            _data.adsEnter.IsValid &&
+            _adsEventState.Clip == _data.adsEnter.Clip &&
+            _adsEventState.IsPlaying)
+        {
+            return 1f - GetUpperLayerClipProgress01(_adsEventState);
+        }
+
+        if (_adsExiting &&
+            _adsEventState != null &&
+            _data.adsExit != null &&
+            _data.adsExit.IsValid &&
+            _adsEventState.Clip == _data.adsExit.Clip &&
+            _adsEventState.IsPlaying)
+        {
+            return GetUpperLayerClipProgress01(_adsEventState);
+        }
+
+        if (IsAdsCameraAimActive)
+        {
+            return 0f;
+        }
+
+        return 0f;
+    }
+
+    /// <summary>
     /// 分层持枪时掏枪已播完且上半身进入 idle（可腰射开火）；非分层或未启用分层时视为始终就绪。
     /// </summary>
     public bool IsUpperBodyReadyForWeapon =>

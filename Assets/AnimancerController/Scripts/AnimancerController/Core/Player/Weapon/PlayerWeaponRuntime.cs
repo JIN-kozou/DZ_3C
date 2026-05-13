@@ -9,8 +9,11 @@ public class PlayerWeaponRuntime : MonoBehaviour
     [SerializeField] private GunConfigSO gunConfig;
     [SerializeField] private WeaponViewKickRig viewKickRig;
     [Header("开火口（编辑器）")]
-    [SerializeField, Tooltip("子弹从此 Transform 的世界坐标生成；飞行方向为相机「屏幕中心 + 后坐力/腰射散布」射线指向的远方。未指定时退化为相机射线起点前 0.5m。")]
+    [SerializeField, Tooltip("子弹从此 Transform 的世界坐标生成；飞行方向为从该点指向「相机准星射线」上的参考远点（与纯相机 forward 相比更对准十字线）。未指定时退化为相机射线起点前 0.5m。")]
     private Transform muzzleSocket;
+
+    [SerializeField, Min(10f), Tooltip("计算枪口→准星方向时，在相机准星射线上取的参考距离（米）。越大方向越接近与射线平行，一般 500～5000 即可。")]
+    private float aimCrosshairReferenceDistance = 2000f;
 
     [SerializeField, Tooltip("可选。双手 IK 的 Target 建议指向此 Transform（与枪口独立）；仅用于场景/Prefab 配置参考，逻辑仍由 Animation Rigging 约束上绑定。")]
     private Transform gripSocket;
@@ -400,10 +403,16 @@ public class PlayerWeaponRuntime : MonoBehaviour
         }
 
         var ray = cam.ViewportPointToRay(new Vector3(vp.x, vp.y, 0f));
-        Vector3 aimDir = ray.direction.normalized;
         Vector3 spawnPos = muzzleSocket != null
             ? muzzleSocket.position
-            : ray.origin + aimDir * 0.5f;
+            : ray.origin + ray.direction.normalized * 0.5f;
+
+        float refDist = Mathf.Max(10f, aimCrosshairReferenceDistance);
+        Vector3 aimOnCrosshairRay = ray.GetPoint(refDist);
+        Vector3 toCrosshair = aimOnCrosshairRay - spawnPos;
+        Vector3 aimDir = toCrosshair.sqrMagnitude > 1e-8f
+            ? toCrosshair.normalized
+            : ray.direction.normalized;
         Quaternion spawnRot = Quaternion.LookRotation(aimDir);
 
         if (_ownerColliders == null || _ownerColliders.Length == 0)
