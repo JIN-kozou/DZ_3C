@@ -12,6 +12,15 @@ public class Projectile : MonoBehaviour
     [SerializeField] private float defaultGravityScale = 1f;
     [SerializeField] private float defaultLifetime = 6f;
 
+    [Header("Optional VFX teardown (decoupled)")]
+    [Tooltip("e.g. PolygonProjectileDespawnBridge — 由 Launch(…, visualTeardownDelay) 的独立计时触发一次 IProjectileDespawnVisuals；不在 bullet 寿命到期时触发。")]
+    [SerializeField]
+    private MonoBehaviour despawnVisualsBehaviour;
+
+    [Tooltip("Launch 若传入 visualTeardownDelay < 0，则使用该秒数（<=0 表示关闭定时 teardown）。")]
+    [SerializeField]
+    private float defaultVisualTeardownDelay = -1f;
+
     private Rigidbody _rb;
     private float _damage;
     private float _gravityScale;
@@ -23,6 +32,9 @@ public class Projectile : MonoBehaviour
     private string _hurtBuffId;
     private bool _destroyOnHit;
     private float _maxHitDistanceSqr;
+    private float _visualTeardownAt;
+    private bool _visualTeardownScheduled;
+    private bool _visualTeardownDone;
 
     /// <summary>their Collider instance id -> receiver root GameObject instance id</summary>
     private readonly Dictionary<int, int> _otherColliderToReceiverKey = new Dictionary<int, int>();
@@ -47,7 +59,8 @@ public class Projectile : MonoBehaviour
         string[] damageableTags,
         string hurtBuffId,
         bool destroyOnHit,
-        float maxHitDistance)
+        float maxHitDistance,
+        float visualTeardownDelay = 0f)
     {
         _ownerRoot = ownerRoot;
         _ownerColliders = ownerColliders;
@@ -61,6 +74,24 @@ public class Projectile : MonoBehaviour
 
         _infiniteLifetime = lifetime <= 0f;
         _despawnAt = _infiniteLifetime ? float.PositiveInfinity : Time.time + lifetime;
+
+        _visualTeardownDone = false;
+        var teardownSeconds = visualTeardownDelay;
+        if (teardownSeconds < 0f)
+        {
+            teardownSeconds = defaultVisualTeardownDelay;
+        }
+
+        if (teardownSeconds > 0f)
+        {
+            _visualTeardownScheduled = true;
+            _visualTeardownAt = Time.time + teardownSeconds;
+        }
+        else
+        {
+            _visualTeardownScheduled = false;
+            _visualTeardownAt = float.PositiveInfinity;
+        }
 
         _otherColliderToReceiverKey.Clear();
         _receiverOverlapDepth.Clear();
@@ -86,6 +117,12 @@ public class Projectile : MonoBehaviour
     private void FixedUpdate()
     {
         _rb.velocity += Physics.gravity * (_gravityScale * Time.fixedDeltaTime);
+
+        if (_visualTeardownScheduled && !_visualTeardownDone && Time.time >= _visualTeardownAt)
+        {
+            TryInvokeVisualTeardownOnce();
+        }
+
         if (!_infiniteLifetime && Time.time >= _despawnAt)
         {
             Destroy(gameObject);
@@ -161,6 +198,7 @@ public class Projectile : MonoBehaviour
 
             if (_destroyOnHit)
             {
+                TryInvokeVisualTeardownOnce();
                 Destroy(gameObject);
                 return;
             }
@@ -277,5 +315,19 @@ public class Projectile : MonoBehaviour
         }
 
         return c.transform == _ownerRoot || c.transform.IsChildOf(_ownerRoot);
+    }
+
+    private void TryInvokeVisualTeardownOnce()
+    {
+        if (_visualTeardownDone)
+        {
+            return;
+        }
+
+        _visualTeardownDone = true;
+        if (despawnVisualsBehaviour is IProjectileDespawnVisuals visuals)
+        {
+            visuals.OnProjectileDespawned();
+        }
     }
 }
