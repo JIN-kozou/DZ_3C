@@ -16,7 +16,7 @@ public static class AudioPrefabPlayer
         return Play(soundPrefab, position, null, false, 1f, 1f);
     }
 
-    public static AudioSource Play(GameObject soundPrefab, Vector3 position, Transform parent, bool attachToParent, float volumeMultiplier = 1f, float pitchMultiplier = 1f)
+    public static AudioSource Play(GameObject soundPrefab, Vector3 position, Transform parent, bool attachToParent, float volumeMultiplier = 1f, float pitchMultiplier = 1f, float startTimeSeconds = 0f)
     {
         if (soundPrefab == null)
         {
@@ -57,6 +57,16 @@ public static class AudioPrefabPlayer
 
             source.volume = Mathf.Clamp01(source.volume * Mathf.Max(0f, volumeMultiplier));
             source.pitch = Mathf.Max(0.01f, source.pitch * Mathf.Max(0.01f, pitchMultiplier));
+            if (source.clip != null && source.clip.loadState == AudioDataLoadState.Unloaded)
+            {
+                source.clip.LoadAudioData();
+            }
+
+            if (source.clip != null && startTimeSeconds > 0f)
+            {
+                source.time = Mathf.Min(startTimeSeconds, Mathf.Max(0f, source.clip.length - 0.01f));
+            }
+
             if (!source.isPlaying)
             {
                 source.Play();

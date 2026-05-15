@@ -28,6 +28,8 @@ public class Projectile : MonoBehaviour
     private bool _infiniteLifetime;
     private Collider[] _ownerColliders;
     private Transform _ownerRoot;
+    private GunAudio _ownerGunAudio;
+    private ProjectileAudio _projectileAudio;
     private string[] _damageableTags;
     private string _hurtBuffId;
     private bool _destroyOnHit;
@@ -47,6 +49,7 @@ public class Projectile : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
         _rb.useGravity = false;
         _rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        _projectileAudio = GetComponent<ProjectileAudio>() ?? GetComponentInChildren<ProjectileAudio>(true);
     }
 
     public void Launch(
@@ -63,6 +66,7 @@ public class Projectile : MonoBehaviour
         float visualTeardownDelay = 0f)
     {
         _ownerRoot = ownerRoot;
+        _ownerGunAudio = _ownerRoot != null ? _ownerRoot.GetComponent<GunAudio>() : null;
         _ownerColliders = ownerColliders;
         _damage = damage;
         _gravityScale = gravityScale;
@@ -97,6 +101,8 @@ public class Projectile : MonoBehaviour
         _receiverOverlapDepth.Clear();
 
         _rb.velocity = worldVelocity;
+        _projectileAudio?.PlaySpawn();
+        _projectileAudio?.StartFlightLoop();
 
         if (_ownerColliders != null)
         {
@@ -125,6 +131,7 @@ public class Projectile : MonoBehaviour
 
         if (!_infiniteLifetime && Time.time >= _despawnAt)
         {
+            _projectileAudio?.PlayDespawn();
             Destroy(gameObject);
         }
     }
@@ -191,6 +198,8 @@ public class Projectile : MonoBehaviour
             // 使用玩家根物体作为 attacker，便于怪物 HitPerceptor 解析 AITargetable 并写入 Attackers 仇恨桶（弹丸自身通常无 AITargetable）。
             object attackerForAggro = _ownerRoot != null ? _ownerRoot.gameObject : gameObject;
             receiver.ReceiveAIDamage(_damage, _hurtBuffId, attackerForAggro);
+            _ownerGunAudio?.OnHit(transform.position);
+            _projectileAudio?.PlayHit(transform.position);
             if (_ownerRoot != null && _ownerRoot.GetComponentInParent<Player>() != null)
             {
                 WeaponHitHudSignal.RaisePlayerDealtDamageToReceiver();

@@ -15,6 +15,7 @@ public class EnvironmentAudioEmitter : MonoBehaviour
     [SerializeField] private GameObject helmetRadiationNoiseLoop;
     [SerializeField] private GameObject giantMonsterLowGrowlLoop;
     [SerializeField] private GameObject tireRollingLoop;
+    [SerializeField] private bool startAssignedLoopsOnEnable = true;
 
     [Header("AI Noise")]
     [SerializeField] private AINoiseAudioBridge aiNoiseBridge;
@@ -47,6 +48,34 @@ public class EnvironmentAudioEmitter : MonoBehaviour
     private void Awake()
     {
         LoadDefaultSoundsIfNeeded();
+    }
+
+    private void OnEnable()
+    {
+        if (!startAssignedLoopsOnEnable)
+        {
+            return;
+        }
+
+        if (shipMachineryLoop != null)
+        {
+            StartShipMachineryLoop();
+        }
+
+        if (helmetRadiationNoiseLoop != null)
+        {
+            StartHelmetRadiationNoise();
+        }
+
+        if (giantMonsterLowGrowlLoop != null)
+        {
+            StartGiantMonsterLowGrowl();
+        }
+
+        if (tireRollingLoop != null)
+        {
+            StartTireRolling();
+        }
     }
 
     public void PlayDamagedVentGasSpray()

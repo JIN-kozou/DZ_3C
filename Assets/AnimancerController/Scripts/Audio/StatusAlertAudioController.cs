@@ -17,6 +17,10 @@ public class StatusAlertAudioController : MonoBehaviour
     [SerializeField, Min(0.01f)] private float dangerStatusInterval = 0.45f;
     [SerializeField] private bool useUnscaledTime;
     [SerializeField] private bool playAtTransformPosition;
+    [SerializeField] private bool autoFollowPlayerHealth = true;
+    [SerializeField, Range(0f, 1f)] private float lowHealthNormalizedThreshold = 0.35f;
+    [SerializeField, Range(0f, 1f)] private float dangerHealthNormalizedThreshold = 0.18f;
+    [SerializeField, Min(0.1f)] private float healthScanIntervalSeconds = 0.2f;
 
     [Header("AI Noise")]
     [SerializeField] private AINoiseAudioBridge aiNoiseBridge;
@@ -28,8 +32,23 @@ public class StatusAlertAudioController : MonoBehaviour
 
     private StatusAlertState currentState = StatusAlertState.None;
     private Coroutine alertRoutine;
+    private Player player;
+    private float nextHealthScanTime;
 
     public StatusAlertState CurrentState => currentState;
+
+    private void Awake()
+    {
+        player = GetComponent<Player>() ?? GetComponentInParent<Player>();
+    }
+
+    private void Update()
+    {
+        if (autoFollowPlayerHealth)
+        {
+            TickAutoHealthStatus();
+        }
+    }
 
     public void SetStatusNormal() => SetStatusAlertState(StatusAlertState.None);
     public void SetStatusLow() => SetStatusAlertState(StatusAlertState.Low);
@@ -94,6 +113,40 @@ public class StatusAlertAudioController : MonoBehaviour
         if (statusBeepEmitsAINoise && aiNoiseBridge != null)
         {
             aiNoiseBridge.EmitNoise(noiseLoudness, noiseDuration);
+        }
+    }
+
+    private void TickAutoHealthStatus()
+    {
+        if (Time.time < nextHealthScanTime)
+        {
+            return;
+        }
+
+        nextHealthScanTime = Time.time + healthScanIntervalSeconds;
+        if (player == null)
+        {
+            player = FindObjectOfType<Player>();
+        }
+
+        if (player == null || player.ReusableData == null || player.MaxHealth <= 0f)
+        {
+            SetStatusNormal();
+            return;
+        }
+
+        float normalizedHealth = Mathf.Clamp01(player.ReusableData.health.Value / player.MaxHealth);
+        if (normalizedHealth <= dangerHealthNormalizedThreshold)
+        {
+            SetStatusDanger();
+        }
+        else if (normalizedHealth <= lowHealthNormalizedThreshold)
+        {
+            SetStatusLow();
+        }
+        else
+        {
+            SetStatusNormal();
         }
     }
 }

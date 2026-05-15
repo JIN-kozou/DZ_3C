@@ -22,6 +22,7 @@ public class ReverseArrayAudio : MonoBehaviour
     [SerializeField, Min(0f)] private float recallNoiseDuration = 0.5f;
     [SerializeField, Min(0f)] private float warningNoiseLoudness = 2f;
     [SerializeField] private bool warningEmitsContinuousNoise;
+    [SerializeField, Min(0.05f)] private float warningPulseSeconds = 1.5f;
 
     private AudioSource warningSource;
     private AudioSource coreChargeSource;
@@ -51,6 +52,12 @@ public class ReverseArrayAudio : MonoBehaviour
     public void PlayCoreDepleted() => PlayOneShot(coreDepleted);
     public void StartCoreCharge() => coreChargeSource = StartLoop(coreChargeLoop, coreChargeSource);
     public void StopCoreCharge() => StopLoop(ref coreChargeSource);
+    public void PlayWarningPulse()
+    {
+        StartWarning();
+        CancelInvoke(nameof(StopWarning));
+        Invoke(nameof(StopWarning), warningPulseSeconds);
+    }
 
     public void StartWarning()
     {

@@ -1,4 +1,5 @@
 using System.Collections;
+using DZ_3C.AI.Core;
 using UnityEngine;
 
 public class MusicStateAudioController : MonoBehaviour
@@ -15,18 +16,32 @@ public class MusicStateAudioController : MonoBehaviour
     [SerializeField, Min(0f)] private float defaultFadeDuration = 1f;
     [SerializeField] private bool playExplorationOnStart;
     [SerializeField] private bool restartSameState;
+    [SerializeField] private bool autoFollowCombatState = true;
+    [SerializeField, Min(0f)] private float combatMusicHoldSeconds = 2f;
+    [SerializeField, Min(0.1f)] private float combatScanIntervalSeconds = 0.5f;
 
     private MusicState currentState = MusicState.None;
     private AudioSource currentMusicSource;
     private Coroutine musicRoutine;
+    private AIBlackboard[] cachedBlackboards;
+    private float nextCombatScanTime;
+    private float combatMusicUntil;
 
     public MusicState CurrentState => currentState;
 
     private void Start()
     {
-        if (playExplorationOnStart)
+        if (playExplorationOnStart || autoFollowCombatState)
         {
             PlayExploration();
+        }
+    }
+
+    private void Update()
+    {
+        if (autoFollowCombatState)
+        {
+            TickAutoCombatMusic();
         }
     }
 
@@ -91,6 +106,59 @@ public class MusicStateAudioController : MonoBehaviour
             default:
                 return null;
         }
+    }
+
+    private void TickAutoCombatMusic()
+    {
+        if (Time.time >= nextCombatScanTime)
+        {
+            nextCombatScanTime = Time.time + combatScanIntervalSeconds;
+            if (AnyPlayerIsHateTarget())
+            {
+                combatMusicUntil = Time.time + combatMusicHoldSeconds;
+            }
+        }
+
+        if (Time.time < combatMusicUntil)
+        {
+            PlayCombat();
+        }
+        else
+        {
+            PlayExploration();
+        }
+    }
+
+    private bool AnyPlayerIsHateTarget()
+    {
+        if (cachedBlackboards == null || cachedBlackboards.Length == 0)
+        {
+            cachedBlackboards = FindObjectsOfType<AIBlackboard>();
+        }
+
+        bool sawLiveBlackboard = false;
+        for (int i = 0; i < cachedBlackboards.Length; i++)
+        {
+            AIBlackboard blackboard = cachedBlackboards[i];
+            if (blackboard == null)
+            {
+                continue;
+            }
+
+            sawLiveBlackboard = true;
+            AITargetable target = blackboard.HateTarget;
+            if (target != null && target.IsPlayer)
+            {
+                return true;
+            }
+        }
+
+        if (!sawLiveBlackboard)
+        {
+            cachedBlackboards = FindObjectsOfType<AIBlackboard>();
+        }
+
+        return false;
     }
 
     private IEnumerator PlayMusicRoutine(GameObject music, float fadeDuration)

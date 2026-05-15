@@ -8,6 +8,7 @@ public class PlayerWeaponRuntime : MonoBehaviour
 {
     [SerializeField] private GunConfigSO gunConfig;
     [SerializeField] private WeaponViewKickRig viewKickRig;
+    [SerializeField] private GunAudio gunAudio;
     [Header("开火口（编辑器）")]
     [SerializeField, Tooltip("子弹从此 Transform 的世界坐标生成；飞行方向为从该点指向「相机准星射线」上的参考远点（与纯相机 forward 相比更对准十字线）。未指定时退化为相机射线起点前 0.5m。")]
     private Transform muzzleSocket;
@@ -76,6 +77,11 @@ public class PlayerWeaponRuntime : MonoBehaviour
         if (gunConfig == null)
         {
             gunConfig = Resources.Load<GunConfigSO>("Config/Weapon/DefaultGun");
+        }
+
+        if (gunAudio == null)
+        {
+            gunAudio = GetComponent<GunAudio>();
         }
 
         if (viewKickRig == null)
@@ -445,6 +451,7 @@ public class PlayerWeaponRuntime : MonoBehaviour
         }
 
         ApplyViewKick();
+        gunAudio?.OnShoot();
 
         _ammo--;
         _timeSinceLastShot = 0f;
