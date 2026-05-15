@@ -37,6 +37,7 @@ namespace DZ_3C.Reverse
 
         [Tooltip("部署位置参考点。空则用 transform 自身（玩家本体）。")]
         [SerializeField] private Transform deployAnchor;
+        [SerializeField] private ReverseArrayAudio reverseArrayAudio;
 
         // ---------- 事件（给 UI / debug 用） ----------
 
@@ -48,6 +49,9 @@ namespace DZ_3C.Reverse
 
         /// <summary>收回失败原因：StackEmpty / SlotEmpty。</summary>
         public event Action<string> OnRetrieveFailed;
+
+        private ReverseArrayAudio cachedReverseArrayAudio;
+        private bool reverseArrayAudioLookupAttempted;
 
         private void Awake()
         {
@@ -124,6 +128,7 @@ namespace DZ_3C.Reverse
             arr.Setup(slot, seq, config.arrayDefaultEnergy);
             registry.RegisterDeployed(arr);
             OnDeployed?.Invoke(arr);
+            PlayPlaceAudio(arr);
             return true;
         }
 
@@ -155,11 +160,74 @@ namespace DZ_3C.Reverse
 
         private bool RetrieveImpl(ReverseArray arr)
         {
+            ReverseArrayAudio audio = ResolveReverseArrayAudio(arr);
             registry.UnregisterArray(arr);
             coreStack.AcceptRetrievedCoreAtOutermost();
             OnRetrieved?.Invoke(arr);
+            if (audio != null)
+            {
+                audio.PlayRecall();
+            }
+
             Destroy(arr.gameObject);
             return true;
+        }
+
+        private void PlayPlaceAudio(ReverseArray arr)
+        {
+            ReverseArrayAudio audio = ResolveReverseArrayAudio(arr);
+            if (audio == null)
+            {
+                return;
+            }
+
+            audio.PlayPlace();
+        }
+
+        private ReverseArrayAudio ResolveReverseArrayAudio(ReverseArray arr)
+        {
+            if (reverseArrayAudio != null)
+            {
+                return reverseArrayAudio;
+            }
+
+            if (arr != null)
+            {
+                ReverseArrayAudio arrayAudio = arr.GetComponent<ReverseArrayAudio>();
+                if (arrayAudio == null)
+                {
+                    arrayAudio = arr.GetComponentInChildren<ReverseArrayAudio>(true);
+                }
+
+                if (arrayAudio == null)
+                {
+                    arrayAudio = arr.GetComponentInParent<ReverseArrayAudio>();
+                }
+
+                if (arrayAudio != null)
+                {
+                    return arrayAudio;
+                }
+            }
+
+            if (reverseArrayAudioLookupAttempted)
+            {
+                return cachedReverseArrayAudio;
+            }
+
+            reverseArrayAudioLookupAttempted = true;
+            cachedReverseArrayAudio = GetComponent<ReverseArrayAudio>();
+            if (cachedReverseArrayAudio == null)
+            {
+                cachedReverseArrayAudio = GetComponentInParent<ReverseArrayAudio>();
+            }
+
+            if (cachedReverseArrayAudio == null)
+            {
+                cachedReverseArrayAudio = GetComponentInChildren<ReverseArrayAudio>(true);
+            }
+
+            return cachedReverseArrayAudio;
         }
 
         private static bool IsKeyDownThisFrame(KeyCode keyCode)

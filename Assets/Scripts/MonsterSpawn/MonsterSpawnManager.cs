@@ -274,7 +274,29 @@ namespace DZ_3C.MonsterSpawn
 
             _aliveByEntry[entryIndex]++;
             _currentUsedWeight += entry.weightCost;
+            PlaySpawnAudio(go);
             return true;
+        }
+
+        private static void PlaySpawnAudio(GameObject spawnedMonster)
+        {
+            if (spawnedMonster == null)
+            {
+                return;
+            }
+
+            EnemyAudio enemyAudio = spawnedMonster.GetComponent<EnemyAudio>();
+            if (enemyAudio == null)
+            {
+                enemyAudio = spawnedMonster.GetComponentInChildren<EnemyAudio>(true);
+            }
+
+            if (enemyAudio == null)
+            {
+                return;
+            }
+
+            enemyAudio.PlaySpawn();
         }
 
         private bool TryPickSpawnPosition(out Vector3 world)

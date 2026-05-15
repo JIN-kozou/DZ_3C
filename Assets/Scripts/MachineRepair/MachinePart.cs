@@ -11,6 +11,7 @@ namespace DZ_3C.MachineRepair
         [SerializeField] private bool usePrefabMesh = true;
         [SerializeField] private MeshFilter meshFilter;
         [SerializeField] private MeshRenderer meshRenderer;
+        [SerializeField] private ItemAudio itemAudio;
 
         private Collider col;
         private RepairInteractionHub cachedHub;
@@ -27,6 +28,7 @@ namespace DZ_3C.MachineRepair
         {
             if (meshFilter == null) meshFilter = GetComponent<MeshFilter>();
             if (meshRenderer == null) meshRenderer = GetComponent<MeshRenderer>();
+            if (itemAudio == null) itemAudio = GetComponent<ItemAudio>();
             col = GetComponent<Collider>();
             if (col != null) col.isTrigger = true;
         }
@@ -94,7 +96,23 @@ namespace DZ_3C.MachineRepair
                 $"[MachineRepair] Picked up part: id={definition.Id}, displayName={definition.DisplayName}. " +
                 $"Inventory: {MachinePartInventory.FormatSnapshotForDebug(inv.Snapshot())}");
             hub.RegisterPart(this, false);
+            PlayPickupAudio();
             Destroy(gameObject);
+        }
+
+        private void PlayPickupAudio()
+        {
+            if (itemAudio == null)
+            {
+                itemAudio = GetComponentInChildren<ItemAudio>(true);
+            }
+
+            if (itemAudio == null)
+            {
+                return;
+            }
+
+            itemAudio.PlayPickup();
         }
 
         private void OnDestroy()

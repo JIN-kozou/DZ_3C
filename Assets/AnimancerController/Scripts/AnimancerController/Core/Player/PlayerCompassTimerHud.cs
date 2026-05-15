@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Events;
@@ -9,6 +11,23 @@ using UnityEngine.UI;
 [DisallowMultipleComponent]
 public class PlayerCompassTimerHud : MonoBehaviour
 {
+    /// <summary>罗盘上指示的「场景物品」：相对玩家（或相机锚点）的水平方位。</summary>
+    [Serializable]
+    public class CompassWorldTargetEntry
+    {
+        [Tooltip("要指示的世界物体 Transform；可空则该项不显示。")]
+        public Transform worldTransform;
+
+        [Tooltip("留空则使用 HUD 上的默认图标或内置白块。")]
+        public Sprite icon;
+
+        [Tooltip("与图标相乘的颜色。")]
+        public Color tint = Color.white;
+
+        [Tooltip("是否参与绘制。")]
+        public bool show = true;
+    }
+
     public enum TimerDisplayMode
     {
         CountUpSinceEnabled,
@@ -34,6 +53,9 @@ public class PlayerCompassTimerHud : MonoBehaviour
     [SerializeField, Tooltip("视口中央的朝向指示线（可选）。")]
     private RectTransform centerMarker;
 
+    [SerializeField, Tooltip("物品图标的父节点；留空则在运行时挂在 CompassViewport 下（在刻度条之上、中线之下）。")]
+    private RectTransform worldTargetMarkerLayer;
+
     [SerializeField]
     private Text timerText;
 
@@ -57,6 +79,25 @@ public class PlayerCompassTimerHud : MonoBehaviour
 
     [SerializeField, Min(8)] private int labelFontSize = 15;
 
+    [Header("Compass world targets")]
+    [SerializeField, Tooltip("在罗盘刻度下方显示的物品方位图标（相对玩家水平角）。")]
+    private List<CompassWorldTargetEntry> worldTargetMarkers = new List<CompassWorldTargetEntry>();
+
+    [SerializeField, Min(4f), Tooltip("图标方形边长（画布像素）。")]
+    private float worldTargetIconSize = 20f;
+
+    [SerializeField, Tooltip("图标锚在视口底边，向上偏移的像素（应在刻度高度之下/贴底条区域）。")]
+    private float worldTargetIconAnchoredY = 6f;
+
+    [SerializeField, Min(0f), Tooltip("相对视口左右边界的留白，用于夹紧越界目标。")]
+    private float worldTargetEdgeMarginPx = 6f;
+
+    [SerializeField, Tooltip("为 true 时方位相对相机水平前向（与罗盘中心一致）；为 false 时相对玩家 Transform 的水平前向。")]
+    private bool worldTargetsRelativeToCameraForward = true;
+
+    [SerializeField, Range(0.2f, 1f), Tooltip("目标在身后（与参考前向点积为负）时的图标透明度乘数。")]
+    private float worldTargetBehindAlphaScale = 0.45f;
+
     [Header("Timer")]
     [SerializeField] private TimerDisplayMode timerMode = TimerDisplayMode.CountUpSinceEnabled;
 
@@ -70,6 +111,19 @@ public class PlayerCompassTimerHud : MonoBehaviour
 
     private float _clockAtEnable;
     private bool _countdownEndedEventFired;
+
+    /// <summary>上一帧归一化水平角，用于 <see cref="Mathf.DeltaAngle"/> 无缝过北。</summary>
+    private float _lastYawNorm;
+
+    /// <summary>罗盘条水平偏移（像素），由角度增量累加，周期性折叠到约 ±180° 对应范围。</summary>
+    private float _compassOffsetPx;
+
+    private bool _compassAngleInitialized;
+
+    private readonly List<Image> _worldTargetMarkerPool = new List<Image>();
+
+    private static Sprite _runtimeWhiteSprite;
+
     private static readonly string[] CardinalLabels =
     {
         "北", "东北", "东", "东南", "南", "西南", "西", "西北"
@@ -82,6 +136,8 @@ public class PlayerCompassTimerHud : MonoBehaviour
         EnsureViewportMask();
         ResolvePlayer();
         BuildCompassIfNeeded();
+        EnsureWorldTargetMarkerLayer();
+        EnsureWorldTargetMarkerPoolSize();
         if (panelBackground != null)
         {
             panelBackground.raycastTarget = false;
@@ -101,12 +157,14 @@ public class PlayerCompassTimerHud : MonoBehaviour
     {
         _clockAtEnable = GetClock();
         _countdownEndedEventFired = false;
+        _compassAngleInitialized = false;
     }
 
     private void LateUpdate()
     {
         ResolvePlayer();
         UpdateCompass();
+        UpdateWorldTargetMarkers();
     }
 
     private void Update()
@@ -127,6 +185,34 @@ public class PlayerCompassTimerHud : MonoBehaviour
         countdownStartSeconds = Mathf.Max(0f, seconds);
         _clockAtEnable = GetClock();
         _countdownEndedEventFired = false;
+    }
+
+    /// <summary>运行时替换指定索引的世界目标（索引越界则忽略）。</summary>
+    public void SetWorldTargetTransform(int index, Transform target)
+    {
+        if (index < 0 || index >= worldTargetMarkers.Count)
+        {
+            return;
+        }
+
+        worldTargetMarkers[index].worldTransform = target;
+    }
+
+    /// <summary>运行时设置目标列表长度（仅增删末尾槽位）。</summary>
+    public void SetWorldTargetMarkerCount(int count)
+    {
+        count = Mathf.Max(0, count);
+        while (worldTargetMarkers.Count < count)
+        {
+            worldTargetMarkers.Add(new CompassWorldTargetEntry());
+        }
+
+        while (worldTargetMarkers.Count > count)
+        {
+            worldTargetMarkers.RemoveAt(worldTargetMarkers.Count - 1);
+        }
+
+        EnsureWorldTargetMarkerPoolSize();
     }
 
     private void EnsureViewportMask()
@@ -209,72 +295,312 @@ public class PlayerCompassTimerHud : MonoBehaviour
         }
 
         var yaw = Normalize360(HorizontalYawDegrees(src) + northWorldYawOffset);
-        var bandWidth = 360f * pixelsPerDegree;
-        compassContent.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, bandWidth);
-        compassContent.anchoredPosition = new Vector2((180f - yaw) * pixelsPerDegree, compassContent.anchoredPosition.y);
+        var band = 360f * pixelsPerDegree;
+        var halfBand = 180f * pixelsPerDegree;
+
+        if (!_compassAngleInitialized)
+        {
+            _lastYawNorm = yaw;
+            _compassOffsetPx = (180f - yaw) * pixelsPerDegree;
+            _compassAngleInitialized = true;
+        }
+        else
+        {
+            var delta = Mathf.DeltaAngle(_lastYawNorm, yaw);
+            _lastYawNorm = yaw;
+            _compassOffsetPx -= delta * pixelsPerDegree;
+            while (_compassOffsetPx > halfBand)
+            {
+                _compassOffsetPx -= band;
+            }
+
+            while (_compassOffsetPx < -halfBand)
+            {
+                _compassOffsetPx += band;
+            }
+        }
+
+        compassContent.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, band * 3f);
+        compassContent.anchoredPosition = new Vector2(_compassOffsetPx, compassContent.anchoredPosition.y);
     }
 
     private void BuildCompassIfNeeded()
     {
-        if (compassContent == null || compassContent.childCount > 0)
+        if (compassContent == null)
+        {
+            return;
+        }
+
+        if (compassContent.childCount > 0 && compassContent.Find("Major_-1_0") == null)
+        {
+            for (var i = compassContent.childCount - 1; i >= 0; i--)
+            {
+                Destroy(compassContent.GetChild(i).gameObject);
+            }
+        }
+
+        if (compassContent.childCount > 0)
         {
             return;
         }
 
         var ppd = pixelsPerDegree;
-        var halfBand = 180f * ppd;
+        var band = 360f * ppd;
 
-        for (var a = 0; a < 360; a += minorTickDegrees)
+        for (var k = -1; k <= 1; k++)
         {
-            var isCardinal = a % 45 == 0;
-            var tickGo = new GameObject(isCardinal ? $"Major_{a}" : $"Minor_{a}", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            tickGo.transform.SetParent(compassContent, false);
-            var rt = tickGo.GetComponent<RectTransform>();
-            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0f);
-            rt.pivot = new Vector2(0.5f, 0f);
-            var x = (a - 180f) * ppd;
-            rt.anchoredPosition = new Vector2(x, 0f);
-            var h = isCardinal ? majorTickHeight : minorTickHeight;
-            rt.sizeDelta = new Vector2(isCardinal ? 2f : 1f, h);
-
-            var img = tickGo.GetComponent<Image>();
-            img.sprite = null;
-            img.color = tickColor;
-            img.raycastTarget = false;
-
-            if (isCardinal)
+            var kOffset = k * band;
+            for (var a = 0; a < 360; a += minorTickDegrees)
             {
-                var labelIdx = a / 45;
-                if (labelIdx >= 0 && labelIdx < CardinalLabels.Length)
-                {
-                    var textGo = new GameObject($"Label_{a}", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
-                    textGo.transform.SetParent(compassContent, false);
-                    var trt = textGo.GetComponent<RectTransform>();
-                    trt.anchorMin = trt.anchorMax = new Vector2(0.5f, 0f);
-                    trt.pivot = new Vector2(0.5f, 0f);
-                    trt.anchoredPosition = new Vector2(x, h + 2f);
-                    trt.sizeDelta = new Vector2(56f, 28f);
-                    var tx = textGo.GetComponent<Text>();
-                    tx.text = CardinalLabels[labelIdx];
-                    tx.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-                    if (tx.font == null)
-                    {
-                        tx.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-                    }
+                var isCardinal = a % 45 == 0;
+                var tickGo = new GameObject(
+                    isCardinal ? $"Major_{k}_{a}" : $"Minor_{k}_{a}",
+                    typeof(RectTransform),
+                    typeof(CanvasRenderer),
+                    typeof(Image));
+                tickGo.transform.SetParent(compassContent, false);
+                var rt = tickGo.GetComponent<RectTransform>();
+                rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0f);
+                rt.pivot = new Vector2(0.5f, 0f);
+                var x = (a - 180f) * ppd + kOffset;
+                rt.anchoredPosition = new Vector2(x, 0f);
+                var h = isCardinal ? majorTickHeight : minorTickHeight;
+                rt.sizeDelta = new Vector2(isCardinal ? 2f : 1f, h);
 
-                    tx.fontSize = labelFontSize;
-                    tx.color = labelColor;
-                    tx.alignment = TextAnchor.LowerCenter;
-                    tx.horizontalOverflow = HorizontalWrapMode.Overflow;
-                    tx.verticalOverflow = VerticalWrapMode.Overflow;
-                    tx.raycastTarget = false;
-                    tx.supportRichText = false;
+                var img = tickGo.GetComponent<Image>();
+                img.sprite = null;
+                img.color = tickColor;
+                img.raycastTarget = false;
+
+                if (isCardinal)
+                {
+                    var labelIdx = a / 45;
+                    if (labelIdx >= 0 && labelIdx < CardinalLabels.Length)
+                    {
+                        var textGo = new GameObject($"Label_{k}_{a}", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+                        textGo.transform.SetParent(compassContent, false);
+                        var trt = textGo.GetComponent<RectTransform>();
+                        trt.anchorMin = trt.anchorMax = new Vector2(0.5f, 0f);
+                        trt.pivot = new Vector2(0.5f, 0f);
+                        trt.anchoredPosition = new Vector2(x, h + 2f);
+                        trt.sizeDelta = new Vector2(56f, 28f);
+                        var tx = textGo.GetComponent<Text>();
+                        tx.text = CardinalLabels[labelIdx];
+                        tx.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                        if (tx.font == null)
+                        {
+                            tx.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                        }
+
+                        tx.fontSize = labelFontSize;
+                        tx.color = labelColor;
+                        tx.alignment = TextAnchor.LowerCenter;
+                        tx.horizontalOverflow = HorizontalWrapMode.Overflow;
+                        tx.verticalOverflow = VerticalWrapMode.Overflow;
+                        tx.raycastTarget = false;
+                        tx.supportRichText = false;
+                    }
                 }
             }
         }
 
-        // 占位：保证首次布局前即有宽度
-        compassContent.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, halfBand * 2f);
+        compassContent.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, band * 3f);
+    }
+
+    private void EnsureWorldTargetMarkerLayer()
+    {
+        if (worldTargetMarkerLayer != null || compassViewport == null)
+        {
+            return;
+        }
+
+        var go = new GameObject("WorldTargetMarkers", typeof(RectTransform));
+        var rt = go.GetComponent<RectTransform>();
+        rt.SetParent(compassViewport, false);
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.offsetMin = Vector2.zero;
+        rt.offsetMax = Vector2.zero;
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.localScale = Vector3.one;
+        worldTargetMarkerLayer = rt;
+
+        if (compassContent != null)
+        {
+            rt.SetSiblingIndex(compassContent.GetSiblingIndex() + 1);
+        }
+
+        if (centerMarker != null)
+        {
+            centerMarker.SetAsLastSibling();
+        }
+    }
+
+    private void EnsureWorldTargetMarkerPoolSize()
+    {
+        EnsureWorldTargetMarkerLayer();
+        if (worldTargetMarkerLayer == null)
+        {
+            return;
+        }
+
+        while (_worldTargetMarkerPool.Count < worldTargetMarkers.Count)
+        {
+            var idx = _worldTargetMarkerPool.Count;
+            var go = new GameObject($"WorldTargetIcon_{idx}", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            go.transform.SetParent(worldTargetMarkerLayer, false);
+            var irt = go.GetComponent<RectTransform>();
+            irt.anchorMin = irt.anchorMax = new Vector2(0.5f, 0f);
+            irt.pivot = new Vector2(0.5f, 0f);
+            irt.sizeDelta = new Vector2(worldTargetIconSize, worldTargetIconSize);
+            var img = go.GetComponent<Image>();
+            img.raycastTarget = false;
+            img.type = Image.Type.Simple;
+            img.preserveAspect = true;
+            _worldTargetMarkerPool.Add(img);
+        }
+
+        for (var i = 0; i < _worldTargetMarkerPool.Count; i++)
+        {
+            var img = _worldTargetMarkerPool[i];
+            if (img == null)
+            {
+                continue;
+            }
+
+            var rt = img.rectTransform;
+            rt.sizeDelta = new Vector2(worldTargetIconSize, worldTargetIconSize);
+        }
+    }
+
+    private static Sprite GetRuntimeWhiteSprite()
+    {
+        if (_runtimeWhiteSprite != null)
+        {
+            return _runtimeWhiteSprite;
+        }
+
+        var tex = Texture2D.whiteTexture;
+        _runtimeWhiteSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100f);
+        return _runtimeWhiteSprite;
+    }
+
+    private void UpdateWorldTargetMarkers()
+    {
+        EnsureWorldTargetMarkerLayer();
+        EnsureWorldTargetMarkerPoolSize();
+
+        if (worldTargetMarkerLayer == null)
+        {
+            return;
+        }
+
+        var yawT = ResolveYawTransform();
+        if (yawT == null)
+        {
+            HideAllWorldTargetMarkers();
+            return;
+        }
+
+        var origin = ResolveWorldOriginPosition();
+        var flatRef = ResolveFlatReferenceForward(yawT);
+        if (flatRef.sqrMagnitude < 1e-6f)
+        {
+            HideAllWorldTargetMarkers();
+            return;
+        }
+
+        flatRef.Normalize();
+
+        var halfW = worldTargetMarkerLayer.rect.width * 0.5f - worldTargetEdgeMarginPx;
+        if (halfW < 1f)
+        {
+            halfW = 1f;
+        }
+
+        for (var i = 0; i < _worldTargetMarkerPool.Count; i++)
+        {
+            var img = _worldTargetMarkerPool[i];
+            if (img == null)
+            {
+                continue;
+            }
+
+            if (i >= worldTargetMarkers.Count)
+            {
+                img.gameObject.SetActive(false);
+                continue;
+            }
+
+            var entry = worldTargetMarkers[i];
+            if (!entry.show || entry.worldTransform == null)
+            {
+                img.gameObject.SetActive(false);
+                continue;
+            }
+
+            var toT = entry.worldTransform.position - origin;
+            toT.y = 0f;
+            if (toT.sqrMagnitude < 1e-8f)
+            {
+                img.gameObject.SetActive(false);
+                continue;
+            }
+
+            toT.Normalize();
+            var bearing = Vector3.SignedAngle(flatRef, toT, Vector3.up);
+            var x = Mathf.Clamp(bearing * pixelsPerDegree, -halfW, halfW);
+            var rt = img.rectTransform;
+            rt.anchoredPosition = new Vector2(x, worldTargetIconAnchoredY);
+            var sp = entry.icon != null ? entry.icon : GetRuntimeWhiteSprite();
+            img.sprite = sp;
+            var a = entry.tint.a;
+            if (Vector3.Dot(flatRef, toT) < 0f)
+            {
+                a *= worldTargetBehindAlphaScale;
+            }
+
+            var c = entry.tint;
+            c.a = a;
+            img.color = c;
+            img.gameObject.SetActive(true);
+        }
+    }
+
+    private Vector3 ResolveWorldOriginPosition()
+    {
+        if (player != null)
+        {
+            return player.transform.position;
+        }
+
+        var yawT = ResolveYawTransform();
+        return yawT != null ? yawT.position : Vector3.zero;
+    }
+
+    private Vector3 ResolveFlatReferenceForward(Transform yawT)
+    {
+        if (worldTargetsRelativeToCameraForward || player == null)
+        {
+            var f = yawT.forward;
+            f.y = 0f;
+            return f;
+        }
+
+        var pf = player.transform.forward;
+        pf.y = 0f;
+        return pf;
+    }
+
+    private void HideAllWorldTargetMarkers()
+    {
+        for (var i = 0; i < _worldTargetMarkerPool.Count; i++)
+        {
+            if (_worldTargetMarkerPool[i] != null)
+            {
+                _worldTargetMarkerPool[i].gameObject.SetActive(false);
+            }
+        }
     }
 
     private float GetClock() => useUnscaledTime ? Time.unscaledTime : Time.time;
