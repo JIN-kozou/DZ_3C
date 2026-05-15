@@ -14,6 +14,7 @@ namespace DZ_3C.AI.HTN
         [SerializeField] private HTNMethodSelector selector;
         [SerializeField] private MonsterCharacter character;
         [SerializeField] private MonoBehaviour attackHandler;
+        [SerializeField] private EnemyAudio enemyAudio;
 
         [Header("Laser attack visual (prefab)")]
         [Tooltip("若为 true 且指定了 Prefab，则在攻击时沿射线方向实例化视觉并作为本物体子级，寿命结束后销毁。")]
@@ -77,6 +78,10 @@ namespace DZ_3C.AI.HTN
                     : selector.CurrentIdleMethod.ToString();
 
         private float nextAttackTime;
+        [SerializeField, Min(0.05f)] private float movementAudioIntervalSeconds = 0.75f;
+        private float nextMovementAudioTime;
+        [SerializeField, Min(0.1f)] private float patrolSonarIntervalSeconds = 3f;
+        private float nextPatrolSonarTime;
         /// <summary>Assault 战前悬停结束时刻（与 Time.time 比较）；负值表示未进入悬停。</summary>
         private float assaultPreAttackHoverEndTime = -1f;
         /// <summary>Assault 射线射出后的悬停结束时刻；负值表示未在射后悬停中。</summary>
@@ -121,6 +126,7 @@ namespace DZ_3C.AI.HTN
             if (blackboard == null) blackboard = GetComponent<AIBlackboard>();
             if (selector == null) selector = GetComponent<HTNMethodSelector>();
             if (character == null) character = GetComponent<MonsterCharacter>();
+            if (enemyAudio == null) enemyAudio = GetComponent<EnemyAudio>();
             attackHandlerInterface = attackHandler as IMonsterAttack;
             _hurtReceiver = GetComponent<MonsterHurtReceiver>();
 
@@ -187,6 +193,8 @@ namespace DZ_3C.AI.HTN
                 MaintainCruiseHeight();
             }
 
+            TickMovementAudio();
+            TickPatrolSonarAudio();
             ApplyFrameMotion();
         }
 
@@ -222,6 +230,46 @@ namespace DZ_3C.AI.HTN
         private void SetDominant(AtomicTask task)
         {
             currentAtomicTask = task;
+        }
+
+        private void TickMovementAudio()
+        {
+            if (enemyAudio == null || Time.time < nextMovementAudioTime)
+            {
+                return;
+            }
+
+            bool isMovingTask =
+                currentAtomicTask == AtomicTask.HorizontalMove ||
+                currentAtomicTask == AtomicTask.Orbit ||
+                currentAtomicTask == AtomicTask.Dash ||
+                currentAtomicTask == AtomicTask.Strafe ||
+                currentAtomicTask == AtomicTask.Ascend ||
+                currentAtomicTask == AtomicTask.Descend;
+
+            if (!isMovingTask)
+            {
+                return;
+            }
+
+            nextMovementAudioTime = Time.time + movementAudioIntervalSeconds;
+            enemyAudio.PlayMovement();
+        }
+
+        private void TickPatrolSonarAudio()
+        {
+            if (enemyAudio == null || Time.time < nextPatrolSonarTime)
+            {
+                return;
+            }
+
+            if (selector.CurrentRoot != RootBehavior.Idle || selector.CurrentIdleMethod != IdleMethod.Patrol)
+            {
+                return;
+            }
+
+            nextPatrolSonarTime = Time.time + patrolSonarIntervalSeconds;
+            enemyAudio.PlayPatrolSonar();
         }
 
         private void AccumulatePlanar(Vector3 worldDelta)
@@ -550,6 +598,7 @@ namespace DZ_3C.AI.HTN
                     assaultPreAttackHoverEndTime = -1f;
                     SetDominant(AtomicTask.Attack);
                     nextAttackTime = Time.time + monsterStat.attackInterval;
+                    enemyAudio?.PlayLaserAttack();
                     attackHandlerInterface?.PerformAttack(target, monsterStat.baseDamage, monsterStat.aoeRadius, monsterStat.buffId);
                     TryApplyAttackRayDamageToPlayer(target);
 
@@ -774,6 +823,10 @@ namespace DZ_3C.AI.HTN
             if (selector.CurrentCombatMethod == CombatMethod.Interfere)
             {
                 interfereUntil = Time.time + monsterStat.interfereDuration;
+                if (lastCombatMethod != CombatMethod.Interfere)
+                {
+                    enemyAudio?.PlayTargetAcquisitionHowl();
+                }
             }
             if (selector.CurrentCombatMethod == CombatMethod.Assault)
             {

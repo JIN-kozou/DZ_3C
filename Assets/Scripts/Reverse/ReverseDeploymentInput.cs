@@ -129,6 +129,7 @@ namespace DZ_3C.Reverse
             registry.RegisterDeployed(arr);
             OnDeployed?.Invoke(arr);
             PlayPlaceAudio(arr);
+            PlayStartupAudio(arr);
             return true;
         }
 
@@ -182,6 +183,17 @@ namespace DZ_3C.Reverse
             }
 
             audio.PlayPlace();
+        }
+
+        private void PlayStartupAudio(ReverseArray arr)
+        {
+            ReverseArrayAudio audio = ResolveReverseArrayAudio(arr);
+            if (audio == null)
+            {
+                return;
+            }
+
+            audio.PlayStartup();
         }
 
         private ReverseArrayAudio ResolveReverseArrayAudio(ReverseArray arr)

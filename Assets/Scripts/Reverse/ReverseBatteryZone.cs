@@ -37,12 +37,15 @@ namespace DZ_3C.Reverse
         [SerializeField] private float holdDuration = 1.2f;
         [SerializeField] private string promptText = "长按E开始充能，并且存储该重生点";
         [SerializeField] private bool useOnGuiPromptFallback = true;
+        [SerializeField] private ReverseArrayAudio reverseArrayAudio;
 
         private readonly HashSet<int> appliedPlayerIds = new HashSet<int>();
         private readonly HashSet<int> playersInZone = new HashSet<int>();
         private Player activePlayer;
+        private CharacterAudio activeCharacterAudio;
         private float holdElapsed;
         private bool hasActivatedInCurrentStay;
+        private bool chargeAudioPlaying;
 
         public bool IsPlayerInside => activePlayer != null;
         public bool IsCharging => IsPlayerInside && !hasActivatedInCurrentStay && holdElapsed > 0f;
@@ -71,6 +74,21 @@ namespace DZ_3C.Reverse
             {
                 reverseConfig = Resources.Load<ReverseConfig>("Config/Reverse/ReverseConfig");
             }
+
+            if (reverseArrayAudio == null)
+            {
+                reverseArrayAudio = GetComponent<ReverseArrayAudio>();
+            }
+
+            if (reverseArrayAudio == null)
+            {
+                reverseArrayAudio = GetComponentInChildren<ReverseArrayAudio>(true);
+            }
+        }
+
+        private void OnDisable()
+        {
+            StopChargeAudio();
         }
 
         private void Update()
@@ -79,7 +97,13 @@ namespace DZ_3C.Reverse
             if (!IsHoldInputPressed())
             {
                 holdElapsed = 0f;
+                StopChargeAudio();
                 return;
+            }
+
+            if (holdElapsed <= 0f)
+            {
+                StartChargeAudio(activePlayer);
             }
 
             holdElapsed += Time.deltaTime;
@@ -87,7 +111,9 @@ namespace DZ_3C.Reverse
 
             holdElapsed = 0f;
             hasActivatedInCurrentStay = true;
+            StopChargeAudio();
             TryApplyBuff(activePlayer);
+            activeCharacterAudio?.OnCoreCharge();
             ReverseBatteryRespawnStore.SaveBatteryRespawnPoint(transform);
         }
 
@@ -123,6 +149,7 @@ namespace DZ_3C.Reverse
             playersInZone.Add(id);
             PlayersInsideAnyZone.Add(id);
             activePlayer = player;
+            activeCharacterAudio = player.GetComponent<CharacterAudio>() ?? player.GetComponentInChildren<CharacterAudio>(true);
             holdElapsed = 0f;
             hasActivatedInCurrentStay = false;
         }
@@ -138,6 +165,10 @@ namespace DZ_3C.Reverse
             }
             PlayersInsideAnyZone.Add(id);
             activePlayer = player;
+            if (activeCharacterAudio == null)
+            {
+                activeCharacterAudio = player.GetComponent<CharacterAudio>() ?? player.GetComponentInChildren<CharacterAudio>(true);
+            }
         }
 
         private void OnTriggerExit(Collider other)
@@ -155,7 +186,9 @@ namespace DZ_3C.Reverse
 
             if (activePlayer == player)
             {
+                StopChargeAudio();
                 activePlayer = null;
+                activeCharacterAudio = null;
                 holdElapsed = 0f;
                 hasActivatedInCurrentStay = false;
             }
@@ -204,6 +237,33 @@ namespace DZ_3C.Reverse
             if (Keyboard.current == null) return false;
             Key key = KeyFromKeyCode(GetHoldKey());
             return key != Key.None && Keyboard.current[key].isPressed;
+        }
+
+        private void StartChargeAudio(Player player)
+        {
+            if (chargeAudioPlaying)
+            {
+                return;
+            }
+
+            if (activeCharacterAudio == null && player != null)
+            {
+                activeCharacterAudio = player.GetComponent<CharacterAudio>() ?? player.GetComponentInChildren<CharacterAudio>(true);
+            }
+
+            reverseArrayAudio?.StartCoreCharge();
+            chargeAudioPlaying = true;
+        }
+
+        private void StopChargeAudio()
+        {
+            if (!chargeAudioPlaying)
+            {
+                return;
+            }
+
+            reverseArrayAudio?.StopCoreCharge();
+            chargeAudioPlaying = false;
         }
 
         private static Key KeyFromKeyCode(KeyCode keyCode)

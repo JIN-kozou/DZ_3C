@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using DZ_3C.Reverse;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace DZ_3C.MachineRepair
 {
@@ -17,6 +18,10 @@ namespace DZ_3C.MachineRepair
         private MachinePartInventory inventory;
         private Player player;
         private ReverseConfig reverseConfig;
+        [SerializeField] private ItemAudio itemAudio;
+        [SerializeField] private KeyCode dropKey = KeyCode.G;
+        [SerializeField, Min(0f)] private float dropForwardDistance = 1.2f;
+        [SerializeField, Min(0f)] private float dropUpOffset = 0.25f;
         private bool wasInteractiveHeldLastFrame;
         private float interactiveHoldSeconds;
 
@@ -29,6 +34,8 @@ namespace DZ_3C.MachineRepair
             }
             player = GetComponent<Player>();
             reverseConfig = Resources.Load<ReverseConfig>("Config/Reverse/ReverseConfig");
+            if (itemAudio == null) itemAudio = GetComponent<ItemAudio>();
+            if (itemAudio == null) itemAudio = GetComponentInChildren<ItemAudio>(true);
         }
 
         public MachinePartInventory Inventory => inventory;//只读属性，允许被.add
@@ -52,6 +59,12 @@ namespace DZ_3C.MachineRepair
             var inputService = InputService.Instance;
             if (inputService == null) return;
             if (inventory == null) return;
+
+            if (IsDropPressedThisFrame())
+            {
+                TryDropFirstInventoryPart();
+                return;
+            }
 
             bool inBatteryZone = ReverseBatteryZone.IsPlayerInsideAnyBatteryZone(player);
             bool isHeld = inputService.Interactive;
@@ -126,6 +139,85 @@ namespace DZ_3C.MachineRepair
             }
 
             best?.TryPickup(inventory, this);
+        }
+
+        private bool TryDropFirstInventoryPart()
+        {
+            IReadOnlyDictionary<MachinePartDefinition, int> snapshot = inventory.Snapshot();
+            foreach (KeyValuePair<MachinePartDefinition, int> kv in snapshot)
+            {
+                MachinePartDefinition definition = kv.Key;
+                if (definition == null || kv.Value <= 0)
+                {
+                    continue;
+                }
+
+                int consumed = inventory.TryConsumeAndNotify(definition, 1);
+                if (consumed <= 0)
+                {
+                    return false;
+                }
+
+                SpawnDroppedPart(definition);
+                PlayDropAudio();
+                return true;
+            }
+
+            return false;
+        }
+
+        private void SpawnDroppedPart(MachinePartDefinition definition)
+        {
+            Vector3 forward = transform.forward;
+            forward.y = 0f;
+            if (forward.sqrMagnitude <= 0.0001f)
+            {
+                forward = Vector3.forward;
+            }
+            forward.Normalize();
+
+            Vector3 position = transform.position + forward * dropForwardDistance + Vector3.up * dropUpOffset;
+            GameObject go = new GameObject($"MachinePart_Dropped_{definition.Id}");
+            go.transform.SetPositionAndRotation(position, Quaternion.identity);
+            go.AddComponent<MeshFilter>();
+            go.AddComponent<MeshRenderer>();
+            SphereCollider sphere = go.AddComponent<SphereCollider>();
+            sphere.isTrigger = true;
+            sphere.radius = 0.65f;
+            MachinePart part = go.AddComponent<MachinePart>();
+            part.Configure(definition);
+        }
+
+        private void PlayDropAudio()
+        {
+            if (itemAudio == null)
+            {
+                itemAudio = GetComponent<ItemAudio>();
+            }
+
+            if (itemAudio == null)
+            {
+                itemAudio = GetComponentInChildren<ItemAudio>(true);
+            }
+
+            itemAudio?.PlayDrop();
+        }
+
+        private bool IsDropPressedThisFrame()
+        {
+            if (Keyboard.current == null)
+            {
+                return false;
+            }
+
+            switch (dropKey)
+            {
+                case KeyCode.G: return Keyboard.current.gKey.wasPressedThisFrame;
+                case KeyCode.Q: return Keyboard.current.qKey.wasPressedThisFrame;
+                case KeyCode.F: return Keyboard.current.fKey.wasPressedThisFrame;
+                case KeyCode.E: return Keyboard.current.eKey.wasPressedThisFrame;
+                default: return false;
+            }
         }
     }
 }
