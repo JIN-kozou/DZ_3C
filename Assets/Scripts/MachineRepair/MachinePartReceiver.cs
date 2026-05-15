@@ -29,6 +29,7 @@ namespace DZ_3C.MachineRepair
         [SerializeField] private MeshFilter meshFilter;
         [SerializeField] private MeshRenderer meshRenderer;
         [SerializeField] private Vector3 receiverScale = new Vector3(4f, 0.35f, 2.5f);
+        [SerializeField] private ItemAudio itemAudio;
 
         public IReadOnlyList<PartRequirement> Requirements => requirements;
 
@@ -50,6 +51,7 @@ namespace DZ_3C.MachineRepair
 
             if (meshFilter == null) meshFilter = GetComponent<MeshFilter>();
             if (meshRenderer == null) meshRenderer = GetComponent<MeshRenderer>();
+            if (itemAudio == null) itemAudio = GetComponent<ItemAudio>();
             if (meshFilter != null && meshRenderer != null && !usePrefabMesh)
             {
                 RepairMeshUtility.ApplyReceiverBox(transform, meshFilter, meshRenderer, receiverScale);
@@ -141,7 +143,27 @@ namespace DZ_3C.MachineRepair
                 $"Inventory: {MachinePartInventory.FormatSnapshotForDebug(inventory.Snapshot())}. " +
                 $"Receiver still needs: {FormatRemainingNeedsForDebug(requirements)}");
 
+            if (any)
+            {
+                PlaySubmitAudio();
+            }
+
             return any;
+        }
+
+        private void PlaySubmitAudio()
+        {
+            if (itemAudio == null)
+            {
+                itemAudio = GetComponentInChildren<ItemAudio>(true);
+            }
+
+            if (itemAudio == null)
+            {
+                return;
+            }
+
+            itemAudio.PlaySubmit();
         }
 
         private static string FormatRemainingNeedsForDebug(List<PartRequirement> reqs)

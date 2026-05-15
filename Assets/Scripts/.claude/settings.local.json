@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\36440\\\\source\\\\repos\\\\newgame\\\\DZ_3C\\\\workflow\" -Recurse -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "PowerShell(head *)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\36440\\\\source\\\\repos\\\\newgame\\\\DZ_3C\\\\Assets\\\\AnimancerController\\\\\" -Recurse | Where-Object { $_.Name -match \"Audio\" } | Select-Object -ExpandProperty FullName)"
+    ]
+  }
+}
