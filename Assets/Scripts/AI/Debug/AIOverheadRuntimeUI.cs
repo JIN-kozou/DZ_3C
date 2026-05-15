@@ -48,14 +48,7 @@ namespace DZ_3C.AI.Debugging
             }
 
             string root = driver != null ? driver.CurrentRootDebug : selector.CurrentRoot.ToString();
-            string method = driver != null
-                ? driver.CurrentMethodDebug
-                : selector.CurrentRoot switch
-                {
-                    RootBehavior.Combat => selector.CurrentCombatMethod.ToString(),
-                    RootBehavior.Retreat => "RetreatMove",
-                    _ => selector.CurrentIdleMethod.ToString()
-                };
+            string method = driver != null ? driver.CurrentMethodDebug : ResolveMethodDebug();
             string atomic = driver != null
                 ? driver.CurrentAtomicTaskDebug
                 : (string.IsNullOrEmpty(runtime.CurrentAtomicTask) ? "None" : runtime.CurrentAtomicTask);
@@ -81,6 +74,21 @@ namespace DZ_3C.AI.Debugging
             }
 
             return $"Energy: {e:0.###}";
+        }
+
+        private string ResolveMethodDebug()
+        {
+            if (selector.CurrentRoot == RootBehavior.Combat)
+            {
+                return selector.CurrentCombatMethod.ToString();
+            }
+
+            if (selector.CurrentRoot == RootBehavior.Retreat)
+            {
+                return "RetreatMove";
+            }
+
+            return selector.CurrentIdleMethod.ToString();
         }
 
         private string BuildHealthLine()

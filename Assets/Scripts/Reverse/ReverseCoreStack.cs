@@ -28,6 +28,7 @@ namespace DZ_3C.Reverse
         [SerializeField] private ReverseAnchor anchor;
         [SerializeField] private ReverseArrayRegistry registry;
         [SerializeField] private Player player;
+        [SerializeField] private CharacterAudio characterAudio;
 
         [Tooltip("是否在 Awake 自动初始化 maxCoreCount 个满血核心。关掉后可由外部代码自定义初始状态。")]
         [SerializeField] private bool autoInitOnAwake = true;
@@ -94,6 +95,7 @@ namespace DZ_3C.Reverse
         {
             if (anchor == null) anchor = GetComponent<ReverseAnchor>();
             if (player == null) player = GetComponent<Player>();
+            if (characterAudio == null) characterAudio = GetComponent<CharacterAudio>();
             if (registry == null)
             {
                 registry = GetComponentInChildren<ReverseArrayRegistry>();
@@ -233,16 +235,27 @@ namespace DZ_3C.Reverse
             if (amount <= 0f) return;
             if (IsInvincible) return;
             float remaining = amount;
+            bool coreDepleted = false;
             for (int i = cores.Count - 1; i >= 0 && remaining > 0f; i--)
             {
                 var c = cores[i];
                 if (c == null || c.IsEmpty) continue;
+                bool hadHealth = c.Health > (config != null ? config.fullnessEpsilon : 0.001f);
                 float taken = c.Drain(remaining);
                 remaining -= taken;
+                if (hadHealth && c.IsEmpty)
+                {
+                    coreDepleted = true;
+                }
             }
             if (remaining > 0f && anchor != null)
             {
                 anchor.Drain(remaining);
+            }
+
+            if (coreDepleted)
+            {
+                characterAudio?.OnCoreConsume();
             }
         }
 
@@ -261,6 +274,7 @@ namespace DZ_3C.Reverse
                     deployed = cores[i];
                     cores.RemoveAt(i);
                     OnCoresChanged?.Invoke();
+                    characterAudio?.OnCoreConsume();
                     return true;
                 }
             }
@@ -277,6 +291,8 @@ namespace DZ_3C.Reverse
             float eps = config != null ? config.fullnessEpsilon : 0.001f;
             cores.Add(new ReverseCore(maxHp, eps));
             OnCoresChanged?.Invoke();
+            characterAudio?.OnCorePickup();
+            characterAudio?.OnCoreInstall();
         }
 
         // ---------- IReverseRecoverTarget ----------
@@ -328,6 +344,7 @@ namespace DZ_3C.Reverse
             if (isDying) return;
             isDying = true;
             OnDeath?.Invoke();
+            characterAudio?.OnDeath();
             TryRespawn();
             isDying = false;
         }
@@ -367,6 +384,12 @@ namespace DZ_3C.Reverse
             {
                 respawnPosition = target.transform.position;
                 respawnFromArray = true;
+                ReverseArrayAudio audio = target.GetComponent<ReverseArrayAudio>();
+                if (audio == null)
+                {
+                    audio = target.GetComponentInChildren<ReverseArrayAudio>(true);
+                }
+                audio?.PlayWarningPulse();
             }
             else if (!ReverseBatteryRespawnStore.TryGetBatteryRespawnPoint(out respawnPosition))
             {
@@ -387,6 +410,7 @@ namespace DZ_3C.Reverse
             RefillExistingCoresAndAnchorToFull();
             invincibleSecondsRemaining = config != null ? config.respawnInvincibleSeconds : 1.5f;
             OnRespawned?.Invoke(respawnPosition);
+            characterAudio?.OnRespawn();
         }
 
         public void RefillExistingCoresAndAnchorToFull()

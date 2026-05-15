@@ -14,6 +14,7 @@ namespace DZ_3C.AI.Core
     {
         [Header("Refs")]
         [SerializeField] private MonsterCharacter character;
+        [SerializeField] private EnemyAudio enemyAudio;
         [Tooltip("实现 IMonsterHitPresentation 的组件（如 MonsterAnimatorHitPresentation）；可为空。")]
         [SerializeField] private MonoBehaviour hitPresentationBehaviour;
 
@@ -41,6 +42,11 @@ namespace DZ_3C.AI.Core
             if (character == null)
             {
                 character = GetComponent<MonsterCharacter>();
+            }
+
+            if (enemyAudio == null)
+            {
+                enemyAudio = GetComponent<EnemyAudio>();
             }
         }
 
@@ -71,6 +77,7 @@ namespace DZ_3C.AI.Core
             var ctx = new MonsterDamageContext(damage, buffId, attacker, _currentHealth, _maxHealth, killed);
 
             HitPresentation?.OnDamaged(in ctx);
+            enemyAudio?.PlayHitReaction();
 
             var attackerGo = ResolveAttackerGameObject(attacker);
             if (attackerGo != null)

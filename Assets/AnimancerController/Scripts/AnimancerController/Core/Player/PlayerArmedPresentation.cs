@@ -21,6 +21,7 @@ public class PlayerArmedPresentation : MonoBehaviour
     private Player _player;
     private AnimancerComponent _animancer;
     private PlayerArmedHandIkRig _handIk;
+    private GunAudio _gunAudio;
     private IArmedWeaponModelVisibility _weaponModelVisibility;
     private bool _weaponShownForCurrentDraw;
     private bool _weaponHiddenForCurrentHolster;
@@ -309,6 +310,7 @@ public class PlayerArmedPresentation : MonoBehaviour
         _player = player;
         _animancer = player != null ? player.animancer : null;
         _handIk = GetComponent<PlayerArmedHandIkRig>();
+        _gunAudio = player != null ? player.GetComponent<GunAudio>() : GetComponent<GunAudio>();
         ResolveWeaponModelVisibility(player);
     }
 
@@ -488,6 +490,8 @@ public class PlayerArmedPresentation : MonoBehaviour
             _weaponHiddenForCurrentHolster = false;
             return;
         }
+
+        _gunAudio?.OnDraw();
 
         _layeredArmedActive = false;
         _simpleMoveLoopOnly = false;
@@ -1540,6 +1544,7 @@ public class PlayerArmedPresentation : MonoBehaviour
         }
 
         float holsterEndToIdleLocomotionFade = ReadCombinedHolsterToIdleLocomotionFade(_player);
+        _gunAudio?.OnHolster();
 
         if (_simpleMoveLoopOnly || !_layeredArmedActive || _data == null)
         {

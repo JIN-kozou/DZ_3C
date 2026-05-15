@@ -1,3 +1,5 @@
+using DZ_3C.AI.Core;
+using DZ_3C.AI.Perception;
 using UnityEngine;
 
 public class CharacterAudio : MonoBehaviour
@@ -21,6 +23,11 @@ public class CharacterAudio : MonoBehaviour
     [SerializeField, Min(0.05f)] private float runFootstepInterval = 0.32f;
     [SerializeField, Min(0f)] private float groundedMoveSpeedThreshold = 0.05f;
 
+    [Header("Stealth")]
+    [SerializeField, Range(0f, 1f)] private float crouchFootstepVolumeMultiplier = 0.5f;
+    [SerializeField, Range(0f, 1f)] private float crouchNoiseStandThreshold = 0.99f;
+    [SerializeField] private bool crouchFootstepsAreSilentToAI = true;
+
     [Header("State")]
     [SerializeField] private GameObject death;
     [SerializeField] private GameObject respawn;
@@ -33,7 +40,7 @@ public class CharacterAudio : MonoBehaviour
 
     [Header("AI Noise")]
     [SerializeField] private AINoiseAudioBridge aiNoiseBridge;
-    [SerializeField, Min(0f)] private float footstepNoiseLoudness = 0.5f;
+    [SerializeField, Min(0f)] private float footstepNoiseLoudness = 12f;
     [SerializeField, Min(0f)] private float footstepNoiseDuration = 0.15f;
     [SerializeField, Min(0f)] private float jumpNoiseLoudness = 0.7f;
     [SerializeField, Min(0f)] private float jumpNoiseDuration = 0.2f;
@@ -54,7 +61,7 @@ public class CharacterAudio : MonoBehaviour
 
     private void Awake()
     {
-        player = GetComponent<Player>() ?? GetComponentInParent<Player>();
+        ResolveReferences();
     }
 
     private void OnEnable()
@@ -86,8 +93,11 @@ public class CharacterAudio : MonoBehaviour
     public void OnFootstep()
     {
         GameObject footstep = GetRandomFootstep();
-        AudioPrefabPlayer.Play(footstep, transform.position);
-        EmitAINoise(footstepNoiseLoudness, footstepNoiseDuration);
+        AudioPrefabPlayer.Play(footstep, transform.position, null, false, GetFootstepVolumeMultiplier());
+        if (!ShouldMuteFootstepNoiseForAI())
+        {
+            EmitAINoise(footstepNoiseLoudness, footstepNoiseDuration);
+        }
     }
 
     public void OnJump()
@@ -267,10 +277,46 @@ public class CharacterAudio : MonoBehaviour
 
     private void EmitAINoise(float loudness, float duration)
     {
+        ResolveReferences();
         if (aiNoiseBridge != null)
         {
             aiNoiseBridge.EmitNoise(loudness, duration);
         }
+    }
+
+    private void ResolveReferences()
+    {
+        if (player == null)
+        {
+            player = GetComponent<Player>() ?? GetComponentInParent<Player>();
+        }
+
+        if (aiNoiseBridge == null)
+        {
+            aiNoiseBridge = GetComponent<AINoiseAudioBridge>() ?? GetComponentInParent<AINoiseAudioBridge>();
+        }
+    }
+
+    private float GetFootstepVolumeMultiplier()
+    {
+        if (player == null || player.ReusableData == null || player.ReusableData.standValueParameter == null)
+        {
+            return 1f;
+        }
+
+        float stand01 = Mathf.Clamp01(player.ReusableData.standValueParameter.CurrentValue);
+        return Mathf.Lerp(crouchFootstepVolumeMultiplier, 1f, stand01);
+    }
+
+    private bool ShouldMuteFootstepNoiseForAI()
+    {
+        if (!crouchFootstepsAreSilentToAI || player == null || player.ReusableData == null || player.ReusableData.standValueParameter == null)
+        {
+            return false;
+        }
+
+        return player.ReusableData.standValueParameter.CurrentValue < crouchNoiseStandThreshold ||
+               player.ReusableData.standValueParameter.TargetValue < crouchNoiseStandThreshold;
     }
 
     private void CaptureGroundedSnapshot()
@@ -302,6 +348,38 @@ internal static class CharacterAudioAutoBinder
             {
                 player.gameObject.AddComponent<CharacterAudio>();
             }
+
+            EnsureAINoiseComponents(player);
+        }
+    }
+
+    private static void EnsureAINoiseComponents(Player player)
+    {
+        if (player == null)
+        {
+            return;
+        }
+
+        AITargetable targetable = player.GetComponent<AITargetable>();
+        if (targetable == null)
+        {
+            targetable = player.gameObject.AddComponent<AITargetable>();
+        }
+
+        targetable.SetAlive(true);
+
+        AINoiseEmitter noiseEmitter = player.GetComponent<AINoiseEmitter>();
+        if (noiseEmitter == null)
+        {
+            noiseEmitter = player.gameObject.AddComponent<AINoiseEmitter>();
+        }
+
+        noiseEmitter.isEmitting = false;
+        noiseEmitter.loudness = 0f;
+
+        if (player.GetComponent<AINoiseAudioBridge>() == null)
+        {
+            player.gameObject.AddComponent<AINoiseAudioBridge>();
         }
     }
 }

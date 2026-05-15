@@ -110,13 +110,22 @@ namespace DZ_3C.AI.Core
 
         private List<TargetFact> GetTargetBucket(ThreatSource source)
         {
-            return source switch
+            if (source == ThreatSource.Contact)
             {
-                ThreatSource.Contact => contactTargets,
-                ThreatSource.Attacker => attackers,
-                ThreatSource.Sight => inSightTargets,
-                _ => heardTargets
-            };
+                return contactTargets;
+            }
+
+            if (source == ThreatSource.Attacker)
+            {
+                return attackers;
+            }
+
+            if (source == ThreatSource.Sight)
+            {
+                return inSightTargets;
+            }
+
+            return heardTargets;
         }
 
     }

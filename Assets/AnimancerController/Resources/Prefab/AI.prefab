@@ -423,11 +423,14 @@ MonoBehaviour:
   selector: {fileID: 8359702207137834310}
   character: {fileID: 2415126630310859549}
   attackHandler: {fileID: 7566732114713936834}
+  enemyAudio: {fileID: 5214937051649352280}
   showAttackRayVisual: 1
   laserAttackVisualPrefab: {fileID: 3504364219570076995, guid: 72f1a933f362eec4eaa271344fa7a1fb,
     type: 3}
   laserAttackVisualSpawnPoint: {fileID: 413729285200019432}
   laserAttackVisualLifetimeSeconds: 0.5
+  movementAudioIntervalSeconds: 0.75
+  patrolSonarIntervalSeconds: 3
 --- !u!114 &7566732114713936834
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -527,6 +530,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fb97a84a6a44e2cb8f6652ebbd16790, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blackboard: {fileID: 720409558556578650}
   laserAttack: {fileID: 6223369136620247487, guid: 9af9224341152b84ca3cf512dded881e,
     type: 3}
   hitReaction: {fileID: 0}
@@ -534,6 +538,9 @@ MonoBehaviour:
     type: 3}
   movement: {fileID: 0}
   spawn: {fileID: 0}
+  patrolSonar: {fileID: 8725546113903245732, guid: fcc8344162ef0ed4d8dbe7a17ad20d21,
+    type: 3}
+  laserAttackStartTimeSeconds: 0.45
   patrolBreathingLoop: {fileID: 2442576880511207717, guid: f7ce2cdda3767f74ba67fb0beef9dfed,
     type: 3}
   aiNoiseBridge: {fileID: 0}
@@ -543,6 +550,8 @@ MonoBehaviour:
   hitReactionNoiseDuration: 0.25
   targetAcquisitionNoiseLoudness: 3
   targetAcquisitionNoiseDuration: 0.8
+  patrolSonarNoiseLoudness: 1
+  patrolSonarNoiseDuration: 0.25
   movementNoiseLoudness: 0.4
   movementNoiseDuration: 0.15
   spawnNoiseLoudness: 2

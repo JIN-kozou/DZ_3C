@@ -25,18 +25,34 @@ namespace DZ_3C.AI.HTN
 
         private string ResolveTaskName()
         {
-            return selector.CurrentRoot switch
+            if (selector.CurrentRoot == RootBehavior.Combat)
             {
-                RootBehavior.Combat => selector.CurrentCombatMethod == CombatMethod.Interfere ? "OrbitAndStrafe" : "DashAndAOEAttack",
-                RootBehavior.Retreat => "MoveToRetreatTarget",
-                _ => selector.CurrentIdleMethod switch
-                {
-                    IdleMethod.AlertPatrol => "DescendAndMoveToHeardTarget",
-                    IdleMethod.Checkpoint => "MoveAndOrbitCheckpoint",
-                    IdleMethod.EnergyAvoid => "TurnAndAvoidEnergy",
-                    _ => "PatrolMoveAndPause"
-                }
-            };
+                return selector.CurrentCombatMethod == CombatMethod.Interfere
+                    ? "OrbitAndStrafe"
+                    : "DashAndAOEAttack";
+            }
+
+            if (selector.CurrentRoot == RootBehavior.Retreat)
+            {
+                return "MoveToRetreatTarget";
+            }
+
+            if (selector.CurrentIdleMethod == IdleMethod.AlertPatrol)
+            {
+                return "DescendAndMoveToHeardTarget";
+            }
+
+            if (selector.CurrentIdleMethod == IdleMethod.Checkpoint)
+            {
+                return "MoveAndOrbitCheckpoint";
+            }
+
+            if (selector.CurrentIdleMethod == IdleMethod.EnergyAvoid)
+            {
+                return "TurnAndAvoidEnergy";
+            }
+
+            return "PatrolMoveAndPause";
         }
     }
 }
