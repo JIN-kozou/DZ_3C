@@ -790,6 +790,62 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+--- !u!1 &5970626947918916936
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1672496839325158117}
+  - component: {fileID: 1642225610793060929}
+  m_Layer: 0
+  m_Name: ShootSound
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1672496839325158117
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5970626947918916936}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.7071057, z: -0, w: 0.7071079}
+  m_LocalPosition: {x: -3.640233, y: -8.948856, z: -55.9087}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 313008795082299893}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1642225610793060929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5970626947918916936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c0e1a2b3d4f46789abc0def12345678, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  draw: {fileID: 0}
+  holster: {fileID: 0}
+  shoot: {fileID: 11400000, guid: 3484c1a0f0670a84ca774810311d2dbc, type: 2}
+  hit: {fileID: 0}
+  bulletFly: {fileID: 0}
+  aiNoiseBridge: {fileID: 0}
+  drawNoiseLoudness: 0.2
+  drawNoiseDuration: 0.1
+  holsterNoiseLoudness: 0.2
+  holsterNoiseDuration: 0.1
+  shootNoiseLoudness: 8
+  shootNoiseDuration: 0.5
 --- !u!1 &6225039592082382201
 GameObject:
   m_ObjectHideFlags: 0
@@ -1006,7 +1062,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.7
+      value: -0.9
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
@@ -1016,7 +1072,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -94.74
+      value: -134
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
@@ -1069,26 +1125,30 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
       insertIndex: 0
-      addedObject: {fileID: 6792189217280532805}
+      addedObject: {fileID: 1672496839325158117}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
       insertIndex: 1
-      addedObject: {fileID: 6086619961432505591}
+      addedObject: {fileID: 6792189217280532805}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
       insertIndex: 2
-      addedObject: {fileID: 5097144709502044903}
+      addedObject: {fileID: 6086619961432505591}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
       insertIndex: 3
-      addedObject: {fileID: 3439287012864706938}
+      addedObject: {fileID: 5097144709502044903}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
       insertIndex: 4
-      addedObject: {fileID: 6110417126725515511}
+      addedObject: {fileID: 3439287012864706938}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
       insertIndex: 5
+      addedObject: {fileID: 6110417126725515511}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
+        type: 3}
+      insertIndex: 6
       addedObject: {fileID: 1138963891631827317}
     - targetCorrespondingSourceObject: {fileID: 7790177421927552515, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
@@ -1203,6 +1263,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6388397884314731502}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 948b2879297c65b49aca3fdf9c3fbc54,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2738171605316802086}
   m_SourcePrefab: {fileID: 100100000, guid: 948b2879297c65b49aca3fdf9c3fbc54, type: 3}
 --- !u!4 &118841307263048380 stripped
 Transform:
@@ -1454,6 +1518,7 @@ MonoBehaviour:
   arrayPrefab: {fileID: 1000070, guid: 20901a2849f54543bac2db712d1af899, type: 3}
   arrayContainer: {fileID: 0}
   deployAnchor: {fileID: 0}
+  reverseArrayAudio: {fileID: 0}
 --- !u!114 &1966932850729397587
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1604,7 +1669,7 @@ MonoBehaviour:
   gunConfig: {fileID: 11400000, guid: 6ffa5b3a4c03755429f3152c3c903338, type: 2}
   viewKickRig: {fileID: 0}
   muzzleSocket: {fileID: 1138963891631827317}
-  aimCrosshairReferenceDistance: 2000
+  aimCrosshairReferenceDistance: 10
   gripSocket: {fileID: 0}
 --- !u!114 &2097994199674027090
 MonoBehaviour:
@@ -1727,6 +1792,48 @@ MonoBehaviour:
   muzzleSocket: {fileID: 1138963891631827317}
   aimCrosshairReferenceDistance: 100
   gripSocket: {fileID: 0}
+--- !u!114 &2738171605316802086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086448861104587599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0b1c2d3e4f547618293a4b5c6d7e8f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  footsteps: []
+  breathing: {fileID: 0}
+  jumpExhale: {fileID: 0}
+  jumpWhoosh: {fileID: 0}
+  land: {fileID: 0}
+  normalBreathingVolumeMultiplier: 1
+  intenseBreathingVolumeMultiplier: 1.4
+  startBreathingOnEnable: 1
+  intenseBreathingDelaySeconds: 2
+  autoDetectPlayerMovement: 1
+  walkFootstepInterval: 0.46
+  runFootstepInterval: 0.32
+  groundedMoveSpeedThreshold: 0.05
+  death: {fileID: 0}
+  respawn: {fileID: 0}
+  corePickup: {fileID: 0}
+  coreInstall: {fileID: 0}
+  coreCharge: {fileID: 0}
+  coreConsume: {fileID: 0}
+  aiNoiseBridge: {fileID: 0}
+  footstepNoiseLoudness: 0.5
+  footstepNoiseDuration: 0.15
+  jumpNoiseLoudness: 0.7
+  jumpNoiseDuration: 0.2
+  landingNoiseLoudness: 1.2
+  landingNoiseDuration: 0.3
+  deathNoiseLoudness: 0
+  deathNoiseDuration: 0.3
+  respawnNoiseLoudness: 0
+  respawnNoiseDuration: 0.2
 --- !u!4 &1432869090135714326 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8056890861941402616, guid: 948b2879297c65b49aca3fdf9c3fbc54,
