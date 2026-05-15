@@ -117,6 +117,7 @@ GameObject:
   - component: {fileID: 8266957273698996134}
   - component: {fileID: 3770404438610151211}
   - component: {fileID: 7349068343660860830}
+  - component: {fileID: -2824716458283884910}
   m_Layer: 0
   m_Name: MachinePartReceiverUseSO
   m_TagString: Untagged
@@ -179,3 +180,29 @@ MonoBehaviour:
   meshFilter: {fileID: 7637809320857316129}
   meshRenderer: {fileID: 5001833543725206106}
   receiverScale: {x: 4, y: 0.35, z: 2.5}
+  itemAudio: {fileID: 0}
+--- !u!114 &-2824716458283884910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2023813943244294301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d2e5d25fe7b4df38cbf7d3a9c4a7d21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pickupItem: {fileID: 0}
+  pickupItemStartSeconds: 0
+  dropItem: {fileID: 0}
+  submitItem: {fileID: 6798478013188682136, guid: 76e60fb3675b0fc45979f5405eacdaff,
+    type: 3}
+  submitItemStartSeconds: 0
+  aiNoiseBridge: {fileID: 0}
+  pickupNoiseLoudness: 0.3
+  pickupNoiseDuration: 0.15
+  dropNoiseLoudness: 0.6
+  dropNoiseDuration: 0.2
+  submitNoiseLoudness: 0.5
+  submitNoiseDuration: 0.2

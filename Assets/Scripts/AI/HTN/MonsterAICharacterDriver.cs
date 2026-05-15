@@ -78,7 +78,7 @@ namespace DZ_3C.AI.HTN
                     : selector.CurrentIdleMethod.ToString();
 
         private float nextAttackTime;
-        [SerializeField, Min(0.05f)] private float movementAudioIntervalSeconds = 0.75f;
+        [SerializeField, Min(0.05f)] private float movementAudioIntervalSeconds = 6f;
         private float nextMovementAudioTime;
         [SerializeField, Min(0.1f)] private float patrolSonarIntervalSeconds = 3f;
         private float nextPatrolSonarTime;
