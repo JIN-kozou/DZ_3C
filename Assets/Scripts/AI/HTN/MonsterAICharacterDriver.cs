@@ -434,11 +434,9 @@ namespace DZ_3C.AI.HTN
 
         private void TickAlertPatrol()
         {
-            if (blackboard.HeardTargets.Count == 0) return;
-            TargetFact heard = blackboard.HeardTargets[0];
-            if (!heard.IsValid) return;
+            if (!blackboard.HasHeardFocus) return;
 
-            Vector3 targetPos = heard.target.transform.position;
+            Vector3 targetPos = blackboard.HeardFocusWorldPosition;
             SetDominant(AtomicTask.HorizontalMove);
             PlanarSeekWorld(targetPos, monsterStat.moveSpeed);
 

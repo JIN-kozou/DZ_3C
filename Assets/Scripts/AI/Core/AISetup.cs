@@ -51,6 +51,7 @@ namespace DZ_3C.AI.Core
 
             VisionPerceptor vision = GetOrAdd<VisionPerceptor>();
             HearingPerceptor hearing = GetOrAdd<HearingPerceptor>();
+            HeardFocusTracker heardFocus = GetOrAdd<HeardFocusTracker>();
             DistancePerceptor distance = GetOrAdd<DistancePerceptor>();
             HitPerceptor hit = GetOrAdd<HitPerceptor>();
             EnergyPerceptor energy = GetOrAdd<EnergyPerceptor>();
@@ -65,6 +66,9 @@ namespace DZ_3C.AI.Core
             // Base links.
             BindCommon(vision, blackboard);
             BindCommon(hearing, blackboard);
+            SetField(heardFocus, "config", config);
+            SetField(heardFocus, "blackboard", blackboard);
+            SetField(heardFocus, "owner", transform);
             BindCommon(distance, blackboard);
             BindCommon(energy, blackboard);
             SetField(hit, "blackboard", blackboard);

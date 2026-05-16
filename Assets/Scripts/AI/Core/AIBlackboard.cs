@@ -19,6 +19,8 @@ namespace DZ_3C.AI.Core
         public float distance;
         public float timestamp;
         public ThreatSource source;
+        /// <summary>感知权重（听觉强度等）；非听觉感知可保持为 0。</summary>
+        public float intensity;
 
         public bool IsValid => target != null;
     }
@@ -32,6 +34,13 @@ namespace DZ_3C.AI.Core
         [SerializeField] private List<TargetFact> attackers = new();
         [SerializeField] private List<TargetFact> energyTargets = new();
 
+        [Header("Heard Focus")]
+        [SerializeField] private bool hasHeardFocus;
+        [SerializeField] private Vector3 heardFocusWorldPosition;
+        [SerializeField] private Vector3 heardFocusDirection = Vector3.forward;
+        [SerializeField] private float heardFocusIntensity;
+        [SerializeField] private float heardFocusLastUpdatedTime;
+
         private readonly Dictionary<int, float> playerEnergyById = new();
 
         public IReadOnlyList<TargetFact> InSightTargets => inSightTargets;
@@ -40,6 +49,12 @@ namespace DZ_3C.AI.Core
         public IReadOnlyList<TargetFact> Attackers => attackers;
         public IReadOnlyList<TargetFact> EnergyTargets => energyTargets;
         public IReadOnlyDictionary<int, float> PlayerEnergyById => playerEnergyById;
+
+        public bool HasHeardFocus => hasHeardFocus;
+        public Vector3 HeardFocusWorldPosition => heardFocusWorldPosition;
+        public Vector3 HeardFocusDirection => heardFocusDirection;
+        public float HeardFocusIntensity => heardFocusIntensity;
+        public float HeardFocusLastUpdatedTime => heardFocusLastUpdatedTime;
 
         public AITargetable HateTarget { get; private set; }
         public ThreatSource HateSource { get; private set; }
@@ -106,6 +121,26 @@ namespace DZ_3C.AI.Core
             SetHateTarget(null, ThreatSource.None, 0, 0f);
             OutOfSightElapsed = 0f;
             AssaultTaskElapsed = 0f;
+        }
+
+        public void SetHeardFocus(Vector3 worldPosition, Vector3 planarDirection, float totalIntensity, float updatedTime)
+        {
+            hasHeardFocus = true;
+            heardFocusWorldPosition = worldPosition;
+            heardFocusDirection = planarDirection.sqrMagnitude > 0.0001f ? planarDirection.normalized : Vector3.forward;
+            heardFocusIntensity = Mathf.Max(0f, totalIntensity);
+            heardFocusLastUpdatedTime = updatedTime;
+        }
+
+        public void ClearHeardFocus()
+        {
+            if (!hasHeardFocus) return;
+
+            hasHeardFocus = false;
+            heardFocusWorldPosition = Vector3.zero;
+            heardFocusDirection = Vector3.forward;
+            heardFocusIntensity = 0f;
+            heardFocusLastUpdatedTime = 0f;
         }
 
         private List<TargetFact> GetTargetBucket(ThreatSource source)
