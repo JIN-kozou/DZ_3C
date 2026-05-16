@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8603868450837157716
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3261717091773503606}
+  - component: {fileID: 3131190383145170781}
+  - component: {fileID: 9015877020593527516}
+  m_Layer: 0
+  m_Name: MusicManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3261717091773503606
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8603868450837157716}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3131190383145170781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8603868450837157716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68c7719d3523477dbd34bc99deef9f11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explorationMusic: {fileID: 1141194874344518569, guid: 85cadb8975e5a2342a4a63c09ecf4b44,
+    type: 3}
+  combatMusic: {fileID: 5438336566503903347, guid: 4c808a7636ee23240a1e5afd81dde7bf,
+    type: 3}
+  defaultFadeDuration: 1
+  playExplorationOnStart: 1
+  restartSameState: 0
+  autoFollowCombatState: 1
+  combatMusicHoldSeconds: 2
+  combatScanIntervalSeconds: 0.5
+--- !u!114 &9015877020593527516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8603868450837157716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1a79687c14d4a64a9f0b85296e61f23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lowStatusBeep: {fileID: 6177496037296783748, guid: 1a76e4fcf9dd8ce409ed9c120c81f59d,
+    type: 3}
+  dangerStatusBeep: {fileID: 0}
+  lowStatusInterval: 1.25
+  dangerStatusInterval: 0.45
+  useUnscaledTime: 0
+  playAtTransformPosition: 0
+  autoFollowPlayerHealth: 1
+  lowHealthNormalizedThreshold: 0.35
+  dangerHealthNormalizedThreshold: 0.18
+  healthScanIntervalSeconds: 0.2
+  aiNoiseBridge: {fileID: 0}
+  statusBeepEmitsAINoise: 0
+  lowStatusNoiseLoudness: 0
+  lowStatusNoiseDuration: 0.1
+  dangerStatusNoiseLoudness: 0
+  dangerStatusNoiseDuration: 0.1
