@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DZ_3C.MachineRepair.UI;
 using DZ_3C.Reverse;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -19,6 +20,7 @@ namespace DZ_3C.MachineRepair
         private Player player;
         private ReverseConfig reverseConfig;
         [SerializeField] private ItemAudio itemAudio;
+        [SerializeField] private MachineRepairPickupBannerQueue pickupBannerQueue;
         [SerializeField] private KeyCode dropKey = KeyCode.G;
         [SerializeField, Min(0f)] private float dropForwardDistance = 1.2f;
         [SerializeField, Min(0f)] private float dropUpOffset = 0.25f;
@@ -36,6 +38,15 @@ namespace DZ_3C.MachineRepair
             reverseConfig = Resources.Load<ReverseConfig>("Config/Reverse/ReverseConfig");
             if (itemAudio == null) itemAudio = GetComponent<ItemAudio>();
             if (itemAudio == null) itemAudio = GetComponentInChildren<ItemAudio>(true);
+            if (pickupBannerQueue == null)
+            {
+                pickupBannerQueue = MachineRepairPickupBannerQueue.FindInScene();
+            }
+
+            if (pickupBannerQueue == null)
+            {
+                pickupBannerQueue = MachineRepairPickupBannerQueue.CreateDefaultUnderCanvas();
+            }
         }
 
         public MachinePartInventory Inventory => inventory;//只读属性，允许被.add
@@ -138,7 +149,20 @@ namespace DZ_3C.MachineRepair
                 }
             }
 
-            best?.TryPickup(inventory, this);
+            if (best == null)
+            {
+                return;
+            }
+
+            MachinePartDefinition def = best.Definition;
+            if (best.TryPickup(inventory, this))
+            {
+                pickupBannerQueue?.ShowPickupSuccess(def);
+            }
+            else if (def != null)
+            {
+                pickupBannerQueue?.ShowPickupFailedInventoryFull();
+            }
         }
 
         private bool TryDropFirstInventoryPart()
