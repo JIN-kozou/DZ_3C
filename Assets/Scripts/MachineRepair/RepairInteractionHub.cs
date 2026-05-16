@@ -21,6 +21,7 @@ namespace DZ_3C.MachineRepair
         private ReverseConfig reverseConfig;
         [SerializeField] private ItemAudio itemAudio;
         [SerializeField] private MachineRepairPickupBannerQueue pickupBannerQueue;
+        [SerializeField] private MachineRepairPartIconPrompt partIconPrompt;
         [SerializeField] private KeyCode dropKey = KeyCode.G;
         [SerializeField, Min(0f)] private float dropForwardDistance = 1.2f;
         [SerializeField, Min(0f)] private float dropUpOffset = 0.25f;
@@ -47,15 +48,70 @@ namespace DZ_3C.MachineRepair
             {
                 pickupBannerQueue = MachineRepairPickupBannerQueue.CreateDefaultUnderCanvas();
             }
+
+            if (partIconPrompt == null)
+            {
+                partIconPrompt = MachineRepairPartIconPrompt.FindInScene();
+            }
+
+            partIconPrompt?.BindHub(this);
         }
 
         public MachinePartInventory Inventory => inventory;//只读属性，允许被.add
+
+        public bool HasAnyPartInRange()
+        {
+            foreach (MachinePart part in partsInRange)
+            {
+                if (part != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool HasAnyReceiverInRange()
+        {
+            foreach (MachinePartReceiver receiver in receiversInRange)
+            {
+                if (receiver != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        internal void RegisterPartIconPrompt(MachineRepairPartIconPrompt prompt)
+        {
+            if (prompt == null)
+            {
+                return;
+            }
+
+            partIconPrompt = prompt;
+            prompt.RefreshFromHub(this);
+        }
+
+        internal void UnregisterPartIconPrompt(MachineRepairPartIconPrompt prompt)
+        {
+            if (prompt == null || partIconPrompt != prompt)
+            {
+                return;
+            }
+
+            partIconPrompt = null;
+        }
 
         internal void RegisterPart(MachinePart part, bool inRange)
         {
             if (part == null) return;
             if (inRange) partsInRange.Add(part);
             else partsInRange.Remove(part);
+            NotifyPartIconProximityChanged();
         }
 
         internal void RegisterReceiver(MachinePartReceiver receiver, bool inRange)
@@ -63,6 +119,12 @@ namespace DZ_3C.MachineRepair
             if (receiver == null) return;
             if (inRange) receiversInRange.Add(receiver);
             else receiversInRange.Remove(receiver);
+            NotifyPartIconProximityChanged();
+        }
+
+        private void NotifyPartIconProximityChanged()
+        {
+            partIconPrompt?.RefreshFromHub(this);
         }
 
         private void Update()
