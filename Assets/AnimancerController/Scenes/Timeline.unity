@@ -4542,6 +4542,7 @@ GameObject:
   - component: {fileID: 823185014}
   - component: {fileID: 823185013}
   - component: {fileID: 823185012}
+  - component: {fileID: 823185011}
   - component: {fileID: 823185010}
   - component: {fileID: 823185015}
   - component: {fileID: 823185016}
@@ -4586,6 +4587,18 @@ MonoBehaviour:
   m_CameraActivatedEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &823185011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 823185009}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 695c849a6d2bd7441bebdc0be6e80144, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &823185012
 MonoBehaviour:
   m_ObjectHideFlags: 0
