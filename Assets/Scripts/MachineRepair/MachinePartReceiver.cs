@@ -297,6 +297,11 @@ namespace DZ_3C.MachineRepair
 
             proximityUi?.Refresh(this);
 
+            if (any)
+            {
+                MachinePartReceiversSceneGate.NotifyReceiverProgressChanged();
+            }
+
             return any;
         }
 
