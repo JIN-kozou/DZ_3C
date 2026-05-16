@@ -21,7 +21,7 @@ public class BatteryButtonRevealDriver : MonoBehaviour
     [SerializeField]
     AppearRevealGate[] pipelines;
 
-    [Tooltip("Layers counted as \"pressing\" (e.g. Player / Default).")]
+    [Tooltip("Layers counted as \"pressing\" (e.g. Player).")]
     [SerializeField]
     LayerMask pressLayers = ~0;
 
@@ -32,7 +32,7 @@ public class BatteryButtonRevealDriver : MonoBehaviour
     [SerializeField]
     string pressedBoolParameter = "Pressed";
 
-    [Tooltip("Trigger volume; defaults to a BoxCollider on this GameObject (isTrigger should be on).")]
+    [Tooltip("Trigger volume; defaults to a trigger Collider on this GameObject or children.")]
     [SerializeField]
     Collider pressVolume;
 
@@ -49,12 +49,33 @@ public class BatteryButtonRevealDriver : MonoBehaviour
     void Awake()
     {
         if (pressVolume == null)
-            pressVolume = GetComponent<BoxCollider>();
-        if (pressVolume == null)
             pressVolume = GetComponent<Collider>();
+
+        if (pressVolume == null)
+            pressVolume = GetComponentInChildren<Collider>(true);
+
+        if (pressVolume != null && !pressVolume.isTrigger)
+        {
+            Debug.LogWarning(
+                $"[BatteryButtonRevealDriver] '{name}': pressVolume '{pressVolume.name}' should have isTrigger enabled.",
+                pressVolume);
+        }
+
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>(true);
 
         if (!string.IsNullOrEmpty(pressedBoolParameter))
             _pressedBoolHash = Animator.StringToHash(pressedBoolParameter);
+
+        if (pressVolume != null && pressVolume.gameObject != gameObject)
+            EnsurePressVolumeForwarder();
+    }
+
+    void OnDisable()
+    {
+        _pressing.Clear();
+        _occupied = false;
+        ApplyAnimator(false);
     }
 
     void FixedUpdate()
@@ -90,6 +111,39 @@ public class BatteryButtonRevealDriver : MonoBehaviour
         }
     }
 
+    void EnsurePressVolumeForwarder()
+    {
+        PressVolumeTriggerForwarder forwarder =
+            pressVolume.GetComponent<PressVolumeTriggerForwarder>();
+        if (forwarder == null)
+            forwarder = pressVolume.gameObject.AddComponent<PressVolumeTriggerForwarder>();
+
+        forwarder.Bind(this);
+    }
+
+    /// <summary>Unity sends trigger messages to the collider's GameObject; forward from child press volumes.</summary>
+    internal void HandleTriggerEnter(Collider other)
+    {
+        if (!IsValidPressCollider(other))
+            return;
+        _pressing.Add(other);
+        SyncOccupiedFromSet();
+    }
+
+    internal void HandleTriggerStay(Collider other)
+    {
+        if (!IsValidPressCollider(other))
+            return;
+        _pressing.Add(other);
+        SyncOccupiedFromSet();
+    }
+
+    internal void HandleTriggerExit(Collider other)
+    {
+        _pressing.Remove(other);
+        SyncOccupiedFromSet();
+    }
+
     void SyncOccupiedFromSet()
     {
         bool occupied = _pressing.Count > 0;
@@ -99,27 +153,11 @@ public class BatteryButtonRevealDriver : MonoBehaviour
         ApplyAnimator(occupied);
     }
 
-    void OnTriggerEnter(Collider other)
-    {
-        if (!IsValidPressCollider(other))
-            return;
-        _pressing.Add(other);
-        SyncOccupiedFromSet();
-    }
+    void OnTriggerEnter(Collider other) => HandleTriggerEnter(other);
 
-    void OnTriggerStay(Collider other)
-    {
-        if (!IsValidPressCollider(other))
-            return;
-        _pressing.Add(other);
-        SyncOccupiedFromSet();
-    }
+    void OnTriggerStay(Collider other) => HandleTriggerStay(other);
 
-    void OnTriggerExit(Collider other)
-    {
-        _pressing.Remove(other);
-        SyncOccupiedFromSet();
-    }
+    void OnTriggerExit(Collider other) => HandleTriggerExit(other);
 
     void PruneDestroyedColliders()
     {
@@ -152,5 +190,21 @@ public class BatteryButtonRevealDriver : MonoBehaviour
         if (animator == null || string.IsNullOrEmpty(pressedBoolParameter))
             return;
         animator.SetBool(_pressedBoolHash, pressed);
+    }
+
+    sealed class PressVolumeTriggerForwarder : MonoBehaviour
+    {
+        BatteryButtonRevealDriver _driver;
+
+        public void Bind(BatteryButtonRevealDriver driver)
+        {
+            _driver = driver;
+        }
+
+        void OnTriggerEnter(Collider other) => _driver?.HandleTriggerEnter(other);
+
+        void OnTriggerStay(Collider other) => _driver?.HandleTriggerStay(other);
+
+        void OnTriggerExit(Collider other) => _driver?.HandleTriggerExit(other);
     }
 }
