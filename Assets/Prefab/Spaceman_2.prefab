@@ -1267,6 +1267,18 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 2738171605316802086}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 948b2879297c65b49aca3fdf9c3fbc54,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4563205466918366962}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 948b2879297c65b49aca3fdf9c3fbc54,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1737456288524216695}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 948b2879297c65b49aca3fdf9c3fbc54,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6569123777949085548}
   m_SourcePrefab: {fileID: 100100000, guid: 948b2879297c65b49aca3fdf9c3fbc54, type: 3}
 --- !u!4 &118841307263048380 stripped
 Transform:
@@ -1498,6 +1510,7 @@ MonoBehaviour:
   anchor: {fileID: 2083796946762864244}
   registry: {fileID: 3227704250049226260}
   player: {fileID: 8241220909394436553}
+  characterAudio: {fileID: 0}
   autoInitOnAwake: 1
   autoTick: 1
 --- !u!114 &4224356821215980580
@@ -1654,6 +1667,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1d2f588bb13627ef6b0f4e3592de394, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemAudio: {fileID: 0}
+  dropKey: 103
+  dropForwardDistance: 1.2
+  dropUpOffset: 0.25
 --- !u!114 &8076602277482189666
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1668,6 +1685,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunConfig: {fileID: 11400000, guid: 6ffa5b3a4c03755429f3152c3c903338, type: 2}
   viewKickRig: {fileID: 0}
+  gunAudio: {fileID: 0}
   muzzleSocket: {fileID: 1138963891631827317}
   aimCrosshairReferenceDistance: 10
   gripSocket: {fileID: 0}
@@ -1789,6 +1807,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunConfig: {fileID: 11400000, guid: 6ffa5b3a4c03755429f3152c3c903338, type: 2}
   viewKickRig: {fileID: 0}
+  gunAudio: {fileID: 0}
   muzzleSocket: {fileID: 1138963891631827317}
   aimCrosshairReferenceDistance: 100
   gripSocket: {fileID: 0}
@@ -1804,26 +1823,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0b1c2d3e4f547618293a4b5c6d7e8f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  footsteps: []
-  breathing: {fileID: 0}
+  footsteps:
+  - {fileID: 7150313007995720494, guid: 72a681cb9ac9e804b86a3c361a693031, type: 3}
+  - {fileID: 7442488476838407930, guid: 54bf64bf3b38eb94c8f9de145be50cf5, type: 3}
+  - {fileID: 3610349738159237416, guid: a77237ded060a5541bfd2539c7a489cc, type: 3}
+  - {fileID: 354250748727181002, guid: 06355e043ec78e1419629de2e391298b, type: 3}
+  - {fileID: 3610349738159237416, guid: 6e65a75107a01e74c913d68dee9ad86f, type: 3}
+  breathing: {fileID: 6040926414909537318, guid: 0944c372485763949a7468a041222f0d,
+    type: 3}
   jumpExhale: {fileID: 0}
   jumpWhoosh: {fileID: 0}
-  land: {fileID: 0}
+  land: {fileID: 548375036332082236, guid: ccc0ac0176bc5c947b20b3c1cf2de6d3, type: 3}
   normalBreathingVolumeMultiplier: 1
   intenseBreathingVolumeMultiplier: 1.4
   startBreathingOnEnable: 1
   intenseBreathingDelaySeconds: 2
   autoDetectPlayerMovement: 1
-  walkFootstepInterval: 0.46
-  runFootstepInterval: 0.32
+  walkFootstepInterval: 0.295
+  runFootstepInterval: 0.295
   groundedMoveSpeedThreshold: 0.05
+  crouchFootstepVolumeMultiplier: 0.5
+  crouchNoiseStandThreshold: 0.99
+  crouchFootstepsAreSilentToAI: 1
+  crouchWalkFootstepInterval: 0.45
+  crouchRunFootstepInterval: 0.42
   death: {fileID: 0}
   respawn: {fileID: 0}
-  corePickup: {fileID: 0}
-  coreInstall: {fileID: 0}
+  corePickup: {fileID: 2195691904466029457, guid: 61ac973a21e945b47bbef1a8334ed127,
+    type: 3}
+  corePickupStartSeconds: 1.2
+  coreInstall: {fileID: 5639275637951080561, guid: b6fb0782f32841d4e88a93ee28afff58,
+    type: 3}
+  coreInstallStartSeconds: 2.2
   coreCharge: {fileID: 0}
-  coreConsume: {fileID: 0}
-  aiNoiseBridge: {fileID: 0}
+  coreConsume: {fileID: 7627817907131107349, guid: 5b30f8afb1c26d14eb713b019f754f60,
+    type: 3}
+  aiNoiseBridge: {fileID: 1737456288524216695}
   footstepNoiseLoudness: 0.5
   footstepNoiseDuration: 0.15
   jumpNoiseLoudness: 0.7
@@ -1834,6 +1869,59 @@ MonoBehaviour:
   deathNoiseDuration: 0.3
   respawnNoiseLoudness: 0
   respawnNoiseDuration: 0.2
+--- !u!114 &4563205466918366962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086448861104587599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c0e1a2b3d4f46789abc0def12345678, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  draw: {fileID: 6344504413513974317, guid: bde5a0b2c928aa642929a7e4c1042adc, type: 3}
+  holster: {fileID: 1301747367137372925, guid: c7e93693292dbc8499007ab30a15f206, type: 3}
+  shoot: {fileID: 0}
+  hit: {fileID: 0}
+  bulletFly: {fileID: 0}
+  aiNoiseBridge: {fileID: 1737456288524216695}
+  drawNoiseLoudness: 0.2
+  drawNoiseDuration: 0.1
+  holsterNoiseLoudness: 0.2
+  holsterNoiseDuration: 0.1
+  shootNoiseLoudness: 8
+  shootNoiseDuration: 0.5
+--- !u!114 &1737456288524216695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086448861104587599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc7f0d497294b2184c9c8f9c1f4ec32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  noiseEmitter: {fileID: 6569123777949085548}
+  targetable: {fileID: 81983922804218291}
+  stopNoiseOnAwake: 1
+--- !u!114 &6569123777949085548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086448861104587599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af94e8bb6e8ddbd4b94b3ca2c8026618, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  loudness: 1
+  isEmitting: 1
 --- !u!4 &1432869090135714326 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8056890861941402616, guid: 948b2879297c65b49aca3fdf9c3fbc54,
