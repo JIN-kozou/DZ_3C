@@ -1,21 +1,20 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 
-public class TimelineLoadScene : MonoBehaviour
+public class ENDsequence : MonoBehaviour
 {
     private float timer = 0;
     public PlayableDirector director;
 
-    [Header("±³¾°ÒôÀÖºÍÅäÒô")]
+    [Header("±³¾°ÒôÀÖ")]
     [Tooltip("½¥³ö±¶ÂÊ")]
     public float VolumeDevay = 1f;
 
     public AudioSource BGM;
     public AudioClip BGM_Clip;
-
-    public AudioSource Dialogue;
-    public AudioClip Dialogue_Clip;
 
     private float bgmStartVolume;
 
@@ -28,13 +27,6 @@ public class TimelineLoadScene : MonoBehaviour
             BGM.Play();
 
             bgmStartVolume = BGM.volume;
-        }
-
-        if (Dialogue != null && Dialogue_Clip != null)
-        {
-            Dialogue.clip = Dialogue_Clip;
-            Dialogue.loop = false;
-            Dialogue.Play();
         }
     }
 
@@ -66,7 +58,7 @@ public class TimelineLoadScene : MonoBehaviour
     {
         if (timer >= director.duration)
         {
-            SceneManager.LoadScene("Level test");
+            SceneManager.LoadScene("MainMenu");
         }
     }
 }

@@ -10,6 +10,7 @@ public class CharacterAudio : MonoBehaviour
     [SerializeField] private GameObject jumpExhale;
     [SerializeField] private GameObject jumpWhoosh;
     [SerializeField] private GameObject land;
+    [SerializeField, Min(0f)] private float landMinInterval = 0.3f;
 
     [Header("Breathing")]
     [SerializeField, Min(0f)] private float normalBreathingVolumeMultiplier = 1f;
@@ -63,6 +64,7 @@ public class CharacterAudio : MonoBehaviour
     private bool wasGrounded;
     private bool wasMovingOnGround;
     private float nextFootstepTime;
+    private float nextLandAudioTime;
     private float continuousEffectiveAdsSeconds;
     private float idleCalmSeconds;
 
@@ -75,6 +77,7 @@ public class CharacterAudio : MonoBehaviour
     {
         continuousEffectiveAdsSeconds = 0f;
         idleCalmSeconds = 0f;
+        nextLandAudioTime = 0f;
         CaptureGroundedSnapshot();
     }
 
@@ -114,6 +117,12 @@ public class CharacterAudio : MonoBehaviour
 
     public void OnLand()
     {
+        if (Time.time < nextLandAudioTime)
+        {
+            return;
+        }
+
+        nextLandAudioTime = Time.time + landMinInterval;
         PlayAtSelf(land);
         EmitAINoise(landingNoiseLoudness, landingNoiseDuration);
     }
@@ -463,6 +472,7 @@ public class CharacterAudio : MonoBehaviour
         hasGroundedSnapshot = true;
         wasMovingOnGround = false;
         nextFootstepTime = 0f;
+        nextLandAudioTime = 0f;
     }
 
 }
