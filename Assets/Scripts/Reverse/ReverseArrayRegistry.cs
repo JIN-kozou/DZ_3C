@@ -98,6 +98,7 @@ namespace DZ_3C.Reverse
             {
                 deployedArrays.Add(array);
                 OnArrayDeployed?.Invoke(array);
+                ReverseRespawnAvailability.NotifyChanged();
             }
         }
 
@@ -108,6 +109,7 @@ namespace DZ_3C.Reverse
             {
                 ReleaseSlot(array.SlotIndex);
                 OnArrayRetrieved?.Invoke(array);
+                ReverseRespawnAvailability.NotifyChanged();
             }
         }
 
@@ -179,6 +181,7 @@ namespace DZ_3C.Reverse
             }
             deployedArrays.Clear();
             for (int i = 0; i < slotOccupied.Length; i++) slotOccupied[i] = false;
+            ReverseRespawnAvailability.NotifyChanged();
         }
     }
 }

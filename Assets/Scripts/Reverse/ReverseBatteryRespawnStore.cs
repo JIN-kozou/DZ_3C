@@ -20,6 +20,7 @@ namespace DZ_3C.Reverse
         {
             respawnWorldPosition = worldPosition;
             hasRespawnPoint = true;
+            ReverseRespawnAvailability.NotifyChanged();
         }
 
         public static bool TryGetBatteryRespawnPoint(out Vector3 worldPosition)
@@ -32,6 +33,7 @@ namespace DZ_3C.Reverse
         {
             hasRespawnPoint = false;
             respawnWorldPosition = default;
+            ReverseRespawnAvailability.NotifyChanged();
         }
     }
 }

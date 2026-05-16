@@ -112,6 +112,11 @@ namespace DZ_3C.Reverse
 
             if (IsKeyDownThisFrame(instantKillKey))
             {
+                if (!ReverseRespawnAvailability.HasRespawnPoint(coreStack))
+                {
+                    return;
+                }
+
                 PrepareDamage();
                 coreStack.ApplyDamage(instantKillDamage);
                 LogIfDamageSkipped();
@@ -208,6 +213,7 @@ namespace DZ_3C.Reverse
             coreStack.InitializeCoresFull();
             coreStack.RefillExistingCoresAndAnchorToFull();
 
+            ReverseRespawnAvailability.NotifyChanged();
             Debug.Log("[ReverseRespawnTestDriver] 已重开：回到初始点、清空阵列、清空 checkpoint、重置核心与锚。", this);
         }
 
@@ -251,6 +257,12 @@ namespace DZ_3C.Reverse
             if (coreStack == null)
             {
                 Debug.LogWarning("[ReverseRespawnTestDriver] No ReverseCoreStack.", this);
+                return;
+            }
+
+            if (!ReverseRespawnAvailability.HasRespawnPoint(coreStack))
+            {
+                Debug.LogWarning("[ReverseRespawnTestDriver] 无复活点，无法测试死亡（T）。", this);
                 return;
             }
 
