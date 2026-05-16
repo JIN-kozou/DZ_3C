@@ -8,7 +8,7 @@ namespace DZ_3C.Reverse
     /// 挂在与 <see cref="ReverseCoreStack"/> 同一物体（玩家）上；伤害走 <see cref="ReverseCoreStack.ApplyDamage"/>，
     /// 会先扣外层核心再扣锚血，与正式受伤一致。
     /// <para><b>重要：</b>复活后 <see cref="ReverseCoreStack"/> 有无敌期，此期间 <see cref="ReverseCoreStack.ApplyDamage"/> 会直接 return，
-    /// 表现为按 F9 不扣血、不触发死亡。可勾选「扣血前清除无敌」或按 <see cref="clearInvincibilityKey"/>。</para>
+    /// 表现为按死亡测试键不扣血、不触发死亡。可勾选「扣血前清除无敌」或按 <see cref="clearInvincibilityKey"/>。</para>
     /// </summary>
     [DisallowMultipleComponent]
     public class ReverseRespawnTestDriver : MonoBehaviour
@@ -35,7 +35,7 @@ namespace DZ_3C.Reverse
         [SerializeField] private float instantKillDamage = 100000f;
 
         [Header("无敌与日志")]
-        [Tooltip("在步进 / F9 扣血前自动清除复活无敌，否则无敌期内 ApplyDamage 无效。")]
+        [Tooltip("在步进 / 死亡测试键扣血前自动清除复活无敌，否则无敌期内 ApplyDamage 无效。")]
         [SerializeField] private bool clearInvincibilityBeforeTestDamage = true;
 
         [Tooltip("向 Console 打印 Death / Respawn / GameOver 以及部署阵列数量（需本组件启用）。")]
@@ -125,14 +125,61 @@ namespace DZ_3C.Reverse
 
         private static bool IsKeyDownThisFrame(KeyCode keyCode)
         {
-            if (Keyboard.current == null) return false;
+            if (Keyboard.current == null)
+            {
+                return Input.GetKeyDown(keyCode);
+            }
+
+            if (!TryGetInputSystemKey(keyCode, out Key key))
+            {
+                return false;
+            }
+
+            return Keyboard.current[key].wasPressedThisFrame;
+        }
+
+        private static bool TryGetInputSystemKey(KeyCode keyCode, out Key key)
+        {
+            if (keyCode >= KeyCode.A && keyCode <= KeyCode.Z)
+            {
+                key = Key.A + (keyCode - KeyCode.A);
+                return true;
+            }
+
+            if (keyCode >= KeyCode.F1 && keyCode <= KeyCode.F12)
+            {
+                key = Key.F1 + (keyCode - KeyCode.F1);
+                return true;
+            }
+
+            if (keyCode >= KeyCode.Alpha0 && keyCode <= KeyCode.Alpha9)
+            {
+                key = Key.Digit0 + (keyCode - KeyCode.Alpha0);
+                return true;
+            }
+
+            if (keyCode >= KeyCode.Keypad0 && keyCode <= KeyCode.Keypad9)
+            {
+                key = Key.Numpad0 + (keyCode - KeyCode.Keypad0);
+                return true;
+            }
+
             switch (keyCode)
             {
-                case KeyCode.F7: return Keyboard.current.f7Key.wasPressedThisFrame;
-                case KeyCode.F8: return Keyboard.current.f8Key.wasPressedThisFrame;
-                case KeyCode.F9: return Keyboard.current.f9Key.wasPressedThisFrame;
-                case KeyCode.Minus: return Keyboard.current.minusKey.wasPressedThisFrame;
-                default: return false;
+                case KeyCode.Minus: key = Key.Minus; return true;
+                case KeyCode.Equals: key = Key.Equals; return true;
+                case KeyCode.Space: key = Key.Space; return true;
+                case KeyCode.Return: key = Key.Enter; return true;
+                case KeyCode.Escape: key = Key.Escape; return true;
+                case KeyCode.Tab: key = Key.Tab; return true;
+                case KeyCode.LeftShift: key = Key.LeftShift; return true;
+                case KeyCode.RightShift: key = Key.RightShift; return true;
+                case KeyCode.LeftControl: key = Key.LeftCtrl; return true;
+                case KeyCode.RightControl: key = Key.RightCtrl; return true;
+                case KeyCode.LeftAlt: key = Key.LeftAlt; return true;
+                case KeyCode.RightAlt: key = Key.RightAlt; return true;
+                default:
+                    return System.Enum.TryParse(keyCode.ToString(), out key);
             }
         }
 

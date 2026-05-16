@@ -11,6 +11,8 @@ namespace DZ_3C.MachineRepair.Editor
     public static class MachineRepairUiSceneSetup
     {
         private const string UiTestScenePath = "Assets/AnimancerController/Scenes/UITest.unity";
+        private const string LevelTestScenePath = "Assets/AnimancerController/Scenes/Level test.unity";
+        private const string HudCanvasPrefabPath = "Assets/Prefab/UI/Canvas.prefab";
         private const string SuccessBannerPath = "Assets/Prefab/UI/getGearBanner.prefab";
         private const string FailBannerPath = "Assets/Prefab/UI/failgetGearBanner.prefab";
         private const string ExamplesFolderName = "BannerExamples";
@@ -18,12 +20,25 @@ namespace DZ_3C.MachineRepair.Editor
         [MenuItem("DZ_3C/Machine Repair/Wire UITest Machine Repair UI")]
         public static void WireUiTestScene()
         {
-            var scene = EditorSceneManager.OpenScene(UiTestScenePath, OpenSceneMode.Single);
+            WireScene(UiTestScenePath, "UITest");
+        }
+
+        [MenuItem("DZ_3C/Machine Repair/Wire Level Test Machine Repair UI")]
+        public static void WireLevelTestScene()
+        {
+            WireScene(LevelTestScenePath, "Level test");
+        }
+
+        private static void WireScene(string scenePath, string sceneLabel)
+        {
+            var scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
             if (!scene.IsValid())
             {
-                Debug.LogError($"[MachineRepair] Could not open scene: {UiTestScenePath}");
+                Debug.LogError($"[MachineRepair] Could not open scene: {scenePath}");
                 return;
             }
+
+            EnsureHudCanvasPrefab();
 
             if (!MachineRepairUiLocator.TryResolveHudWidgets(
                     out Transform inventoryRoot,
@@ -179,8 +194,51 @@ namespace DZ_3C.MachineRepair.Editor
 
             EditorSceneManager.MarkSceneDirty(scene);
             Debug.Log(
-                "[MachineRepair] UITest wired. Banner stack: stackRoot (under HUD/Canvas). " +
-                "Scene examples moved to BannerExamples (kept for layout reference).");
+                $"[MachineRepair] {sceneLabel} wired. Banner stack under HUD/Canvas. " +
+                "Examples in BannerExamples (layout reference).");
+        }
+
+        private static void EnsureHudCanvasPrefab()
+        {
+            if (MachineRepairUiLocator.TryResolveHudWidgets(out _, out _, out _))
+            {
+                return;
+            }
+
+            GameObject hud = GameObject.Find("HUD");
+            if (hud == null)
+            {
+                Debug.LogError("[MachineRepair] HUD not found in scene.");
+                return;
+            }
+
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(HudCanvasPrefabPath);
+            if (prefab == null)
+            {
+                Debug.LogError($"[MachineRepair] Missing HUD UI prefab: {HudCanvasPrefabPath}");
+                return;
+            }
+
+            RectTransform hudRect = hud.GetComponent<RectTransform>();
+            if (hudRect == null)
+            {
+                Debug.LogError("[MachineRepair] HUD has no RectTransform.");
+                return;
+            }
+
+            GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, hudRect);
+            instance.name = "Canvas";
+            RectTransform canvasRect = instance.GetComponent<RectTransform>();
+            if (canvasRect != null)
+            {
+                canvasRect.anchorMin = Vector2.zero;
+                canvasRect.anchorMax = Vector2.one;
+                canvasRect.offsetMin = Vector2.zero;
+                canvasRect.offsetMax = Vector2.zero;
+                canvasRect.pivot = new Vector2(0.5f, 0.5f);
+            }
+
+            Debug.Log("[MachineRepair] Instantiated Canvas.prefab under HUD (Inventory/TAB/banners).");
         }
 
         private static void FindBannerLayoutExamples(

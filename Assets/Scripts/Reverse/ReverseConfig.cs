@@ -105,5 +105,16 @@ namespace DZ_3C.Reverse
 
         [Tooltip("重生在 Battery checkpoint 时附加的位置偏移（世界坐标偏移）。可用于避免卡进模型。")]
         public Vector3 batteryRespawnOffset = new Vector3(0f, 0.5f, 0f);
+
+        [Tooltip("无已部署复活阵列且无 Battery 存档点时，重新加载当前场景（否则触发 OnGameOver）。")]
+        public bool reloadActiveSceneWhenNoRespawnPoint = true;
+
+        [Tooltip("真正死亡（无复活点）时，黑幕渐出时长（秒），然后再 Load Scene。")]
+        [Min(0.1f)]
+        public float deathScreenFadeSeconds = 5f;
+
+        [Tooltip("有复活点（阵列 / Battery 存档）时，LoadPanel 渐出时长（秒），然后再传送复活。")]
+        [Min(0.1f)]
+        public float loadCheckpointFadeSeconds = 3f;
     }
 }

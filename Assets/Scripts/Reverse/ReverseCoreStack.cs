@@ -52,7 +52,7 @@ namespace DZ_3C.Reverse
         /// <summary>找到复活点并复活（newPosition）。</summary>
         public event Action<Vector3> OnRespawned;
 
-        /// <summary>没有任何阵列，复活失败（GameOver）。</summary>
+        /// <summary>无法复活且未配置「无复活点时重载场景」时触发。</summary>
         public event Action OnGameOver;
 
         /// <summary>核心列表内容变化（部署 / 收回 / 数值流动均可能触发）。仅作 UI 刷新用。</summary>
@@ -351,8 +351,10 @@ namespace DZ_3C.Reverse
             isDying = true;
             OnDeath?.Invoke();
             characterAudio?.OnDeath();
-            TryRespawn();
-            isDying = false;
+            if (TryRespawn())
+            {
+                isDying = false;
+            }
         }
 
         /// <summary>
@@ -375,32 +377,62 @@ namespace DZ_3C.Reverse
             Physics.SyncTransforms();
         }
 
-        private void TryRespawn()
+        /// <returns>false when an async death-screen reload or checkpoint fade is in progress.</returns>
+        private bool TryRespawn()
         {
             Vector3 pos = transform.position;
             ReverseArray target = null;
-            bool respawnFromArray = false;
             if (registry != null && registry.DeployedCount > 0)
             {
                 target = registry.FindRespawnTarget(pos);
             }
 
-            Vector3 respawnPosition;
-            if (target != null)
+            bool hasBatteryCheckpoint = ReverseBatteryRespawnStore.TryGetBatteryRespawnPoint(out Vector3 batteryPosition);
+
+            if (target == null && !hasBatteryCheckpoint)
             {
-                respawnPosition = target.transform.position;
-                respawnFromArray = true;
+                if (config == null || config.reloadActiveSceneWhenNoRespawnPoint)
+                {
+                    float fadeSeconds = config != null ? config.deathScreenFadeSeconds : 5f;
+                    if (!ReverseDeathScreenOverlay.TryPlayThenReload(fadeSeconds, ReloadActiveScene))
+                    {
+                        ReloadActiveScene();
+                    }
+
+                    return false;
+                }
+
+                OnGameOver?.Invoke();
+                return true;
+            }
+
+            bool respawnFromArray = target != null;
+            Vector3 respawnPosition = respawnFromArray ? target.transform.position : batteryPosition;
+
+            float loadFadeSeconds = config != null ? config.loadCheckpointFadeSeconds : 3f;
+            if (ReverseLoadCheckpointOverlay.TryPlayThen(loadFadeSeconds, () =>
+                {
+                    CompleteRespawn(respawnPosition, respawnFromArray, target);
+                }))
+            {
+                return false;
+            }
+
+            CompleteRespawn(respawnPosition, respawnFromArray, target);
+            return true;
+        }
+
+        private void CompleteRespawn(Vector3 respawnPosition, bool respawnFromArray, ReverseArray target)
+        {
+            if (respawnFromArray && target != null)
+            {
                 ReverseArrayAudio audio = target.GetComponent<ReverseArrayAudio>();
                 if (audio == null)
                 {
                     audio = target.GetComponentInChildren<ReverseArrayAudio>(true);
                 }
+
                 audio?.PlayWarningPulse();
-            }
-            else if (!ReverseBatteryRespawnStore.TryGetBatteryRespawnPoint(out respawnPosition))
-            {
-                OnGameOver?.Invoke();
-                return;
             }
 
             Vector3 offset = Vector3.zero;
@@ -408,15 +440,19 @@ namespace DZ_3C.Reverse
             {
                 offset = respawnFromArray ? config.arrayRespawnOffset : config.batteryRespawnOffset;
             }
+
             respawnPosition += offset;
 
-            // 放回阵列位置（不消耗阵列，不改变核心数量），核心列表槽位补满血、锚补满。
-            // CharacterController 会覆盖直接改 transform.position；需短暂禁用再写位置。
             TeleportToWorldPosition(respawnPosition);
             RefillExistingCoresAndAnchorToFull();
             invincibleSecondsRemaining = config != null ? config.respawnInvincibleSeconds : 1.5f;
             OnRespawned?.Invoke(respawnPosition);
             characterAudio?.OnRespawn();
+
+            ReverseLoadCheckpointOverlay loadOverlay = FindObjectOfType<ReverseLoadCheckpointOverlay>(true);
+            loadOverlay?.HideImmediate();
+
+            isDying = false;
         }
 
         public void RefillExistingCoresAndAnchorToFull()
@@ -430,6 +466,11 @@ namespace DZ_3C.Reverse
                 }
             }
             OnCoresChanged?.Invoke();
+        }
+
+        private static void ReloadActiveScene()
+        {
+            ReverseDeathScreenOverlay.ReloadActiveSceneImmediate();
         }
     }
 }
