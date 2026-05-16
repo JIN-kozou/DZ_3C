@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using DZ_3C.MachineRepair.UI;
 using UnityEngine;
 
 namespace DZ_3C.MachineRepair
@@ -31,6 +32,9 @@ namespace DZ_3C.MachineRepair
         [SerializeField] private Vector3 receiverScale = new Vector3(4f, 0.35f, 2.5f);
         [SerializeField] private ItemAudio itemAudio;
 
+        [Header("Proximity UI")]
+        [SerializeField] private MachinePartReceiverUIView proximityUi;
+
         public IReadOnlyList<PartRequirement> Requirements => requirements;
 
         /// <summary>挂接了预设 SO 时返回预设里的名称；否则为 null。</summary>
@@ -59,6 +63,122 @@ namespace DZ_3C.MachineRepair
 
             var c = GetComponent<Collider>();
             if (c != null) c.isTrigger = true;
+
+            if (proximityUi == null)
+            {
+                proximityUi = GetComponentInChildren<MachinePartReceiverUIView>(true);
+            }
+        }
+
+        public bool IsLineSatisfied(PartRequirement req)
+        {
+            if (req == null || req.part == null)
+            {
+                return false;
+            }
+
+            return req.delivered >= req.countRequired;
+        }
+
+        public bool AreAllRequirementsSatisfied()
+        {
+            if (requirements == null || requirements.Count == 0)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < requirements.Count; i++)
+            {
+                PartRequirement req = requirements[i];
+                if (req == null || req.part == null)
+                {
+                    continue;
+                }
+
+                if (!IsLineSatisfied(req))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>UI 从上到下：一级 → 二级 → 三级 → 四级，再按 Category / 名称。</summary>
+        public List<PartRequirement> GetRequirementsInDisplayOrder()
+        {
+            var ordered = new List<PartRequirement>();
+            if (requirements == null)
+            {
+                return ordered;
+            }
+
+            for (int i = 0; i < requirements.Count; i++)
+            {
+                PartRequirement req = requirements[i];
+                if (req != null && req.part != null)
+                {
+                    ordered.Add(req);
+                }
+            }
+
+            ordered.Sort(CompareRequirementsForDisplay);
+            return ordered;
+        }
+
+        private static int CompareRequirementsForDisplay(PartRequirement a, PartRequirement b)
+        {
+            int rankA = GetDisplayTierRank(a.part);
+            int rankB = GetDisplayTierRank(b.part);
+            int rankCompare = rankA.CompareTo(rankB);
+            if (rankCompare != 0)
+            {
+                return rankCompare;
+            }
+
+            int categoryCompare = a.part.Category.CompareTo(b.part.Category);
+            if (categoryCompare != 0)
+            {
+                return categoryCompare;
+            }
+
+            return string.Compare(a.part.DisplayName, b.part.DisplayName, StringComparison.Ordinal);
+        }
+
+        private static int GetDisplayTierRank(MachinePartDefinition part)
+        {
+            if (part == null)
+            {
+                return 999;
+            }
+
+            string name = part.DisplayName;
+            if (string.IsNullOrEmpty(name))
+            {
+                return (int)part.Category * 10;
+            }
+
+            if (name.Contains("一级", StringComparison.Ordinal))
+            {
+                return 1;
+            }
+
+            if (name.Contains("二级", StringComparison.Ordinal))
+            {
+                return 2;
+            }
+
+            if (name.Contains("三级", StringComparison.Ordinal))
+            {
+                return 3;
+            }
+
+            if (name.Contains("四级", StringComparison.Ordinal))
+            {
+                return 4;
+            }
+
+            return 100 + (int)part.Category;
         }
 
         private void ApplyPresetIfAssigned()
@@ -82,6 +202,11 @@ namespace DZ_3C.MachineRepair
             RepairInteractionHub hub = FindHub(other);
             if (hub == null) return;
             hub.RegisterReceiver(this, true);
+            if (proximityUi != null)
+            {
+                proximityUi.SetVisible(true);
+                proximityUi.Refresh(this);
+            }
         }
 
         private void OnTriggerExit(Collider other)
@@ -89,6 +214,7 @@ namespace DZ_3C.MachineRepair
             RepairInteractionHub hub = FindHub(other);
             if (hub == null) return;
             hub.RegisterReceiver(this, false);
+            proximityUi?.SetVisible(false);
         }
 
         private static RepairInteractionHub FindHub(Collider other)
@@ -122,13 +248,32 @@ namespace DZ_3C.MachineRepair
             }
 
             bool any = false;
-            foreach (PartRequirement req in requirements)
+            List<PartRequirement> submitOrder = GetRequirementsInDisplayOrder();
+            for (int i = 0; i < submitOrder.Count; i++)
             {
-                if (req.part == null) continue;
+                PartRequirement req = submitOrder[i];
+                if (req.part == null)
+                {
+                    continue;
+                }
+
+                if (IsLineSatisfied(req))
+                {
+                    continue;
+                }
+
                 int need = req.countRequired - req.delivered;
-                if (need <= 0) continue;
+                if (need <= 0)
+                {
+                    continue;
+                }
+
                 int have = inventory.GetCount(req.part);
-                if (have <= 0) continue;
+                if (have <= 0)
+                {
+                    break;
+                }
+
                 int give = Mathf.Min(have, need);
                 int taken = inventory.TryConsumeAndNotify(req.part, give);
                 if (taken > 0)
@@ -136,6 +281,8 @@ namespace DZ_3C.MachineRepair
                     req.delivered += taken;
                     any = true;
                 }
+
+                break;
             }
 
             Debug.Log(
@@ -147,6 +294,8 @@ namespace DZ_3C.MachineRepair
             {
                 PlaySubmitAudio();
             }
+
+            proximityUi?.Refresh(this);
 
             return any;
         }
