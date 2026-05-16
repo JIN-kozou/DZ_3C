@@ -1062,7 +1062,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.9
+      value: -0.8999901
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
@@ -1072,7 +1072,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -134
+      value: -134.00015
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
@@ -1082,17 +1082,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
@@ -1207,10 +1207,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1966932850729397587}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 948b2879297c65b49aca3fdf9c3fbc54,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7921427846989636541}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 948b2879297c65b49aca3fdf9c3fbc54,
         type: 3}
       insertIndex: -1
@@ -1445,7 +1441,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 8241220909394436553}
-  showOnScreen: 1
+  showOnScreen: 0
   anchor: {x: 20, y: 120}
   smoothTime: 0.12
 --- !u!114 &8480377634405409883
@@ -1573,24 +1569,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &7921427846989636541
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1086448861104587599}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52b595e0e03d4b80aa8a208675560d5c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  coreStack: {fileID: 6129257497694812251}
-  registry: {fileID: 3227704250049226260}
-  anchor: {fileID: 2083796946762864244}
-  screenAnchor: {x: 10, y: 10}
-  panelWidth: 320
-  fontSize: 14
 --- !u!114 &81983922804218291
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1668,6 +1646,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemAudio: {fileID: 0}
+  pickupBannerQueue: {fileID: 0}
+  partIconPrompt: {fileID: 0}
   dropKey: 103
   dropForwardDistance: 1.2
   dropUpOffset: 0.25

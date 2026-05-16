@@ -81,9 +81,14 @@ namespace DZ_3C.MachineRepair.Editor
             Transform stackTransform = MachineRepairPickupBannerQueue.FindBannerStackTransform(bannerStackParent);
             if (stackTransform == null)
             {
-                GameObject stackGo = new GameObject("StackRoot", typeof(RectTransform));
+                GameObject stackGo = new GameObject("PickupBannerStack", typeof(RectTransform));
                 stackGo.transform.SetParent(bannerStackParent, false);
                 stackTransform = stackGo.transform;
+                MachineRepairPickupBannerQueue.ApplyDefaultStackRootLayout(stackTransform as RectTransform);
+            }
+            else if (stackTransform is RectTransform existingStackRect)
+            {
+                MachineRepairPickupBannerQueue.ApplyDefaultStackRootLayout(existingStackRect);
             }
 
             MachineRepairPickupBannerQueue queue = stackTransform.GetComponent<MachineRepairPickupBannerQueue>();
@@ -95,6 +100,9 @@ namespace DZ_3C.MachineRepair.Editor
             queue.EnsureStackRootLayout();
 
             FindBannerLayoutExamples(bannerStackParent, out RectTransform layoutExample, out RectTransform failExample);
+            OrganizeBannerExamples(bannerStackParent, layoutExample, failExample);
+
+            RectTransform examplesRootRect = bannerStackParent.Find(ExamplesFolderName) as RectTransform;
             Vector2 anchorPos = layoutExample != null ? layoutExample.anchoredPosition : new Vector2(-851.5f, 369.58f);
             float spacing = 65f;
             if (layoutExample != null && failExample != null)
@@ -107,18 +115,18 @@ namespace DZ_3C.MachineRepair.Editor
             }
 
             SerializedObject queueSo = new SerializedObject(queue);
+            queueSo.FindProperty("bannerExamplesRoot").objectReferenceValue = examplesRootRect;
             queueSo.FindProperty("stackRoot").objectReferenceValue = stackTransform as RectTransform;
             queueSo.FindProperty("layoutReference").objectReferenceValue = layoutExample;
             queueSo.FindProperty("failLayoutReference").objectReferenceValue = failExample;
             queueSo.FindProperty("stackAnchorPosition").vector2Value = anchorPos;
             queueSo.FindProperty("stackSpacing").floatValue = spacing;
+            queueSo.FindProperty("maxConcurrent").intValue = 4;
             queueSo.FindProperty("successBannerPrefab").objectReferenceValue =
                 AssetDatabase.LoadAssetAtPath<GameObject>(SuccessBannerPath);
             queueSo.FindProperty("failBannerPrefab").objectReferenceValue =
                 AssetDatabase.LoadAssetAtPath<GameObject>(FailBannerPath);
             queueSo.ApplyModifiedPropertiesWithoutUndo();
-
-            OrganizeBannerExamples(bannerStackParent, layoutExample, failExample);
 
             if (stackTransform != layoutExample?.parent && layoutExample != null)
             {
@@ -143,8 +151,15 @@ namespace DZ_3C.MachineRepair.Editor
                 panel = uiHost.AddComponent<MachineRepairInventoryPanel>();
             }
 
+            MachineRepairInventoryPanel copySource = FindBestExistingPanel(panel);
+            RemoveDuplicateInventoryPanels(panel);
+
             MachinePartInventory inventory = Object.FindObjectOfType<MachinePartInventory>();
             SerializedObject panelSo = new SerializedObject(panel);
+            if (copySource != null && copySource != panel)
+            {
+                CopyPanelCopyFields(copySource, panelSo);
+            }
             panelSo.FindProperty("inventory").objectReferenceValue = inventory;
             panelSo.FindProperty("tier1Definition").objectReferenceValue =
                 AssetDatabase.LoadAssetAtPath<MachinePartDefinition>(
@@ -345,6 +360,105 @@ namespace DZ_3C.MachineRepair.Editor
             }
 
             examplesRoot.gameObject.SetActive(true);
+        }
+
+        private static MachineRepairInventoryPanel FindBestExistingPanel(MachineRepairInventoryPanel keep)
+        {
+            MachineRepairInventoryPanel[] panels = Object.FindObjectsOfType<MachineRepairInventoryPanel>(true);
+            MachineRepairInventoryPanel best = null;
+            int bestScore = -1;
+            for (int i = 0; i < panels.Length; i++)
+            {
+                MachineRepairInventoryPanel candidate = panels[i];
+                if (candidate == keep)
+                {
+                    continue;
+                }
+
+                int score = GetReferenceScore(candidate);
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    best = candidate;
+                }
+            }
+
+            return best;
+        }
+
+        private static int GetReferenceScore(MachineRepairInventoryPanel panel)
+        {
+            SerializedObject so = new SerializedObject(panel);
+            int score = 0;
+            if (so.FindProperty("panelRoot").objectReferenceValue != null)
+            {
+                score += 100;
+            }
+
+            if (so.FindProperty("tabHintText").objectReferenceValue != null)
+            {
+                score += 20;
+            }
+
+            if (so.FindProperty("amountText").objectReferenceValue != null)
+            {
+                score += 10;
+            }
+
+            if (so.FindProperty("gearUiRoot").objectReferenceValue != null)
+            {
+                score += 5;
+            }
+
+            if (so.FindProperty("customButtonRoot").objectReferenceValue != null)
+            {
+                score += 5;
+            }
+
+            if (so.FindProperty("emptyInventoryRoot").objectReferenceValue != null)
+            {
+                score += 5;
+            }
+
+            return score;
+        }
+
+        private static void RemoveDuplicateInventoryPanels(MachineRepairInventoryPanel keep)
+        {
+            MachineRepairInventoryPanel[] panels = Object.FindObjectsOfType<MachineRepairInventoryPanel>(true);
+            for (int i = 0; i < panels.Length; i++)
+            {
+                MachineRepairInventoryPanel duplicate = panels[i];
+                if (duplicate == keep)
+                {
+                    continue;
+                }
+
+                Object.DestroyImmediate(duplicate);
+            }
+        }
+
+        private static void CopyPanelCopyFields(MachineRepairInventoryPanel source, SerializedObject target)
+        {
+            SerializedObject sourceSo = new SerializedObject(source);
+            CopyStringProperty(sourceSo, target, "tabHintClosed");
+            CopyStringProperty(sourceSo, target, "tabHintOpen");
+            CopyStringProperty(sourceSo, target, "remainCapacityFull");
+            CopyStringProperty(sourceSo, target, "remainCapacityEmpty");
+            CopyStringProperty(sourceSo, target, "emptyInventoryLabel");
+            CopyStringProperty(sourceSo, target, "tierButtonLabelFormat");
+        }
+
+        private static void CopyStringProperty(SerializedObject source, SerializedObject target, string propertyName)
+        {
+            SerializedProperty sourceProperty = source.FindProperty(propertyName);
+            SerializedProperty targetProperty = target.FindProperty(propertyName);
+            if (sourceProperty == null || targetProperty == null)
+            {
+                return;
+            }
+
+            targetProperty.stringValue = sourceProperty.stringValue;
         }
 
         private static void AddBannerViewToPrefab(string path)

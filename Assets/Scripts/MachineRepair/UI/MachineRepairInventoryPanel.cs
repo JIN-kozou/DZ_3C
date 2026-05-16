@@ -6,14 +6,21 @@ using UnityEngine.UI;
 
 namespace DZ_3C.MachineRepair.UI
 {
+    [DisallowMultipleComponent]
+    [DefaultExecutionOrder(-100)]
     public class MachineRepairInventoryPanel : MonoBehaviour
     {
-        private const string TabHintClosed = "库存";
-        private const string TabHintOpen = "关闭";
-        private const string RemainFull = "剩余载荷：1/1";
-        private const string RemainEmpty = "剩余载荷：0/1";
-        private const string EmptyInventoryLabel = "库存为空";
+        private static MachineRepairInventoryPanel activeInstance;
+        [Header("文案")]
+        [SerializeField] private string tabHintClosed = "库存";
+        [SerializeField] private string tabHintOpen = "关闭";
+        [SerializeField] private string remainCapacityFull = "剩余载荷：1/1";
+        [SerializeField] private string remainCapacityEmpty = "剩余载荷：0/1";
+        [SerializeField] private string emptyInventoryLabel = "库存为空";
+        [Tooltip("Tier1 按钮文案，{0} 为零件显示名")]
+        [SerializeField] private string tierButtonLabelFormat = "{0} x 1";
 
+        [Header("引用")]
         [SerializeField] private MachinePartInventory inventory;
         [SerializeField] private MachinePartDefinition tier1Definition;
         [SerializeField] private GameObject panelRoot;
@@ -23,15 +30,23 @@ namespace DZ_3C.MachineRepair.UI
         [SerializeField] private GameObject customButtonRoot;
         [SerializeField] private Text customButtonLabel;
         [SerializeField] private GameObject emptyInventoryRoot;
+
+        [Header("行为")]
         [SerializeField] private bool startPanelClosed = true;
         [SerializeField] private bool autoBindSceneReferences = true;
 
         private bool panelOpen;
+        private bool panelIamPrimed;
         private Coroutine iamRefreshRoutine;
         private InterfaceAnimManager panelIam;
 
         private void Awake()
         {
+            if (!TryBecomeActiveInstance())
+            {
+                return;
+            }
+
             if (inventory == null)
             {
                 inventory = FindObjectOfType<MachinePartInventory>();
@@ -53,6 +68,7 @@ namespace DZ_3C.MachineRepair.UI
                 if (panelIam != null)
                 {
                     panelIam.autoStart = false;
+                    panelIamPrimed = panelRoot.activeInHierarchy;
                 }
             }
         }
@@ -79,6 +95,107 @@ namespace DZ_3C.MachineRepair.UI
             }
         }
 
+        private void OnDestroy()
+        {
+            if (activeInstance == this)
+            {
+                activeInstance = null;
+            }
+        }
+
+        private bool TryBecomeActiveInstance()
+        {
+            MachineRepairInventoryPanel[] panels = FindObjectsOfType<MachineRepairInventoryPanel>(true);
+            if (panels.Length == 1)
+            {
+                activeInstance = this;
+                return true;
+            }
+
+            MachineRepairInventoryPanel primary = SelectPrimary(panels);
+            if (this != primary)
+            {
+                enabled = false;
+                return false;
+            }
+
+            activeInstance = this;
+            for (int i = 0; i < panels.Length; i++)
+            {
+                MachineRepairInventoryPanel duplicate = panels[i];
+                if (duplicate == this || !duplicate.enabled)
+                {
+                    continue;
+                }
+
+                Debug.LogWarning(
+                    $"[MachineRepair] Disabled duplicate MachineRepairInventoryPanel on \"{duplicate.name}\". " +
+                    $"Edit copy on \"{name}\" (Machine Repair Inventory Panel).",
+                    duplicate);
+                duplicate.enabled = false;
+            }
+
+            return true;
+        }
+
+        private static MachineRepairInventoryPanel SelectPrimary(MachineRepairInventoryPanel[] panels)
+        {
+            MachineRepairInventoryPanel best = panels[0];
+            int bestScore = best.GetReferenceScore();
+            for (int i = 1; i < panels.Length; i++)
+            {
+                int score = panels[i].GetReferenceScore();
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    best = panels[i];
+                }
+            }
+
+            return best;
+        }
+
+        private int GetReferenceScore()
+        {
+            int score = 0;
+            if (panelRoot != null)
+            {
+                score += 100;
+            }
+
+            if (tabHintText != null)
+            {
+                score += 20;
+            }
+
+            if (amountText != null)
+            {
+                score += 10;
+            }
+
+            if (gearUiRoot != null)
+            {
+                score += 5;
+            }
+
+            if (customButtonRoot != null)
+            {
+                score += 5;
+            }
+
+            if (emptyInventoryRoot != null)
+            {
+                score += 5;
+            }
+
+            if (gameObject.name == "MachineRepairUI")
+            {
+                score += 1;
+            }
+
+            return score;
+        }
+
         private void Start()
         {
             panelOpen = !startPanelClosed;
@@ -97,14 +214,9 @@ namespace DZ_3C.MachineRepair.UI
 
         private void ApplyPanelVisibility()
         {
-            if (panelRoot != null)
-            {
-                panelRoot.SetActive(panelOpen);
-            }
-
             if (tabHintText != null)
             {
-                tabHintText.text = panelOpen ? TabHintOpen : TabHintClosed;
+                tabHintText.text = panelOpen ? tabHintOpen : tabHintClosed;
             }
 
             if (!panelOpen || panelRoot == null)
@@ -115,10 +227,19 @@ namespace DZ_3C.MachineRepair.UI
                     iamRefreshRoutine = null;
                 }
 
+                HideInventoryPanel();
                 return;
             }
 
-            if (panelIam == null)
+            if (!ShowInventoryPanel())
+            {
+                Refresh();
+            }
+        }
+
+        private void EnsurePanelIam()
+        {
+            if (panelIam == null && panelRoot != null)
             {
                 panelIam = panelRoot.GetComponent<InterfaceAnimManager>();
                 if (panelIam != null)
@@ -126,32 +247,115 @@ namespace DZ_3C.MachineRepair.UI
                     panelIam.autoStart = false;
                 }
             }
+        }
 
-            TryGetInventoryState(out bool empty, out bool hasTier1);
+        private void HideInventoryPanel()
+        {
+            EnsurePanelIam();
 
             if (panelIam != null)
             {
-                MachineRepairInventoryIamSync.ResetAllElementsForAppear(panelIam);
-                MachineRepairInventoryIamSync.PrepareConditionalBeforeAppear(
-                    panelIam,
-                    empty,
-                    hasTier1,
-                    gearUiRoot,
-                    customButtonRoot,
-                    emptyInventoryRoot);
+                panelIam.startDisappear(true);
+            }
 
-                panelIam.gameObject.SetActive(true);
-                panelIam.startAppear();
+            if (panelRoot != null)
+            {
+                panelRoot.SetActive(false);
+            }
+        }
 
+        /// <returns>True when appear animation is deferred (caller should skip Refresh).</returns>
+        private bool ShowInventoryPanel()
+        {
+            if (panelRoot == null)
+            {
+                return false;
+            }
+
+            panelRoot.SetActive(true);
+            EnsurePanelIam();
+
+            if (panelIam == null)
+            {
+                return false;
+            }
+
+            if (!TryGetInventoryState(out bool empty, out bool hasTier1))
+            {
+                return false;
+            }
+
+            panelIam.autoStart = false;
+
+            if (!panelIamPrimed)
+            {
                 if (iamRefreshRoutine != null)
                 {
                     StopCoroutine(iamRefreshRoutine);
                 }
 
-                iamRefreshRoutine = StartCoroutine(WaitForPanelAppearThenRefresh(panelIam));
+                iamRefreshRoutine = StartCoroutine(ShowInventoryPanelAfterIamStart(empty, hasTier1));
+                return true;
             }
 
+            PlayInventoryAppearAnimation(empty, hasTier1);
+            return false;
+        }
+
+        private IEnumerator ShowInventoryPanelAfterIamStart(bool empty, bool hasTier1)
+        {
+            // Inventory was inactive, so IAM.Start() had not run yet. It calls startDisappear(true)
+            // on the first active frame and would cancel our appear if we started in the same frame.
+            yield return null;
+
+            panelIamPrimed = true;
+            iamRefreshRoutine = null;
+
+            if (!panelOpen || panelRoot == null || panelIam == null)
+            {
+                yield break;
+            }
+
+            PlayInventoryAppearAnimation(empty, hasTier1);
             Refresh();
+
+            iamRefreshRoutine = StartCoroutine(WaitForPanelAppearThenRefresh(panelIam));
+        }
+
+        private void PlayInventoryAppearAnimation(bool empty, bool hasTier1)
+        {
+            if (panelIam == null)
+            {
+                return;
+            }
+
+            // Closing only deactivated the root; IAM can stay "appeared" while children are hidden.
+            // startAppear() is a no-op in that state — force a clean disappear before re-appearing.
+            if (panelIam.currentState == CSFHIAnimableState.appeared
+                || panelIam.currentState == CSFHIAnimableState.appearing
+                || panelIam.currentState == CSFHIAnimableState.disappearing)
+            {
+                panelIam.startDisappear(true);
+            }
+
+            MachineRepairInventoryIamSync.ResetAllElementsForAppear(panelIam);
+            MachineRepairInventoryIamSync.PrepareConditionalBeforeAppear(
+                panelIam,
+                empty,
+                hasTier1,
+                gearUiRoot,
+                customButtonRoot,
+                emptyInventoryRoot);
+
+            panelIam.gameObject.SetActive(true);
+            panelIam.startAppear();
+
+            if (iamRefreshRoutine != null)
+            {
+                StopCoroutine(iamRefreshRoutine);
+            }
+
+            iamRefreshRoutine = StartCoroutine(WaitForPanelAppearThenRefresh(panelIam));
         }
 
         private IEnumerator WaitForPanelAppearThenRefresh(InterfaceAnimManager iam)
@@ -254,7 +458,7 @@ namespace DZ_3C.MachineRepair.UI
 
             if (amountText != null)
             {
-                amountText.text = empty || !hasTier1 ? RemainFull : RemainEmpty;
+                amountText.text = empty || !hasTier1 ? remainCapacityFull : remainCapacityEmpty;
             }
 
             MachineRepairInventoryIamSync.ApplyConditionalVisibility(
@@ -271,15 +475,15 @@ namespace DZ_3C.MachineRepair.UI
 
             if (customButtonLabel != null && hasTier1 && tier1Definition != null)
             {
-                customButtonLabel.text = $"{tier1Definition.DisplayName} x 1";
+                customButtonLabel.text = string.Format(tierButtonLabelFormat, tier1Definition.DisplayName);
             }
 
-            if (emptyInventoryRoot != null)
+            if (emptyInventoryRoot != null && empty)
             {
                 Text emptyLabel = emptyInventoryRoot.GetComponentInChildren<Text>(true);
-                if (emptyLabel != null && string.IsNullOrEmpty(emptyLabel.text))
+                if (emptyLabel != null)
                 {
-                    emptyLabel.text = EmptyInventoryLabel;
+                    emptyLabel.text = emptyInventoryLabel;
                 }
             }
         }

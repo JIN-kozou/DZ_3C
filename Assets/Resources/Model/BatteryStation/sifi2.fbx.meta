@@ -3,7 +3,22 @@ guid: e0548bc140aa90b42bc17e4c95a7ce15
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: body.002
+    second: {fileID: 2100000, guid: 39ba73e1c749dea4b9ad2da89f4c3a28, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: pivotscreen.002
+    second: {fileID: 2100000, guid: b0778f814cfb22b4c8f67cc28fbe71bf, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wireport.002
+    second: {fileID: 2100000, guid: 4a40676817cf5cc4e9c94374d78bfe87, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

@@ -32,14 +32,42 @@ namespace DZ_3C.MachineRepair.UI
                 return;
             }
 
+            CopyLayoutExceptPosition(example, target, example.anchoredPosition);
+        }
+
+        public static void CopyLayoutExceptPosition(
+            RectTransform example,
+            RectTransform target,
+            Vector2 anchoredPosition)
+        {
+            if (example == null || target == null)
+            {
+                return;
+            }
+
             target.anchorMin = example.anchorMin;
             target.anchorMax = example.anchorMax;
             target.pivot = example.pivot;
             target.sizeDelta = example.sizeDelta;
-            target.anchoredPosition = example.anchoredPosition;
+            target.anchoredPosition = anchoredPosition;
             target.localRotation = example.localRotation;
             target.localScale = example.localScale;
             target.localPosition = example.localPosition;
+        }
+
+        public static bool TryGetRelativeBounds(
+            RectTransform root,
+            RectTransform relativeTo,
+            out Bounds bounds)
+        {
+            bounds = default;
+            if (root == null || relativeTo == null)
+            {
+                return false;
+            }
+
+            bounds = RectTransformUtility.CalculateRelativeRectTransformBounds(relativeTo, root);
+            return true;
         }
 
         public static void CopyFromExampleWithStackIndex(

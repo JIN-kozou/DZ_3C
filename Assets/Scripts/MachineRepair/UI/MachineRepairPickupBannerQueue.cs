@@ -18,6 +18,7 @@ namespace DZ_3C.MachineRepair.UI
         private const string FailPrefabPath = "Assets/Prefab/UI/failgetGearBanner.prefab";
         private const string ExamplesFolderName = "BannerExamples";
 
+        [SerializeField] private RectTransform bannerExamplesRoot;
         [SerializeField] private RectTransform layoutReference;
         [SerializeField] private RectTransform failLayoutReference;
         [SerializeField] private RectTransform stackRoot;
@@ -26,6 +27,7 @@ namespace DZ_3C.MachineRepair.UI
         [SerializeField] private Vector2 stackAnchorPosition = new Vector2(-851.5f, 369.57764f);
         [SerializeField] private float stackSpacing = 65.57764f;
         [SerializeField, Min(0f)] private float extraStackPadding = 12f;
+        [SerializeField, Min(0f)] private float scrollTopPadding = 8f;
 
         [Header("布局调节（叠在 BannerExamples 示例之上）")]
         [Tooltip("若指定，则使用资源中的缩放/偏移；否则使用下方组件字段。")]
@@ -35,8 +37,11 @@ namespace DZ_3C.MachineRepair.UI
         [SerializeField] private Vector2 bannerPositionOffset;
         [SerializeField, Min(0.1f)] private float bannerStackSpacingMultiplier = 1f;
 
+        [Header("卷轴溢出")]
+        [SerializeField, Min(0.1f)] private float evictDuration = 0.35f;
+        [SerializeField, Min(0f)] private float evictScrollDistance;
         [SerializeField, Min(0.5f)] private float holdSecondsAfterAppear = 2.2f;
-        [SerializeField, Min(1)] private int maxConcurrent = 5;
+        [SerializeField, Min(1)] private int maxConcurrent = 4;
 
         private readonly List<ActiveBanner> activeBanners = new();
         private Vector2 stackStep = new Vector2(0f, 65.57764f);
@@ -81,13 +86,30 @@ namespace DZ_3C.MachineRepair.UI
                 return queue;
             }
 
-            GameObject stackGo = new GameObject("StackRoot", typeof(RectTransform));
+            GameObject stackGo = new GameObject("PickupBannerStack", typeof(RectTransform));
             stackGo.transform.SetParent(parent, false);
+            RectTransform stackRect = stackGo.GetComponent<RectTransform>();
+            ApplyDefaultStackRootLayout(stackRect);
             MachineRepairPickupBannerQueue created = stackGo.AddComponent<MachineRepairPickupBannerQueue>();
-            created.stackRoot = stackGo.GetComponent<RectTransform>();
-            created.EnsureStackRootLayout();
+            created.stackRoot = stackRect;
             created.RefreshLayoutFromExamples();
             return created;
+        }
+
+        public static void ApplyDefaultStackRootLayout(RectTransform rect)
+        {
+            if (rect == null)
+            {
+                return;
+            }
+
+            rect.anchorMin = new Vector2(0f, 0.5f);
+            rect.anchorMax = new Vector2(0f, 0.5f);
+            rect.pivot = new Vector2(0f, 0.5f);
+            rect.sizeDelta = new Vector2(500f, 800f);
+            rect.anchoredPosition = Vector2.zero;
+            rect.localScale = Vector3.one;
+            rect.localRotation = Quaternion.identity;
         }
 
         public static Transform FindBannerStackTransform(Transform hudCanvas)
@@ -153,7 +175,13 @@ namespace DZ_3C.MachineRepair.UI
 
             for (int i = 0; i < activeBanners.Count; i++)
             {
-                ApplyUserLayoutTuning(activeBanners[i]);
+                ActiveBanner entry = activeBanners[i];
+                if (entry?.Rect == null)
+                {
+                    continue;
+                }
+
+                ApplyUserLayoutTuning(entry);
             }
         }
 
@@ -170,8 +198,6 @@ namespace DZ_3C.MachineRepair.UI
             {
                 stackRoot = transform as RectTransform;
             }
-
-            MachineRepairRectLayoutMirror.ApplyFullCanvasStretch(stackRoot);
         }
 
         public void RefreshLayoutFromExamples()
@@ -192,6 +218,15 @@ namespace DZ_3C.MachineRepair.UI
             RectTransform canvasRect = MachineRepairUiLocator.GetBannerStackParent();
             if (canvasRect != null)
             {
+                if (bannerExamplesRoot == null)
+                {
+                    Transform examples = canvasRect.Find(ExamplesFolderName);
+                    if (examples != null)
+                    {
+                        bannerExamplesRoot = examples as RectTransform;
+                    }
+                }
+
                 if (TryFindExamplesOnCanvas(canvasRect, out RectTransform success, out RectTransform fail))
                 {
                     if (layoutReference == null)
@@ -222,6 +257,11 @@ namespace DZ_3C.MachineRepair.UI
                 {
                     failLayoutReference = failExample.GetComponent<RectTransform>();
                 }
+            }
+
+            if (bannerExamplesRoot == null && layoutReference != null)
+            {
+                bannerExamplesRoot = layoutReference.parent as RectTransform;
             }
         }
 
@@ -320,9 +360,12 @@ namespace DZ_3C.MachineRepair.UI
             EnsureStackRootLayout();
             RefreshLayoutFromExamples();
 
-            while (activeBanners.Count >= maxConcurrent)
+            if (activeBanners.Count >= maxConcurrent)
             {
-                ForceFinishOldest();
+                int oldestIndex = activeBanners.Count - 1;
+                ActiveBanner oldest = activeBanners[oldestIndex];
+                activeBanners.RemoveAt(oldestIndex);
+                StartCoroutine(EvictBannerCoroutine(oldest));
             }
 
             GameObject instance = Instantiate(prefab, stackRoot);
@@ -358,8 +401,9 @@ namespace DZ_3C.MachineRepair.UI
                 Anim = iam,
                 IsFail = isFail,
             };
-            activeBanners.Add(entry);
-            ApplyBannerLayout(entry, activeBanners.Count - 1);
+            activeBanners.Insert(0, entry);
+            ApplyBannerLayout(entry, 0);
+            ReflowStack();
 
             entry.Routine = StartCoroutine(RunBannerLifecycle(entry, instance, iam));
         }
@@ -383,26 +427,55 @@ namespace DZ_3C.MachineRepair.UI
 
             RefreshLayoutFromExamples();
 
-            RectTransform stackBase = layoutReference != null ? layoutReference : failLayoutReference;
-            if (stackBase == null)
+            RectTransform template = entry.IsFail
+                ? failLayoutReference != null ? failLayoutReference : layoutReference
+                : layoutReference != null ? layoutReference : failLayoutReference;
+
+            if (template == null)
             {
                 rect.anchorMin = new Vector2(0.5f, 0.5f);
                 rect.anchorMax = new Vector2(0.5f, 0.5f);
                 rect.pivot = new Vector2(0.5f, 0.5f);
-                rect.anchoredPosition = stackAnchorPosition - GetStackStepVector() * stackIndex;
+                rect.anchoredPosition = ComputeSlotAnchoredPosition(stackIndex, null);
                 CacheBannerBaseLayout(entry);
                 ApplyUserLayoutTuning(entry);
                 return;
             }
 
-            MachineRepairRectLayoutMirror.CopyFromExampleWithStackIndex(
-                stackBase,
-                rect,
-                stackIndex,
-                GetStackStepVector());
-
+            Vector2 slotPosition = ComputeSlotAnchoredPosition(stackIndex, template);
+            MachineRepairRectLayoutMirror.CopyLayoutExceptPosition(template, rect, slotPosition);
             CacheBannerBaseLayout(entry);
             ApplyUserLayoutTuning(entry);
+        }
+
+        private Vector2 ComputeSlotAnchoredPosition(int stackIndex, RectTransform template)
+        {
+            Vector2 step = GetStackStepVector();
+            float x = template != null ? template.anchoredPosition.x : stackAnchorPosition.x;
+
+            if (stackRoot != null
+                && bannerExamplesRoot != null
+                && MachineRepairRectLayoutMirror.TryGetRelativeBounds(
+                    bannerExamplesRoot,
+                    stackRoot,
+                    out Bounds bounds))
+            {
+                float slot0Y = bounds.min.y - scrollTopPadding;
+                return new Vector2(x, slot0Y - step.y * stackIndex);
+            }
+
+            float fallbackSlot0Y = stackAnchorPosition.y;
+            if (layoutReference != null && failLayoutReference != null)
+            {
+                fallbackSlot0Y = Mathf.Min(layoutReference.anchoredPosition.y, failLayoutReference.anchoredPosition.y)
+                    - step.y;
+            }
+            else if (layoutReference != null)
+            {
+                fallbackSlot0Y = layoutReference.anchoredPosition.y - step.y;
+            }
+
+            return new Vector2(x, fallbackSlot0Y - step.y * stackIndex);
         }
 
         private static void CacheBannerBaseLayout(ActiveBanner entry)
@@ -432,6 +505,16 @@ namespace DZ_3C.MachineRepair.UI
             }
 
             return new Vector2(0f, stepY);
+        }
+
+        private float GetEvictScrollDistance()
+        {
+            if (evictScrollDistance > 0f)
+            {
+                return evictScrollDistance;
+            }
+
+            return GetStackStepVector().y;
         }
 
         private Vector3 GetScaleMultiplier()
@@ -495,21 +578,94 @@ namespace DZ_3C.MachineRepair.UI
             {
                 iam.startAppear();
                 yield return WaitUntilState(iam, CSFHIAnimableState.appeared, 4f);
-                ApplyUserLayoutTuning(entry);
+                if (entry != null && entry.Rect != null)
+                {
+                    ApplyUserLayoutTuning(entry);
+                }
+
                 yield return new WaitForSeconds(holdSecondsAfterAppear);
+                if (instance == null)
+                {
+                    yield break;
+                }
+
                 iam.startDisappear();
                 yield return WaitUntilState(iam, CSFHIAnimableState.disappeared, 4f);
             }
             else
             {
-                ApplyUserLayoutTuning(entry);
+                if (entry != null && entry.Rect != null)
+                {
+                    ApplyUserLayoutTuning(entry);
+                }
+
                 yield return new WaitForSeconds(holdSecondsAfterAppear);
             }
 
-            RemoveEntry(entry);
-            if (instance != null)
+            if (instance == null)
             {
-                Destroy(instance);
+                yield break;
+            }
+
+            RemoveEntry(entry);
+            Destroy(instance);
+        }
+
+        private IEnumerator EvictBannerCoroutine(ActiveBanner entry)
+        {
+            if (entry?.Rect == null)
+            {
+                yield break;
+            }
+
+            if (entry.Routine != null)
+            {
+                StopCoroutine(entry.Routine);
+                entry.Routine = null;
+            }
+
+            RectTransform rect = entry.Rect;
+            GameObject go = rect.gameObject;
+            CanvasGroup group = go.GetComponent<CanvasGroup>();
+            if (group == null)
+            {
+                group = go.AddComponent<CanvasGroup>();
+            }
+
+            Button button = go.GetComponent<Button>();
+            if (button != null)
+            {
+                button.interactable = false;
+            }
+
+            if (entry.Anim != null)
+            {
+                entry.Anim.startDisappear(true);
+            }
+
+            Vector2 startPos = rect.anchoredPosition;
+            Vector2 endPos = startPos + new Vector2(0f, GetEvictScrollDistance());
+            float startAlpha = group.alpha;
+            float duration = Mathf.Max(0.1f, evictDuration);
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                if (rect == null)
+                {
+                    yield break;
+                }
+
+                float t = elapsed / duration;
+                rect.anchoredPosition = Vector2.Lerp(startPos, endPos, t);
+                group.alpha = Mathf.Lerp(startAlpha, 0f, t);
+                elapsed += Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            if (go != null)
+            {
+                Destroy(go);
             }
         }
 
@@ -523,38 +679,17 @@ namespace DZ_3C.MachineRepair.UI
             }
         }
 
-        private void ForceFinishOldest()
+        private void RemoveEntry(ActiveBanner entry)
         {
-            if (activeBanners.Count == 0)
+            if (entry == null)
             {
                 return;
             }
 
-            ActiveBanner oldest = activeBanners[0];
-            if (oldest.Routine != null)
-            {
-                StopCoroutine(oldest.Routine);
-            }
-
-            if (oldest.Anim != null)
-            {
-                oldest.Anim.startDisappear(true);
-            }
-
-            if (oldest.Rect != null)
-            {
-                Destroy(oldest.Rect.gameObject);
-            }
-
-            activeBanners.RemoveAt(0);
-            ReflowStack();
-        }
-
-        private void RemoveEntry(ActiveBanner entry)
-        {
             if (entry.Routine != null)
             {
                 StopCoroutine(entry.Routine);
+                entry.Routine = null;
             }
 
             activeBanners.Remove(entry);

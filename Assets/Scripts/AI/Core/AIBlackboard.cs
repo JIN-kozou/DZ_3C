@@ -123,6 +123,19 @@ namespace DZ_3C.AI.Core
             AssaultTaskElapsed = 0f;
         }
 
+        /// <summary>从 Attackers 桶移除指定目标；无匹配项时不触发感知更新。</summary>
+        public void RemoveAttackerTarget(AITargetable target)
+        {
+            if (target == null) return;
+
+            for (int i = attackers.Count - 1; i >= 0; i--)
+            {
+                if (attackers[i].target != target) continue;
+                attackers.RemoveAt(i);
+                OnPerceptionUpdated?.Invoke();
+            }
+        }
+
         public void SetHeardFocus(Vector3 worldPosition, Vector3 planarDirection, float totalIntensity, float updatedTime)
         {
             hasHeardFocus = true;
