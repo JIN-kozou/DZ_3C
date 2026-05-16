@@ -81,16 +81,17 @@ namespace DZ_3C.MachineRepair
             return p != null ? p.GetComponent<RepairInteractionHub>() : null;
         }
 
-        internal void TryPickup(MachinePartInventory inv, RepairInteractionHub hub)
+        internal bool TryPickup(MachinePartInventory inv, RepairInteractionHub hub)
         {
-            if (definition == null || inv == null) return;
+            if (definition == null || inv == null) return false;
             if (!inv.CanAdd(definition, 1))
             {
                 Debug.Log(
                     $"[MachineRepair] Pickup blocked by carry limit: id={definition.Id}, displayName={definition.DisplayName}. " +
                     $"Inventory: {MachinePartInventory.FormatSnapshotForDebug(inv.Snapshot())}");
-                return;
+                return false;
             }
+
             inv.AddAndNotify(definition, 1);
             Debug.Log(
                 $"[MachineRepair] Picked up part: id={definition.Id}, displayName={definition.DisplayName}. " +
@@ -98,6 +99,7 @@ namespace DZ_3C.MachineRepair
             hub.RegisterPart(this, false);
             PlayPickupAudio();
             Destroy(gameObject);
+            return true;
         }
 
         private void PlayPickupAudio()
