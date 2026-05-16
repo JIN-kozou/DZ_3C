@@ -95,7 +95,14 @@ namespace DZ_3C.Reverse
         {
             if (anchor == null) anchor = GetComponent<ReverseAnchor>();
             if (player == null) player = GetComponent<Player>();
-            if (characterAudio == null) characterAudio = GetComponent<CharacterAudio>();
+            if (characterAudio == null)
+            {
+                characterAudio = GetComponent<CharacterAudio>();
+                if (characterAudio == null)
+                {
+                    characterAudio = GetComponentInParent<CharacterAudio>(true);
+                }
+            }
             if (registry == null)
             {
                 registry = GetComponentInChildren<ReverseArrayRegistry>();
@@ -274,7 +281,7 @@ namespace DZ_3C.Reverse
                     deployed = cores[i];
                     cores.RemoveAt(i);
                     OnCoresChanged?.Invoke();
-                    characterAudio?.OnCoreConsume();
+                    characterAudio?.OnCoreInstall();
                     return true;
                 }
             }
@@ -292,7 +299,6 @@ namespace DZ_3C.Reverse
             cores.Add(new ReverseCore(maxHp, eps));
             OnCoresChanged?.Invoke();
             characterAudio?.OnCorePickup();
-            characterAudio?.OnCoreInstall();
         }
 
         // ---------- IReverseRecoverTarget ----------

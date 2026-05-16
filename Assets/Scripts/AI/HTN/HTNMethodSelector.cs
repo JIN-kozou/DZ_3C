@@ -98,7 +98,7 @@ namespace DZ_3C.AI.HTN
 
         private void SelectIdleMethod()
         {
-            bool hasHeard = blackboard.HeardTargets.Count > 0;
+            bool hasHeard = blackboard.HasHeardFocus;
             if (!hasHeard)
             {
                 alertPatrolPhaseStartTime = -1f;

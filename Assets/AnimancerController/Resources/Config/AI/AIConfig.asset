@@ -16,7 +16,7 @@ MonoBehaviour:
   hateLostSightClearSeconds: 5
   hateAttackTaskMaxSeconds: 12
   visionTickHz: 8
-  hearingTickHz: 8
+  hearingTickHz: 20
   distanceTickHz: 10
   energyTickHz: 5
   visionRadius: 10
@@ -29,9 +29,12 @@ MonoBehaviour:
   visionObstacleMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  hearingDistance: 16
+  hearingDistance: 30
   hearingThreshold: 0.1
-  alertPatrolPrioritySeconds: 8
+  hearingSensitivity: 10
+  alertPatrolPrioritySeconds: 0
+  heardFocusUpdateHz: 4
+  heardFocusStaleSeconds: 8
   hearingTargetMask:
     serializedVersion: 2
     m_Bits: 4294967295

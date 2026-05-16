@@ -61,6 +61,14 @@ namespace DZ_3C.AI.Debugging
                 Gizmos.color = Color.red;
                 Gizmos.DrawLine(transform.position, blackboard.HateTarget.transform.position);
             }
+
+            if (blackboard != null && blackboard.HasHeardFocus)
+            {
+                Gizmos.color = new Color(0.2f, 0.8f, 1f, 1f);
+                Vector3 focus = blackboard.HeardFocusWorldPosition;
+                Gizmos.DrawLine(transform.position, focus);
+                Gizmos.DrawWireSphere(focus, 0.6f);
+            }
         }
     }
 }

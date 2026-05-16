@@ -78,7 +78,7 @@ namespace DZ_3C.AI.HTN
                     : selector.CurrentIdleMethod.ToString();
 
         private float nextAttackTime;
-        [SerializeField, Min(0.05f)] private float movementAudioIntervalSeconds = 0.75f;
+        [SerializeField, Min(0.05f)] private float movementAudioIntervalSeconds = 6f;
         private float nextMovementAudioTime;
         [SerializeField, Min(0.1f)] private float patrolSonarIntervalSeconds = 3f;
         private float nextPatrolSonarTime;
@@ -434,11 +434,9 @@ namespace DZ_3C.AI.HTN
 
         private void TickAlertPatrol()
         {
-            if (blackboard.HeardTargets.Count == 0) return;
-            TargetFact heard = blackboard.HeardTargets[0];
-            if (!heard.IsValid) return;
+            if (!blackboard.HasHeardFocus) return;
 
-            Vector3 targetPos = heard.target.transform.position;
+            Vector3 targetPos = blackboard.HeardFocusWorldPosition;
             SetDominant(AtomicTask.HorizontalMove);
             PlanarSeekWorld(targetPos, monsterStat.moveSpeed);
 

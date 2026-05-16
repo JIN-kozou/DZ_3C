@@ -24,7 +24,7 @@ namespace DZ_3C.AI.Perception
                 if (target == null || noise == null || !noise.isEmitting || !target.IsAlive || target.transform == owner) continue;
 
                 float distance = Vector3.Distance(owner.position, target.transform.position);
-                float intensity = noise.loudness / Mathf.Max(1f, distance * distance);
+                float intensity = config.EvaluateHearingIntensity(noise.loudness, distance);
                 if (intensity < config.hearingThreshold) continue;
 
                 results.Add(new TargetFact
@@ -32,7 +32,8 @@ namespace DZ_3C.AI.Perception
                     target = target,
                     distance = distance,
                     timestamp = now,
-                    source = ThreatSource.None
+                    source = ThreatSource.None,
+                    intensity = intensity
                 });
             }
 
