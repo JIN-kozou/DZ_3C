@@ -14085,6 +14085,21 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: bfd9fc2c96f6d214ea2f6efc1a05d882, type: 2}
+    - target: {fileID: 353629056737859138, guid: 57767621d6944a64594db7eb5828c848,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 2.3473442
+      objectReference: {fileID: 0}
+    - target: {fileID: 353629056737859138, guid: 57767621d6944a64594db7eb5828c848,
+        type: 3}
+      propertyPath: m_Size.z
+      value: 0.9999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 353629056737859138, guid: 57767621d6944a64594db7eb5828c848,
+        type: 3}
+      propertyPath: m_Center.y
+      value: -0.67367214
+      objectReference: {fileID: 0}
     - target: {fileID: 521665439797411134, guid: 57767621d6944a64594db7eb5828c848,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -14105,6 +14120,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2754109149958107154, guid: 57767621d6944a64594db7eb5828c848,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2853441972650111099, guid: 57767621d6944a64594db7eb5828c848,
         type: 3}
@@ -14191,6 +14211,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: bfd9fc2c96f6d214ea2f6efc1a05d882, type: 2}
+    - target: {fileID: 4465820048464344225, guid: 57767621d6944a64594db7eb5828c848,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 4490764235995045298, guid: 57767621d6944a64594db7eb5828c848,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -14298,6 +14323,16 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+    - target: {fileID: 5687193666698872847, guid: 57767621d6944a64594db7eb5828c848,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.3272753
+      objectReference: {fileID: 0}
+    - target: {fileID: 5687193666698872847, guid: 57767621d6944a64594db7eb5828c848,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 4.6637
+      objectReference: {fileID: 0}
     - target: {fileID: 5986413489376828508, guid: 57767621d6944a64594db7eb5828c848,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -14476,6 +14511,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 3755006957491736109, guid: 29eeae2bae07ce2419ae1cb1c8877601,
         type: 3}
+    - target: {fileID: 8270313316245521722, guid: 57767621d6944a64594db7eb5828c848,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 2.3458664
+      objectReference: {fileID: 0}
+    - target: {fileID: 8270313316245521722, guid: 57767621d6944a64594db7eb5828c848,
+        type: 3}
+      propertyPath: m_Center.y
+      value: -0.67293334
+      objectReference: {fileID: 0}
     - target: {fileID: 8336511849454639302, guid: 57767621d6944a64594db7eb5828c848,
         type: 3}
       propertyPath: m_IsActive
@@ -14518,8 +14563,19 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 3755006957491736109, guid: 29eeae2bae07ce2419ae1cb1c8877601,
         type: 3}
+    - target: {fileID: 8989865445478877792, guid: 57767621d6944a64594db7eb5828c848,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.7573698
+      objectReference: {fileID: 0}
+    - target: {fileID: 8989865445478877792, guid: 57767621d6944a64594db7eb5828c848,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.3786
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 8967932372809351564, guid: 57767621d6944a64594db7eb5828c848, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 7823335660374928403, guid: 57767621d6944a64594db7eb5828c848,
         type: 3}
