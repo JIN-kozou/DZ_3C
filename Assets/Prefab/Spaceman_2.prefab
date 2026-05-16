@@ -1831,13 +1831,15 @@ MonoBehaviour:
   - {fileID: 3610349738159237416, guid: 6e65a75107a01e74c913d68dee9ad86f, type: 3}
   breathing: {fileID: 6040926414909537318, guid: 0944c372485763949a7468a041222f0d,
     type: 3}
-  jumpExhale: {fileID: 0}
+  jumpExhale: {fileID: 3355736038469124288, guid: 1858131c56884904c9fd425c7f6bd3a4,
+    type: 3}
   jumpWhoosh: {fileID: 0}
   land: {fileID: 548375036332082236, guid: ccc0ac0176bc5c947b20b3c1cf2de6d3, type: 3}
-  normalBreathingVolumeMultiplier: 1
-  intenseBreathingVolumeMultiplier: 1.4
-  startBreathingOnEnable: 1
-  intenseBreathingDelaySeconds: 2
+  landMinInterval: 0.8
+  normalBreathingVolumeMultiplier: 0.2
+  intenseBreathingVolumeMultiplier: 0.2
+  adsBreathingHoldSeconds: 3
+  idleCalmBreathingHoldSeconds: 3
   autoDetectPlayerMovement: 1
   walkFootstepInterval: 0.295
   runFootstepInterval: 0.295
@@ -1855,7 +1857,8 @@ MonoBehaviour:
   coreInstall: {fileID: 5639275637951080561, guid: b6fb0782f32841d4e88a93ee28afff58,
     type: 3}
   coreInstallStartSeconds: 2.2
-  coreCharge: {fileID: 0}
+  coreCharge: {fileID: 3073538238840932348, guid: fd37378981f58a6469db43d4b136af7a,
+    type: 3}
   coreConsume: {fileID: 7627817907131107349, guid: 5b30f8afb1c26d14eb713b019f754f60,
     type: 3}
   aiNoiseBridge: {fileID: 1737456288524216695}

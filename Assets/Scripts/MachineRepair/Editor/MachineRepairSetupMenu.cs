@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using DZ_3C.MachineRepair.UI;
 using UnityEditor;
 using UnityEngine;
 using DZ_3C.MachineRepair;
@@ -275,6 +276,90 @@ namespace DZ_3C.MachineRepair.Editor
             }
             so.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(def);
+        }
+
+        [MenuItem("DZ_3C/Machine Repair/Wire Receiver UI On Selected")]
+        public static void WireReceiverUiOnSelected()
+        {
+            GameObject selected = Selection.activeGameObject;
+            if (selected == null)
+            {
+                Debug.LogWarning("[MachineRepair] Select a MachinePartReceiver (or its ReceiverUI child) in the Hierarchy.");
+                return;
+            }
+
+            MachinePartReceiver receiver = selected.GetComponentInParent<MachinePartReceiver>();
+            if (receiver == null)
+            {
+                receiver = selected.GetComponent<MachinePartReceiver>();
+            }
+
+            if (receiver == null)
+            {
+                Debug.LogWarning("[MachineRepair] No MachinePartReceiver found on selection.");
+                return;
+            }
+
+            MachinePartReceiverUIView view = selected.GetComponent<MachinePartReceiverUIView>();
+            if (view == null)
+            {
+                view = receiver.GetComponentInChildren<MachinePartReceiverUIView>(true);
+            }
+
+            if (view == null)
+            {
+                Transform receiverUi = receiver.transform.Find("ReceiverUI");
+                if (receiverUi == null)
+                {
+                    Debug.LogWarning("[MachineRepair] Add a child named ReceiverUI with Panel/amount/winorLose, then run again.");
+                    return;
+                }
+
+                view = receiverUi.gameObject.AddComponent<MachinePartReceiverUIView>();
+            }
+
+            view.TryAutoBindReferences();
+
+            SerializedObject viewSo = new SerializedObject(view);
+            Transform panel = view.transform.Find("Panel") ?? view.transform;
+            Transform winorLose = panel.Find("winorLose");
+            if (winorLose != null)
+            {
+                viewSo.FindProperty("statusTextTmp").objectReferenceValue =
+                    winorLose.GetComponent<TMPro.TextMeshProUGUI>();
+            }
+
+            viewSo.ApplyModifiedPropertiesWithoutUndo();
+
+            InterfaceAnimManager iam = view.GetComponent<InterfaceAnimManager>();
+            if (iam == null && view.transform.parent != null)
+            {
+                iam = view.gameObject.GetComponent<InterfaceAnimManager>();
+            }
+
+            if (iam == null)
+            {
+                iam = view.GetComponentInChildren<InterfaceAnimManager>(true);
+            }
+
+            if (iam != null)
+            {
+                iam.autoStart = false;
+                EditorUtility.SetDirty(iam);
+            }
+
+            SerializedObject receiverSo = new SerializedObject(receiver);
+            receiverSo.FindProperty("proximityUi").objectReferenceValue = view;
+            receiverSo.ApplyModifiedPropertiesWithoutUndo();
+
+            view.gameObject.SetActive(false);
+            EditorUtility.SetDirty(receiver);
+            EditorUtility.SetDirty(view);
+
+            Debug.Log(
+                "[MachineRepair] Receiver UI wired. Keep ReceiverUI inactive in scene; IAM autoStart=0. " +
+                "Proximity UI shows on trigger enter.",
+                receiver);
         }
     }
 }

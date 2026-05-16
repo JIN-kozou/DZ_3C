@@ -33,6 +33,7 @@ GameObject:
   - component: {fileID: 882234560013}
   - component: {fileID: 782234560002}
   - component: {fileID: 5214937051649352280}
+  - component: {fileID: 5244972631695412145}
   m_Layer: 0
   m_Name: AI
   m_TagString: Monster
@@ -146,6 +147,11 @@ MonoBehaviour:
   contactTargets: []
   attackers: []
   energyTargets: []
+  hasHeardFocus: 0
+  heardFocusWorldPosition: {x: 0, y: 0, z: 0}
+  heardFocusDirection: {x: 0, y: 0, z: 1}
+  heardFocusIntensity: 0
+  heardFocusLastUpdatedTime: 0
 --- !u!114 &8359702207137834310
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -428,7 +434,7 @@ MonoBehaviour:
   laserAttackVisualPrefab: {fileID: 3504364219570076995, guid: 72f1a933f362eec4eaa271344fa7a1fb,
     type: 3}
   laserAttackVisualSpawnPoint: {fileID: 413729285200019432}
-  laserAttackVisualLifetimeSeconds: 0.5
+  laserAttackVisualLifetimeSeconds: 1
   movementAudioIntervalSeconds: 6
   patrolSonarIntervalSeconds: 3
 --- !u!114 &7566732114713936834
@@ -513,6 +519,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   character: {fileID: 2415126630310859549}
+  enemyAudio: {fileID: 0}
   hitPresentationBehaviour: {fileID: 882234560013}
   fallbackMaxHealth: 100
   destroyGameObjectOnDeath: 1
@@ -536,11 +543,12 @@ MonoBehaviour:
   hitReaction: {fileID: 0}
   targetAcquisitionHowl: {fileID: 7764951935935556611, guid: 1b05d906fe762e14dbcf73456321f65b,
     type: 3}
-  movement: {fileID: 0}
+  movement: {fileID: 2380485828673312467, guid: 252b2ddc73c10ee4299a01d7489a852e,
+    type: 3}
   spawn: {fileID: 0}
   patrolSonar: {fileID: 8725546113903245732, guid: fcc8344162ef0ed4d8dbe7a17ad20d21,
     type: 3}
-  laserAttackStartTimeSeconds: 0.45
+  laserAttackStartTimeSeconds: 0
   patrolBreathingLoop: {fileID: 2442576880511207717, guid: f7ce2cdda3767f74ba67fb0beef9dfed,
     type: 3}
   aiNoiseBridge: {fileID: 0}
@@ -558,6 +566,21 @@ MonoBehaviour:
   spawnNoiseDuration: 0.6
   patrolBreathingNoiseLoudness: 0.3
   patrolBreathingEmitsContinuousNoise: 0
+--- !u!114 &5244972631695412145
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5737582618028807084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 955b1fa4b9a3f5e449b02e46fb2478c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  config: {fileID: 11400000, guid: 765185ef31879f44ebbe97abcd39b9d6, type: 2}
+  blackboard: {fileID: 720409558556578650}
+  owner: {fileID: 2539064326662965698}
 --- !u!1 &5967168280176440551
 GameObject:
   m_ObjectHideFlags: 0
