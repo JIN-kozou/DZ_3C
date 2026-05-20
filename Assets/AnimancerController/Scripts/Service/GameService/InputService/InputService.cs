@@ -1,4 +1,4 @@
-
+using DZ_3C.UI.WorldInteraction;
 using UnityEngine;
 using UnityEngine.InputSystem;
 /**************************************************************************
@@ -114,6 +114,11 @@ public class InputService : MonoSingleton<InputService>
                 return Vector2.zero;
             }
 
+            if (WorldInteractionMovementLock.IsLocked)
+            {
+                return Vector2.zero;
+            }
+
             return QuantizeMove(inputMap.Player.Move.ReadValue<Vector2>());
         }
     }
@@ -165,7 +170,7 @@ public class InputService : MonoSingleton<InputService>
             return;
         }
 
-        Vector2 discrete = QuantizeMove(inputMap.Player.Move.ReadValue<Vector2>());
+        Vector2 discrete = MoveDiscrete;
         if (!_moveSmoothPrimed)
         {
             _moveSmoothed = discrete;

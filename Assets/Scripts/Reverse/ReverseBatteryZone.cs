@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DZ_3C.UI.WorldInteraction;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,7 +15,7 @@ namespace DZ_3C.Reverse
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Collider))]
-    public class ReverseBatteryZone : MonoBehaviour
+    public class ReverseBatteryZone : MonoBehaviour, IWorldInteractionHoldProgress
     {
         private static readonly HashSet<int> PlayersInsideAnyZone = new HashSet<int>();
         [Header("Buff Config")]
@@ -36,8 +37,8 @@ namespace DZ_3C.Reverse
         [Min(0.1f)]
         [SerializeField] private float holdDuration = 1.2f;
         [SerializeField] private string promptText = "长按E开始充能，并且存储该重生点";
-        [SerializeField] private bool useOnGuiPromptFallback = true;
         [SerializeField] private ReverseArrayAudio reverseArrayAudio;
+        [SerializeField] private WorldInteractionPromptAnchor promptAnchor;
 
         private readonly HashSet<int> appliedPlayerIds = new HashSet<int>();
         private readonly HashSet<int> playersInZone = new HashSet<int>();
@@ -49,7 +50,10 @@ namespace DZ_3C.Reverse
 
         public bool IsPlayerInside => activePlayer != null;
         public bool IsCharging => IsPlayerInside && !hasActivatedInCurrentStay && holdElapsed > 0f;
-        public float ChargeProgressNormalized
+        public bool BlocksMovement => IsCharging;
+        public float ChargeProgressNormalized => NormalizedProgress;
+
+        public float NormalizedProgress
         {
             get
             {
@@ -84,11 +88,18 @@ namespace DZ_3C.Reverse
             {
                 reverseArrayAudio = GetComponentInChildren<ReverseArrayAudio>(true);
             }
+
+            EnsurePromptAnchor();
         }
 
         private void OnDisable()
         {
             StopChargeAudio();
+            if (promptAnchor != null)
+            {
+                promptAnchor.SetPlayerInRange(false);
+                promptAnchor.SetAvailable(false);
+            }
         }
 
         private void Update()
@@ -115,30 +126,7 @@ namespace DZ_3C.Reverse
             TryApplyBuff(activePlayer);
             activeCharacterAudio?.OnCoreCharge();
             ReverseBatteryRespawnStore.SaveBatteryRespawnPoint(transform);
-        }
-
-        private void OnGUI()
-        {
-            if (!useOnGuiPromptFallback) return;
-            if (!IsPlayerInside || IsActivatedInCurrentStay) return;
-
-            const float width = 460f;
-            const float height = 36f;
-            float x = (Screen.width - width) * 0.5f;
-            float y = Screen.height - 120f;
-            GUI.Label(new Rect(x, y, width, height), promptText);
-
-            const float barHeight = 18f;
-            float barY = y + height + 6f;
-            Rect bgRect = new Rect(x, barY, width, barHeight);
-            GUI.Box(bgRect, GUIContent.none);
-
-            float fill = ChargeProgressNormalized;
-            if (fill > 0f)
-            {
-                Rect fillRect = new Rect(x + 2f, barY + 2f, (width - 4f) * fill, barHeight - 4f);
-                GUI.Box(fillRect, GUIContent.none);
-            }
+            RefreshPromptAvailability();
         }
 
         private void OnTriggerEnter(Collider other)
@@ -152,6 +140,13 @@ namespace DZ_3C.Reverse
             activeCharacterAudio = player.GetComponent<CharacterAudio>() ?? player.GetComponentInChildren<CharacterAudio>(true);
             holdElapsed = 0f;
             hasActivatedInCurrentStay = false;
+            WorldInteractionPromptManager.EnsureOnPlayer(player);
+            if (promptAnchor != null)
+            {
+                promptAnchor.SetPlayerInRange(true);
+            }
+
+            RefreshPromptAvailability();
         }
 
         private void OnTriggerStay(Collider other)
@@ -191,6 +186,11 @@ namespace DZ_3C.Reverse
                 activeCharacterAudio = null;
                 holdElapsed = 0f;
                 hasActivatedInCurrentStay = false;
+                if (promptAnchor != null)
+                {
+                    promptAnchor.SetPlayerInRange(false);
+                    RefreshPromptAvailability();
+                }
             }
         }
 
@@ -214,6 +214,33 @@ namespace DZ_3C.Reverse
         public static bool IsPlayerInsideAnyBatteryZone(Player player)
         {
             return player != null && PlayersInsideAnyZone.Contains(player.GetInstanceID());
+        }
+
+        private void EnsurePromptAnchor()
+        {
+            if (promptAnchor == null)
+            {
+                promptAnchor = GetComponent<WorldInteractionPromptAnchor>();
+            }
+
+            if (promptAnchor == null)
+            {
+                promptAnchor = gameObject.AddComponent<WorldInteractionPromptAnchor>();
+            }
+
+            string key = GetHoldKey() == KeyCode.E ? "E" : GetHoldKey().ToString();
+            promptAnchor.Configure(promptText, WorldInteractionMode.Hold, key);
+        }
+
+        private void RefreshPromptAvailability()
+        {
+            if (promptAnchor == null)
+            {
+                return;
+            }
+
+            bool available = !hasActivatedInCurrentStay;
+            promptAnchor.SetAvailable(available);
         }
 
         private KeyCode GetHoldKey()

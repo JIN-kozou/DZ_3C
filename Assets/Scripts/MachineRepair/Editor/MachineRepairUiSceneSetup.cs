@@ -210,7 +210,8 @@ namespace DZ_3C.MachineRepair.Editor
             EditorSceneManager.MarkSceneDirty(scene);
             Debug.Log(
                 $"[MachineRepair] {sceneLabel} wired. Banner stack under HUD/Canvas. " +
-                "Examples in BannerExamples (layout reference).");
+                "Examples in BannerExamples (layout reference). " +
+                "Part pickup/submit prompts use world-space UI (DZ_3C/UI/Add World Interaction Prompts In Open Scene).");
         }
 
         private static void EnsureHudCanvasPrefab()

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using DZ_3C.MachineRepair.UI;
 using DZ_3C.Reverse;
+using DZ_3C.UI.WorldInteraction;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -21,7 +22,6 @@ namespace DZ_3C.MachineRepair
         private ReverseConfig reverseConfig;
         [SerializeField] private ItemAudio itemAudio;
         [SerializeField] private MachineRepairPickupBannerQueue pickupBannerQueue;
-        [SerializeField] private MachineRepairPartIconPrompt partIconPrompt;
         [SerializeField] private KeyCode dropKey = KeyCode.G;
         [SerializeField, Min(0f)] private float dropForwardDistance = 1.2f;
         [SerializeField, Min(0f)] private float dropUpOffset = 0.25f;
@@ -49,12 +49,7 @@ namespace DZ_3C.MachineRepair
                 pickupBannerQueue = MachineRepairPickupBannerQueue.CreateDefaultUnderCanvas();
             }
 
-            if (partIconPrompt == null)
-            {
-                partIconPrompt = MachineRepairPartIconPrompt.FindInScene();
-            }
-
-            partIconPrompt?.BindHub(this);
+            WorldInteractionPromptManager.EnsureOnPlayer(player);
         }
 
         public MachinePartInventory Inventory => inventory;//只读属性，允许被.add
@@ -85,25 +80,46 @@ namespace DZ_3C.MachineRepair
             return false;
         }
 
-        internal void RegisterPartIconPrompt(MachineRepairPartIconPrompt prompt)
+        public void NotifyPickupSuccess(MachinePartDefinition definition)
         {
-            if (prompt == null)
-            {
-                return;
-            }
-
-            partIconPrompt = prompt;
-            prompt.RefreshFromHub(this);
+            pickupBannerQueue?.ShowPickupSuccess(definition);
         }
 
-        internal void UnregisterPartIconPrompt(MachineRepairPartIconPrompt prompt)
+        public void NotifyPickupFailedInventoryFull()
         {
-            if (prompt == null || partIconPrompt != prompt)
+            pickupBannerQueue?.ShowPickupFailedInventoryFull();
+        }
+
+        public bool TrySubmitFocusedReceiver(MachinePartReceiver receiver)
+        {
+            if (receiver == null || !receiversInRange.Contains(receiver))
             {
-                return;
+                return false;
             }
 
-            partIconPrompt = null;
+            return receiver.TrySubmitAllFrom(inventory);
+        }
+
+        public bool TryPickupFocusedPart(MachinePart part)
+        {
+            if (part == null || !partsInRange.Contains(part))
+            {
+                return false;
+            }
+
+            MachinePartDefinition def = part.Definition;
+            if (part.TryPickup(inventory, this))
+            {
+                NotifyPickupSuccess(def);
+                return true;
+            }
+
+            if (def != null)
+            {
+                NotifyPickupFailedInventoryFull();
+            }
+
+            return false;
         }
 
         internal void RegisterPart(MachinePart part, bool inRange)
@@ -111,7 +127,6 @@ namespace DZ_3C.MachineRepair
             if (part == null) return;
             if (inRange) partsInRange.Add(part);
             else partsInRange.Remove(part);
-            NotifyPartIconProximityChanged();
         }
 
         internal void RegisterReceiver(MachinePartReceiver receiver, bool inRange)
@@ -119,12 +134,6 @@ namespace DZ_3C.MachineRepair
             if (receiver == null) return;
             if (inRange) receiversInRange.Add(receiver);
             else receiversInRange.Remove(receiver);
-            NotifyPartIconProximityChanged();
-        }
-
-        private void NotifyPartIconProximityChanged()
-        {
-            partIconPrompt?.RefreshFromHub(this);
         }
 
         private void Update()
@@ -147,8 +156,7 @@ namespace DZ_3C.MachineRepair
                 interactiveHoldSeconds = 0f;
                 wasInteractiveHeldLastFrame = isHeld;
                 if (!inputService.InteractiveWasPressedThisFrame) return;
-                if (TrySubmitNearestReceiver()) return;
-                TryPickupNearestPart();
+                TryPerformCrosshairTapInteraction();
                 return;
             }
 
@@ -160,8 +168,7 @@ namespace DZ_3C.MachineRepair
                 bool treatedAsBatteryLongPress = inBatteryZone && interactiveHoldSeconds >= holdThreshold;
                 if (!treatedAsBatteryLongPress)
                 {
-                    if (TrySubmitNearestReceiver()) return;
-                    TryPickupNearestPart();
+                    TryPerformCrosshairTapInteraction();
                 }
 
                 interactiveHoldSeconds = 0f;
@@ -175,56 +182,15 @@ namespace DZ_3C.MachineRepair
             wasInteractiveHeldLastFrame = isHeld;
         }
 
-        private bool TrySubmitNearestReceiver()
+        private void TryPerformCrosshairTapInteraction()
         {
-            MachinePartReceiver best = null;
-            float bestSqr = float.MaxValue;
-            Vector3 p = transform.position;
-            foreach (var r in receiversInRange)
-            {
-                if (r == null) continue;
-                float s = (r.transform.position - p).sqrMagnitude;
-                if (s < bestSqr)
-                {
-                    bestSqr = s;
-                    best = r;
-                }
-            }
-
-            if (best == null) return false;
-            return best.TrySubmitAllFrom(inventory);
-        }
-
-        private void TryPickupNearestPart()
-        {
-            MachinePart best = null;
-            float bestSqr = float.MaxValue;
-            Vector3 p = transform.position;
-            foreach (var part in partsInRange)
-            {
-                if (part == null) continue;
-                float s = (part.transform.position - p).sqrMagnitude;
-                if (s < bestSqr)
-                {
-                    bestSqr = s;
-                    best = part;
-                }
-            }
-
-            if (best == null)
+            WorldInteractionPromptManager manager = WorldInteractionPromptManager.Instance;
+            if (manager == null)
             {
                 return;
             }
 
-            MachinePartDefinition def = best.Definition;
-            if (best.TryPickup(inventory, this))
-            {
-                pickupBannerQueue?.ShowPickupSuccess(def);
-            }
-            else if (def != null)
-            {
-                pickupBannerQueue?.ShowPickupFailedInventoryFull();
-            }
+            manager.TryPerformFocusedTapInteraction(this);
         }
 
         private bool TryDropFirstInventoryPart()

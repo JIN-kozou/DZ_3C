@@ -4542,7 +4542,6 @@ GameObject:
   - component: {fileID: 823185014}
   - component: {fileID: 823185013}
   - component: {fileID: 823185012}
-  - component: {fileID: 823185011}
   - component: {fileID: 823185010}
   - component: {fileID: 823185015}
   - component: {fileID: 823185016}
@@ -4587,18 +4586,6 @@ MonoBehaviour:
   m_CameraActivatedEvent:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &823185011
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 823185009}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 695c849a6d2bd7441bebdc0be6e80144, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &823185012
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7463,7 +7450,7 @@ MonoBehaviour:
   holdKey: 101
   holdDuration: 1.2
   promptText: "\u957F\u6309E\u5F00\u59CB\u5145\u80FD\uFF0C\u5E76\u4E14\u5B58\u50A8\u8BE5\u91CD\u751F\u70B9"
-  useOnGuiPromptFallback: 1
+  promptAnchor: {fileID: 0}
   reverseArrayAudio: {fileID: 0}
 --- !u!1 &1720630307
 GameObject:
@@ -7632,7 +7619,7 @@ MonoBehaviour:
   holdKey: 101
   holdDuration: 1.2
   promptText: "\u957F\u6309E\u5F00\u59CB\u5145\u80FD\uFF0C\u5E76\u4E14\u5B58\u50A8\u8BE5\u91CD\u751F\u70B9"
-  useOnGuiPromptFallback: 1
+  promptAnchor: {fileID: 0}
   reverseArrayAudio: {fileID: 0}
 --- !u!65 &1744144132
 BoxCollider:

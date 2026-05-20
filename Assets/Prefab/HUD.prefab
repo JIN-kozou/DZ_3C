@@ -4476,7 +4476,6 @@ GameObject:
   - component: {fileID: 2760682449432979226}
   - component: {fileID: 6178667149373403090}
   - component: {fileID: 1621414301386292490}
-  - component: {fileID: 5045305062986107220}
   m_Layer: 0
   m_Name: PartIcon
   m_TagString: Untagged
@@ -4599,21 +4598,6 @@ MonoBehaviour:
   - {fileID: 7400000, guid: 633d8e0b954ccda4bbd89ac29e7fae2b, type: 2}
   currentState: 3
   isNested_IAM: 0
---- !u!114 &5045305062986107220
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3578730986062467516}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4a8c2e19d3b4f6a8e1c0d5b7a9e2f31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  uiRoot: {fileID: 3578730986062467516}
-  titleText: {fileID: 1516424127623234021}
-  interactionHub: {fileID: 0}
 --- !u!1 &3823890959920728850
 GameObject:
   m_ObjectHideFlags: 0

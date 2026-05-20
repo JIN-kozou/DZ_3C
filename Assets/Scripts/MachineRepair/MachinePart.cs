@@ -1,3 +1,4 @@
+using DZ_3C.UI.WorldInteraction;
 using UnityEngine;
 
 namespace DZ_3C.MachineRepair
@@ -6,7 +7,11 @@ namespace DZ_3C.MachineRepair
     [RequireComponent(typeof(Collider))]
     public class MachinePart : MonoBehaviour
     {
+        private const string DefaultPickupPrompt = "拾取零件";
+
         [SerializeField] private MachinePartDefinition definition;
+        [SerializeField] private WorldInteractionPromptAnchor promptAnchor;
+        [SerializeField] private string pickupPromptText = DefaultPickupPrompt;
         [Tooltip("开启时：不在运行时按 Definition 的 VisualShape 重建 mesh/材质，完全使用 prefab 上的 MeshFilter/缩放/材质。")]
         [SerializeField] private bool usePrefabMesh = true;
         [SerializeField] private MeshFilter meshFilter;
@@ -31,6 +36,7 @@ namespace DZ_3C.MachineRepair
             if (itemAudio == null) itemAudio = GetComponent<ItemAudio>();
             col = GetComponent<Collider>();
             if (col != null) col.isTrigger = true;
+            EnsurePromptAnchor();
         }
 
         private void Start()
@@ -64,6 +70,9 @@ namespace DZ_3C.MachineRepair
             if (hub == null) return;
             cachedHub = hub;
             hub.RegisterPart(this, true);
+            WorldInteractionPromptManager.EnsureOnPlayer(hub.GetComponent<Player>());
+            promptAnchor?.SetPlayerInRange(true);
+            promptAnchor?.SetAvailable(true);
         }
 
         private void OnTriggerExit(Collider other)
@@ -72,6 +81,7 @@ namespace DZ_3C.MachineRepair
             if (hub == null) return;
             hub.RegisterPart(this, false);
             if (cachedHub == hub) cachedHub = null;
+            promptAnchor?.SetPlayerInRange(false);
         }
 
         private static RepairInteractionHub FindHub(Collider other)
@@ -123,6 +133,27 @@ namespace DZ_3C.MachineRepair
             {
                 cachedHub.RegisterPart(this, false);
             }
+
+            if (promptAnchor != null)
+            {
+                promptAnchor.SetPlayerInRange(false);
+                promptAnchor.SetAvailable(false);
+            }
+        }
+
+        private void EnsurePromptAnchor()
+        {
+            if (promptAnchor == null)
+            {
+                promptAnchor = GetComponent<WorldInteractionPromptAnchor>();
+            }
+
+            if (promptAnchor == null)
+            {
+                promptAnchor = gameObject.AddComponent<WorldInteractionPromptAnchor>();
+            }
+
+            promptAnchor.Configure(pickupPromptText, WorldInteractionMode.Tap, "E");
         }
     }
 }

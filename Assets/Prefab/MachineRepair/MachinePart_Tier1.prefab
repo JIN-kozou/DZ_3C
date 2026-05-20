@@ -120,6 +120,7 @@ GameObject:
   - component: {fileID: 6546458620157547047}
   - component: {fileID: 2109948230473163492}
   - component: {fileID: 3774068906260846791}
+  - component: {fileID: 2822620096347597689}
   m_Layer: 0
   m_Name: MachinePart_Tier1
   m_TagString: Untagged
@@ -227,9 +228,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   definition: {fileID: 11400000, guid: a1b2c3d4e5f6478091a2b3c4d5e6f708, type: 2}
+  promptAnchor: {fileID: 0}
+  pickupPromptText: "\u62FE\u53D6\u96F6\u4EF6"
   usePrefabMesh: 1
-  meshFilter: {fileID: 1236770151651638430}
-  meshRenderer: {fileID: 4759750227147183309}
+  meshFilter: {fileID: 834444919760936279}
+  meshRenderer: {fileID: 5861996895367136971}
   itemAudio: {fileID: 0}
 --- !u!114 &3774068906260846791
 MonoBehaviour:
@@ -257,3 +260,25 @@ MonoBehaviour:
   dropNoiseDuration: 0.2
   submitNoiseLoudness: 0.5
   submitNoiseDuration: 0.2
+--- !u!114 &2822620096347597689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4521928893997949838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 681ec32ee390b1d469dc2dcee15e6441, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  promptText: "\u62FE\u53D6"
+  keyLabel: E
+  interactionMode: 0
+  anchorTransform: {fileID: 380043497558522547}
+  worldOffset: {x: 0, y: 0.1, z: 0}
+  markerMode: 0
+  customMarkerPrefab: {fileID: 0}
+  markerTint: {r: 1, g: 1, b: 1, a: 0.95}
+  activePromptPrefab: {fileID: 0}
+  markerPrefab: {fileID: 0}

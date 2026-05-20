@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2647878381205673379}
   - component: {fileID: 6734456587441311774}
   - component: {fileID: 3774851626925699823}
+  - component: {fileID: 1147298370965737851}
   m_Layer: 0
   m_Name: BatteryZone
   m_TagString: Untagged
@@ -28,7 +29,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5644026868234727990}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 15.202522, y: 0.51447856, z: 0.9175389}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -125,8 +126,33 @@ MonoBehaviour:
   reverseConfig: {fileID: 0}
   holdKey: 101
   holdDuration: 1.2
-  promptText: "\u957F\u6309E\u5F00\u59CB\u5145\u80FD\uFF0C\u5E76\u4E14\u5B58\u50A8\u8BE5\u91CD\u751F\u70B9"
-  useOnGuiPromptFallback: 1
+  promptText: "\u9577\u6309\u5145\u80FD"
+  reverseArrayAudio: {fileID: 0}
+  promptAnchor: {fileID: 0}
+--- !u!114 &1147298370965737851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5644026868234727990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 681ec32ee390b1d469dc2dcee15e6441, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  promptText: "\u5145\u80FD"
+  keyLabel: E
+  interactionMode: 1
+  anchorTransform: {fileID: 237558536883607281}
+  worldOffset: {x: -1.5, y: 1, z: -0.5}
+  markerMode: 0
+  customMarkerPrefab: {fileID: 0}
+  markerTint: {r: 1, g: 1, b: 1, a: 0.95}
+  activePromptPrefab: {fileID: 8277865775419173945, guid: 46e558ddd5565d14c9ef388ca64fa89c,
+    type: 3}
+  markerPrefab: {fileID: 1715352157345951450, guid: 4795fa11ac092ad4489b9020585cbd69,
+    type: 3}
 --- !u!1001 &5942395555279005043
 PrefabInstance:
   m_ObjectHideFlags: 0

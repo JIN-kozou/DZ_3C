@@ -8,6 +8,7 @@ using UnityEngine.Playables;
 功能: 依赖虚拟相机，用于平滑控制相机距离
 **************************************************************************/
 
+[RequireComponent(typeof(CinemachineVirtualCamera))]
 public class CameraController : MonoBehaviour
 {
     public float defaultDistance;
@@ -30,7 +31,19 @@ public class CameraController : MonoBehaviour
     {
         inputService = InputService.Instance;
 
-        virtualCamera = GetComponent<CinemachineVirtualCamera>().GetCinemachineComponent<CinemachineFramingTransposer>();
+        var vcam = GetComponent<CinemachineVirtualCamera>();
+        virtualCamera = vcam != null
+            ? vcam.GetCinemachineComponent<CinemachineFramingTransposer>()
+            : null;
+        if (virtualCamera == null)
+        {
+            Debug.LogError(
+                $"{nameof(CameraController)} on {name} requires {nameof(CinemachineVirtualCamera)} with {nameof(CinemachineFramingTransposer)} on the same object.",
+                this);
+            enabled = false;
+            return;
+        }
+
         playableDirector = transform.GetComponent<PlayableDirector>();
         currentDistance = defaultDistance;
         virtualCamera.m_CameraDistance = currentDistance;
@@ -45,6 +58,11 @@ public class CameraController : MonoBehaviour
     }
     private void LateUpdate()
     {
+        if (virtualCamera == null)
+        {
+            return;
+        }
+
         UpdateCameraDistance();
     }
 

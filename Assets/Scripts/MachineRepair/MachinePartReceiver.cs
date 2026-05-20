@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using DZ_3C.MachineRepair.UI;
+using DZ_3C.UI.WorldInteraction;
 using UnityEngine;
 
 namespace DZ_3C.MachineRepair
@@ -34,6 +35,8 @@ namespace DZ_3C.MachineRepair
 
         [Header("Proximity UI")]
         [SerializeField] private MachinePartReceiverUIView proximityUi;
+        [SerializeField] private WorldInteractionPromptAnchor promptAnchor;
+        [SerializeField] private string submitPromptText = "提交零件";
 
         public IReadOnlyList<PartRequirement> Requirements => requirements;
 
@@ -68,6 +71,8 @@ namespace DZ_3C.MachineRepair
             {
                 proximityUi = GetComponentInChildren<MachinePartReceiverUIView>(true);
             }
+
+            EnsurePromptAnchor();
         }
 
         public bool IsLineSatisfied(PartRequirement req)
@@ -202,6 +207,9 @@ namespace DZ_3C.MachineRepair
             RepairInteractionHub hub = FindHub(other);
             if (hub == null) return;
             hub.RegisterReceiver(this, true);
+            WorldInteractionPromptManager.EnsureOnPlayer(hub.GetComponent<Player>());
+            promptAnchor?.SetPlayerInRange(true);
+            promptAnchor?.SetAvailable(true);
             if (proximityUi != null)
             {
                 proximityUi.SetVisible(true);
@@ -214,6 +222,7 @@ namespace DZ_3C.MachineRepair
             RepairInteractionHub hub = FindHub(other);
             if (hub == null) return;
             hub.RegisterReceiver(this, false);
+            promptAnchor?.SetPlayerInRange(false);
             proximityUi?.SetVisible(false);
         }
 
@@ -333,6 +342,21 @@ namespace DZ_3C.MachineRepair
             }
 
             return sb.Length == 0 ? "(all satisfied)" : sb.ToString();
+        }
+
+        private void EnsurePromptAnchor()
+        {
+            if (promptAnchor == null)
+            {
+                promptAnchor = GetComponent<WorldInteractionPromptAnchor>();
+            }
+
+            if (promptAnchor == null)
+            {
+                promptAnchor = gameObject.AddComponent<WorldInteractionPromptAnchor>();
+            }
+
+            promptAnchor.Configure(submitPromptText, WorldInteractionMode.Tap, "E");
         }
     }
 }
