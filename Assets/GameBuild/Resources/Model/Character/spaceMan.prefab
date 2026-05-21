@@ -1040,6 +1040,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 79d08a8e5026c214f8e4cc1ee37b9eea,
         type: 3}
       insertIndex: -1
+      addedObject: {fileID: 9940586731405968724}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 79d08a8e5026c214f8e4cc1ee37b9eea,
+        type: 3}
+      insertIndex: -1
       addedObject: {fileID: 2329422448389621622}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 79d08a8e5026c214f8e4cc1ee37b9eea,
         type: 3}
@@ -1312,6 +1316,45 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radius: 100
   offset: {x: 0, y: 0, z: 0}
+--- !u!114 &9940586731405968724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5328563006661601500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8d4e1f2a3b4567890abcdef12345678, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shaderPosition: {fileID: 1659457713238994157}
+  config: {fileID: 11400000, guid: 39b4218859a146a2a65162d85c8a8f6d, type: 2}
+  fallbackTransitionDuration: 0.25
+  fallbackTransitionCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &2329422448389621622
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1393,33 +1436,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   coreStack: {fileID: 5421706574336869697}
   shaderPosition: {fileID: 1659457713238994157}
+  radiusTransition: {fileID: 9940586731405968724}
   initialRadius: 5
   pointLight: {fileID: 0}
-  fallbackTransitionDuration: 0.25
-  fallbackTransitionCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &2842392197927113906
 MonoBehaviour:
   m_ObjectHideFlags: 0

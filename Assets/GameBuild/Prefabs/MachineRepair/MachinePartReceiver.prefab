@@ -191,6 +191,9 @@ GameObject:
   - component: {fileID: 6929503669919340220}
   - component: {fileID: 9034540233798176373}
   - component: {fileID: 8217440443723334855}
+  - component: {fileID: 468187449187685815}
+  - component: {fileID: 8827364519283746501}
+  - component: {fileID: 9223372036854775807}
   m_Layer: 0
   m_Name: MachinePartReceiver
   m_TagString: Untagged
@@ -264,6 +267,7 @@ MonoBehaviour:
   proximityUi: {fileID: 1292163822657847668}
   promptAnchor: {fileID: 8217440443723334855}
   submitPromptText: "\u63D0\u4EA4\u96F6\u4EF6"
+  revealDriver: {fileID: 9223372036854775807}
 --- !u!114 &9034540233798176373
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -313,6 +317,75 @@ MonoBehaviour:
     type: 3}
   markerPrefab: {fileID: 1715352157345951450, guid: 4795fa11ac092ad4489b9020585cbd69,
     type: 3}
+--- !u!114 &468187449187685815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6756024360891166839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f538b07f5a3588b448307f783546e2da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radius: 15
+  offset: {x: 0, y: 0, z: 0}
+--- !u!114 &8827364519283746501
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6756024360891166839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8d4e1f2a3b4567890abcdef12345678, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shaderPosition: {fileID: 468187449187685815}
+  config: {fileID: 0}
+  fallbackTransitionDuration: 0.25
+  fallbackTransitionCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &9223372036854775807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6756024360891166839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9e5f2a3b4c5678901abcdef23456789, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  receiver: {fileID: 6929503669919340220}
+  shaderPosition: {fileID: 468187449187685815}
+  radiusTransition: {fileID: 8827364519283746501}
+  minRadius: 3
 --- !u!1001 &8634335083985038168
 PrefabInstance:
   m_ObjectHideFlags: 0

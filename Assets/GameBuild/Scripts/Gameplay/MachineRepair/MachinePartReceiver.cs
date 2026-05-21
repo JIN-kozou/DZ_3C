@@ -38,6 +38,8 @@ namespace DZ_3C.MachineRepair
         [SerializeField] private WorldInteractionPromptAnchor promptAnchor;
         [SerializeField] private string submitPromptText = "提交零件";
 
+        [SerializeField] private MachinePartReceiverRevealDriver revealDriver;
+
         public IReadOnlyList<PartRequirement> Requirements => requirements;
 
         /// <summary>挂接了预设 SO 时返回预设里的名称；否则为 null。</summary>
@@ -73,6 +75,37 @@ namespace DZ_3C.MachineRepair
             }
 
             EnsurePromptAnchor();
+
+            if (revealDriver == null)
+            {
+                revealDriver = GetComponent<MachinePartReceiverRevealDriver>();
+            }
+        }
+
+        /// <summary>按零件数量加权：sum(delivered) / sum(countRequired)，无有效需求时为 0。</summary>
+        public float GetItemWeightedCompletionRatio()
+        {
+            if (requirements == null || requirements.Count == 0)
+            {
+                return 0f;
+            }
+
+            int deliveredTotal = 0;
+            int requiredTotal = 0;
+            for (int i = 0; i < requirements.Count; i++)
+            {
+                PartRequirement req = requirements[i];
+                if (req == null || req.part == null)
+                {
+                    continue;
+                }
+
+                int count = req.countRequired < 1 ? 1 : req.countRequired;
+                requiredTotal += count;
+                deliveredTotal += Mathf.Min(req.delivered, count);
+            }
+
+            return requiredTotal > 0 ? deliveredTotal / (float)requiredTotal : 0f;
         }
 
         public bool IsLineSatisfied(PartRequirement req)
@@ -309,6 +342,7 @@ namespace DZ_3C.MachineRepair
             if (any)
             {
                 MachinePartReceiversSceneGate.NotifyReceiverProgressChanged();
+                revealDriver?.RefreshFromRequirements();
             }
 
             return any;

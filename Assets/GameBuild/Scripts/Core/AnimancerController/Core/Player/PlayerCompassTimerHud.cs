@@ -126,7 +126,7 @@ public class PlayerCompassTimerHud : MonoBehaviour
 
     private static readonly string[] CardinalLabels =
     {
-        "北", "东北", "东", "东南", "南", "西南", "西", "西北"
+       //"黑洞", " ", " ", " ", "飞船", " ", " ", " "
     };
 
     private readonly StringBuilder _sb = new StringBuilder(12);

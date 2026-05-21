@@ -58,7 +58,7 @@ public class ShaderPosition : MonoBehaviour
         if (updatedThisFrame) return;
         updatedThisFrame = true;
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 15; i++)
         {
             if (i < instances.Count && instances[i] != null)
             {
