@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 596646368}
+  m_SkyboxMaterial: {fileID: 594221273}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -1769,13 +1769,7 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 589661981}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &596437732 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 85d9070a081c340458cfd89bde96aa33,
-    type: 3}
-  m_PrefabInstance: {fileID: 883381536}
-  m_PrefabAsset: {fileID: 0}
---- !u!21 &596646368
+--- !u!21 &594221273
 Material:
   serializedVersion: 8
   m_ObjectHideFlags: 0
@@ -1864,6 +1858,12 @@ Material:
     - _SunDir: {r: 1, g: 1, b: 1, a: 1}
     - _SunTint: {r: 1, g: 1, b: 0.7, a: 1}
   m_BuildTextureStacks: []
+--- !u!4 &596437732 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 85d9070a081c340458cfd89bde96aa33,
+    type: 3}
+  m_PrefabInstance: {fileID: 883381536}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &599348091
 PrefabInstance:
   m_ObjectHideFlags: 0
