@@ -24,6 +24,10 @@ public class PlayerCompassTimerHud : MonoBehaviour
         [Tooltip("与图标相乘的颜色。")]
         public Color tint = Color.white;
 
+        [Tooltip("图标方形边长（画布像素）；≤0 时使用 TopHudBar 上的全局 worldTargetIconSize。")]
+        [Min(0f)]
+        public float iconSize;
+
         [Tooltip("是否参与绘制。")]
         public bool show = true;
     }
@@ -213,6 +217,92 @@ public class PlayerCompassTimerHud : MonoBehaviour
         }
 
         EnsureWorldTargetMarkerPoolSize();
+    }
+
+    /// <summary>世界目标标记数量（<see cref="worldTargetMarkers"/> 列表长度）。</summary>
+    public int WorldTargetMarkerCount => worldTargetMarkers.Count;
+
+    /// <summary>外部调用：设置指定索引目标图标的显示颜色（写入 entry.tint，下一帧绘制生效）。</summary>
+    public void SetWorldTargetTint(int index, Color color)
+    {
+        if (!TryGetWorldTargetEntry(index, out var entry))
+        {
+            return;
+        }
+
+        entry.tint = color;
+        RefreshWorldTargetMarkerVisual(index);
+    }
+
+    /// <summary>与 <see cref="SetWorldTargetTint"/> 相同，便于外部按「改颜色」语义调用。</summary>
+    public void SetWorldTargetColor(int index, Color color) => SetWorldTargetTint(index, color);
+
+    /// <summary>外部调用：设置指定索引目标图标的方形边长（画布像素）。</summary>
+    public void SetWorldTargetIconSize(int index, float sizePixels)
+    {
+        if (!TryGetWorldTargetEntry(index, out var entry))
+        {
+            return;
+        }
+
+        entry.iconSize = Mathf.Max(0f, sizePixels);
+        RefreshWorldTargetMarkerVisual(index);
+    }
+
+    /// <summary>外部调用：设置指定索引目标是否显示。</summary>
+    public void SetWorldTargetVisible(int index, bool visible)
+    {
+        if (!TryGetWorldTargetEntry(index, out var entry))
+        {
+            return;
+        }
+
+        entry.show = visible;
+        RefreshWorldTargetMarkerVisual(index);
+    }
+
+    private bool TryGetWorldTargetEntry(int index, out CompassWorldTargetEntry entry)
+    {
+        entry = null;
+        if (index < 0 || index >= worldTargetMarkers.Count)
+        {
+            return false;
+        }
+
+        entry = worldTargetMarkers[index];
+        return entry != null;
+    }
+
+    private float ResolveWorldTargetIconSize(CompassWorldTargetEntry entry)
+    {
+        if (entry == null || entry.iconSize <= 0f)
+        {
+            return worldTargetIconSize;
+        }
+
+        return entry.iconSize;
+    }
+
+    private void RefreshWorldTargetMarkerVisual(int index)
+    {
+        if (index < 0 || index >= _worldTargetMarkerPool.Count)
+        {
+            return;
+        }
+
+        var img = _worldTargetMarkerPool[index];
+        if (img == null)
+        {
+            return;
+        }
+
+        var entry = index < worldTargetMarkers.Count ? worldTargetMarkers[index] : null;
+        float size = ResolveWorldTargetIconSize(entry);
+        img.rectTransform.sizeDelta = new Vector2(size, size);
+        if (entry != null)
+        {
+            img.color = entry.tint;
+        }
     }
 
     private void EnsureViewportMask()
@@ -452,7 +542,9 @@ public class PlayerCompassTimerHud : MonoBehaviour
             var irt = go.GetComponent<RectTransform>();
             irt.anchorMin = irt.anchorMax = new Vector2(0.5f, 0f);
             irt.pivot = new Vector2(0.5f, 0f);
-            irt.sizeDelta = new Vector2(worldTargetIconSize, worldTargetIconSize);
+            var entryForSize = idx < worldTargetMarkers.Count ? worldTargetMarkers[idx] : null;
+            float size = ResolveWorldTargetIconSize(entryForSize);
+            irt.sizeDelta = new Vector2(size, size);
             var img = go.GetComponent<Image>();
             img.raycastTarget = false;
             img.type = Image.Type.Simple;
@@ -469,7 +561,9 @@ public class PlayerCompassTimerHud : MonoBehaviour
             }
 
             var rt = img.rectTransform;
-            rt.sizeDelta = new Vector2(worldTargetIconSize, worldTargetIconSize);
+            var entryForSize = i < worldTargetMarkers.Count ? worldTargetMarkers[i] : null;
+            float size = ResolveWorldTargetIconSize(entryForSize);
+            rt.sizeDelta = new Vector2(size, size);
         }
     }
 
@@ -551,6 +645,8 @@ public class PlayerCompassTimerHud : MonoBehaviour
             var bearing = Vector3.SignedAngle(flatRef, toT, Vector3.up);
             var x = Mathf.Clamp(bearing * pixelsPerDegree, -halfW, halfW);
             var rt = img.rectTransform;
+            float iconSize = ResolveWorldTargetIconSize(entry);
+            rt.sizeDelta = new Vector2(iconSize, iconSize);
             rt.anchoredPosition = new Vector2(x, worldTargetIconAnchoredY);
             var sp = entry.icon != null ? entry.icon : GetRuntimeWhiteSprite();
             img.sprite = sp;

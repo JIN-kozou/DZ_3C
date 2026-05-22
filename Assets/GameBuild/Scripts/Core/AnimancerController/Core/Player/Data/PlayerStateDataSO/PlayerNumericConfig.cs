@@ -68,6 +68,20 @@ public class PlayerNumericConfig
     [Min(0f)] public float slideControlDamping = 4f;
     [Range(0f, 1f)] public float minGroundNormalY = 0.1f;
 
+    [Header("Ledge Walk-Off")]
+    [Tooltip("开启后，在地面移动态朝输入方向前探；前方无连续地面或落差可走下时强制离地，避免台缘卡住。")]
+    public bool ledgeWalkOffEnabled = true;
+    [Tooltip("从脚底平面中心沿移动方向前移的距离（米），用于台缘前探点。")]
+    [Min(0f)] public float ledgeProbeForwardDistance = 0.35f;
+    [Tooltip("前方地面比脚底低多少以内仍视为可走下（米）；建议不小于 CharacterController.stepOffset。")]
+    [Min(0f)] public float ledgeMaxWalkDownHeight = 0.4f;
+    [Tooltip("前探点向下射线最大长度（米）。")]
+    [Min(0.1f)] public float ledgeProbeDownDistance = 2f;
+    [Tooltip("前方地面与脚底高度差小于此值（米）视为仍连着，不强制离地。")]
+    [Min(0f)] public float ledgeSameHeightTolerance = 0.08f;
+    [Tooltip("为 true 时必须有移动输入（MoveDiscrete）才做台缘检测，避免站边缘误落。")]
+    public bool ledgeRequireMoveInput = true;
+
     [Header("Jump")]
     [Tooltip("台边 Coyote：离地后仍可起跳的秒数；0 表示离地立即进下落（不再使用原 50ms 定时器）。")]
     [Min(0f)] public float coyoteJumpTimeSeconds = 0.12f;

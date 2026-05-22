@@ -118,9 +118,45 @@ public class CharacterBase : MonoBehaviour
     protected virtual void Update()
     {
         CheckOnGround();
+        PostGroundCheck();
         CharacterGravity();
         CharacterVerticalVelocity();
         ResetHorizontalVelocity();
+    }
+
+    /// <summary>接地判定之后、重力结算之前调用；<see cref="Player"/> 用于台缘走下检测。</summary>
+    protected virtual void PostGroundCheck() { }
+
+    protected void ForceWalkOffLedge()
+    {
+        if (!isOnGround.Value)
+        {
+            return;
+        }
+
+        isOnGround.Value = false;
+    }
+
+    protected bool TryProbeGroundBelow(Vector3 worldOrigin, float downDistance, out RaycastHit hitInfo)
+    {
+        hitInfo = default;
+        if (downDistance <= 0f)
+        {
+            return false;
+        }
+
+        if (Physics.Raycast(worldOrigin, Vector3.down, out hitInfo, downDistance, whatIsGround, QueryTriggerInteraction.Ignore))
+        {
+            return true;
+        }
+
+        float probeRadius = controller != null ? Mathf.Max(0.05f, controller.radius * 0.35f) : 0.1f;
+        if (Physics.SphereCast(worldOrigin, probeRadius, Vector3.down, out hitInfo, downDistance, whatIsGround, QueryTriggerInteraction.Ignore))
+        {
+            return true;
+        }
+
+        return false;
     }
 
   

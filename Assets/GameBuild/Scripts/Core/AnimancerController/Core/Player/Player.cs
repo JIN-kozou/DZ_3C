@@ -530,6 +530,115 @@ public class Player : CharacterBase
         controller.center = center;
     }
 
+    private const float LedgeDebugRayDuration = 0.08f;
+
+    protected override void PostGroundCheck()
+    {
+        PlayerNumericConfig cfg = playerSO?.playerMovementData?.PlayerNumericConfig;
+        if (cfg == null || !cfg.ledgeWalkOffEnabled)
+        {
+            return;
+        }
+
+        if (disEnableGravity || controller == null || !controller.enabled || !isOnGround.Value)
+        {
+            return;
+        }
+
+        if (!IsLedgeWalkOffStateAllowed())
+        {
+            return;
+        }
+
+        Vector2 moveInput = InputService != null ? InputService.MoveDiscrete : Vector2.zero;
+        if (cfg.ledgeRequireMoveInput)
+        {
+            if (moveInput.sqrMagnitude < 1e-6f)
+            {
+                return;
+            }
+        }
+        else if (InputService != null)
+        {
+            moveInput = InputService.Move;
+            if (moveInput.sqrMagnitude < 1e-6f)
+            {
+                return;
+            }
+        }
+        else
+        {
+            return;
+        }
+
+        Vector3 planarDir = GetPlanarMoveDirection(moveInput);
+        if (planarDir.sqrMagnitude < 1e-6f)
+        {
+            return;
+        }
+
+        float footY = GetCapsuleFootWorldY();
+        Vector3 planarOrigin = new Vector3(transform.position.x, footY, transform.position.z);
+        Vector3 probeOrigin = planarOrigin + planarDir.normalized * cfg.ledgeProbeForwardDistance + Vector3.up * 0.05f;
+
+        bool shouldWalkOff;
+        if (TryProbeGroundBelow(probeOrigin, cfg.ledgeProbeDownDistance, out RaycastHit hit))
+        {
+            float drop = footY - hit.point.y;
+            if (drop <= cfg.ledgeSameHeightTolerance)
+            {
+                DrawLedgeDebugRay(probeOrigin, hit.point, false);
+                return;
+            }
+
+            shouldWalkOff = true;
+            DrawLedgeDebugRay(probeOrigin, hit.point, true);
+        }
+        else
+        {
+            shouldWalkOff = true;
+            DrawLedgeDebugRay(probeOrigin, probeOrigin + Vector3.down * cfg.ledgeProbeDownDistance, true);
+        }
+
+        if (shouldWalkOff)
+        {
+            ForceWalkOffLedge();
+        }
+    }
+
+    private bool IsLedgeWalkOffStateAllowed()
+    {
+        if (StateMachine == null)
+        {
+            return false;
+        }
+
+        IState state = StateMachine.currentState;
+        return state is PlayerIdleState
+            || state is PlayerMoveStartState
+            || state is PlayerMoveLoopState
+            || state is PlayerLandState
+            || state is PlayerArmedState;
+    }
+
+    private Vector3 GetPlanarMoveDirection(Vector2 move)
+    {
+        if (camTransform == null)
+        {
+            return new Vector3(move.x, 0f, move.y);
+        }
+
+        return Quaternion.Euler(0f, camTransform.eulerAngles.y, 0f) * new Vector3(move.x, 0f, move.y);
+    }
+
+    private void DrawLedgeDebugRay(Vector3 origin, Vector3 end, bool walkOff)
+    {
+#if UNITY_EDITOR
+        Color color = walkOff ? Color.red : Color.green;
+        Debug.DrawLine(origin, end, color, LedgeDebugRayDuration);
+#endif
+    }
+
     protected override void OnAnimatorMove()
     {
         base.OnAnimatorMove();

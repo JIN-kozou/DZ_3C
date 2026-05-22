@@ -40,7 +40,22 @@ namespace DZ_3C.MachineRepair
 
         [SerializeField] private MachinePartReceiverRevealDriver revealDriver;
 
+        [Header("Compass HUD (TopHudBar WorldTargetMarkers)")]
+        [SerializeField, Tooltip("留空则在运行时从 HUD 下查找 PlayerCompassTimerHud。")]
+        private PlayerCompassTimerHud compassHud;
+
+        [SerializeField, Min(-1), Tooltip("对应 PlayerCompassTimerHud → World Target Markers 列表索引；-1 表示不联动改色。")]
+        private int compassWorldTargetMarkerIndex = -1;
+
+        [SerializeField, Tooltip("该 Receiver 全部需求满足后，将对应罗盘图标改为该颜色。")]
+        private Color compassCompletedTint = new Color(0.35f, 1f, 0.45f, 0.85f);
+
+        private bool _compassCompletedTintApplied;
+
         public IReadOnlyList<PartRequirement> Requirements => requirements;
+
+        /// <summary>配置的罗盘 WorldTarget 索引；-1 表示未绑定。</summary>
+        public int CompassWorldTargetMarkerIndex => compassWorldTargetMarkerIndex;
 
         /// <summary>挂接了预设 SO 时返回预设里的名称；否则为 null。</summary>
         public string ReceiverPresetDisplayName =>
@@ -343,10 +358,84 @@ namespace DZ_3C.MachineRepair
             {
                 MachinePartReceiversSceneGate.NotifyReceiverProgressChanged();
                 revealDriver?.RefreshFromRequirements();
+                TryApplyCompassCompletedTintIfFullyRepaired();
             }
 
             return any;
         }
+
+        /// <summary>全部需求已满足时，将绑定的罗盘 WorldTarget 图标改为 <see cref="compassCompletedTint"/>（仅执行一次）。</summary>
+        public void TryApplyCompassCompletedTintIfFullyRepaired()
+        {
+            if (_compassCompletedTintApplied || compassWorldTargetMarkerIndex < 0)
+            {
+                return;
+            }
+
+            if (!AreAllRequirementsSatisfied())
+            {
+                return;
+            }
+
+            PlayerCompassTimerHud hud = ResolveCompassHud();
+            if (hud == null)
+            {
+                Debug.LogWarning(
+                    $"[MachineRepair] Receiver '{name}': PlayerCompassTimerHud not found; cannot apply completed tint for marker index {compassWorldTargetMarkerIndex}.",
+                    this);
+                return;
+            }
+
+            if (compassWorldTargetMarkerIndex >= hud.WorldTargetMarkerCount)
+            {
+                Debug.LogWarning(
+                    $"[MachineRepair] Receiver '{name}': compassWorldTargetMarkerIndex {compassWorldTargetMarkerIndex} is out of range (count={hud.WorldTargetMarkerCount}).",
+                    this);
+                return;
+            }
+
+            hud.SetWorldTargetTint(compassWorldTargetMarkerIndex, compassCompletedTint);
+            _compassCompletedTintApplied = true;
+        }
+
+        private PlayerCompassTimerHud ResolveCompassHud()
+        {
+            if (compassHud != null)
+            {
+                return compassHud;
+            }
+
+            if (MachineRepairUiLocator.TryResolveCompassTimerHud(out PlayerCompassTimerHud found))
+            {
+                compassHud = found;
+                return compassHud;
+            }
+
+            return null;
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (compassWorldTargetMarkerIndex < 0)
+            {
+                return;
+            }
+
+            if (compassHud == null)
+            {
+                MachineRepairUiLocator.TryResolveCompassTimerHud(out PlayerCompassTimerHud found);
+                compassHud = found;
+            }
+
+            if (compassHud != null && compassWorldTargetMarkerIndex >= compassHud.WorldTargetMarkerCount)
+            {
+                Debug.LogWarning(
+                    $"[MachineRepair] Receiver '{name}': compassWorldTargetMarkerIndex {compassWorldTargetMarkerIndex} >= marker count {compassHud.WorldTargetMarkerCount} on '{compassHud.name}'.",
+                    this);
+            }
+        }
+#endif
 
         private void PlaySubmitAudio()
         {

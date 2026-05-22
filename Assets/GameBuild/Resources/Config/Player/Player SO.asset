@@ -202,13 +202,19 @@ MonoBehaviour:
       groundNormalSmoothFrames: 3
       groundNormalRayStartHeight: 0.2
       groundNormalRayDistance: 2
-      maxWalkableSlopeAngle: 80
-      slideStartAngle: 80
+      maxWalkableSlopeAngle: 60
+      slideStartAngle: 70
       slideLeadPastWalkableDegrees: 2
       slideAcceleration: 8
       slideMaxSpeed: 8
       slideControlDamping: 4
       minGroundNormalY: 0.1
+      ledgeWalkOffEnabled: 0
+      ledgeProbeForwardDistance: 0.35
+      ledgeMaxWalkDownHeight: 0.4
+      ledgeProbeDownDistance: 2
+      ledgeSameHeightTolerance: 0.08
+      ledgeRequireMoveInput: 1
       coyoteJumpTimeSeconds: 0.12
       defaultJumpHeight: 0.8
       outPlaceJumpHeight: 0.8
@@ -218,7 +224,7 @@ MonoBehaviour:
       inAirSpeedDecay: 4
       inAirInputMaintainAcceleration: 8
       climbDetectionAngle: 90
-      wallProbeDistance: 0.25
+      wallProbeDistance: 0.5
       wallProbeRadius: 0.25
       canClimbMaxHeight: 10
       canClimbMinHeight: 0.5
@@ -226,9 +232,9 @@ MonoBehaviour:
       climbConfirmFrames: 2
       lowClimbMaxHeight: 0.35
       lowMediumClimbMaxHeight: 0.5
-      mediumClimbMaxHeight: 1.5
-      mediumHighClimbMinHeight: 2
-      mediumHighClimbMaxHeight: 2.5
+      mediumClimbMaxHeight: 1
+      mediumHighClimbMinHeight: 1.5
+      mediumHighClimbMaxHeight: 3
       stateSwitchCooldown: 0.1
       adsEnterAnimationSpeedScale: 2
       armedLocomotionSpeedMultiplier: 0.8

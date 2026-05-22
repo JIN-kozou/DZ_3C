@@ -43,6 +43,24 @@ namespace DZ_3C.MachineRepair.UI
             return any != null ? any.transform as RectTransform : null;
         }
 
+        /// <summary>解析 TopHudBar 上的 <see cref="PlayerCompassTimerHud"/>（优先 HUD/Canvas 下）。</summary>
+        public static bool TryResolveCompassTimerHud(out PlayerCompassTimerHud compassHud)
+        {
+            compassHud = null;
+            GameObject hudRoot = GameObject.Find("HUD");
+            if (hudRoot != null)
+            {
+                compassHud = hudRoot.GetComponentInChildren<PlayerCompassTimerHud>(true);
+                if (compassHud != null)
+                {
+                    return true;
+                }
+            }
+
+            compassHud = Object.FindObjectOfType<PlayerCompassTimerHud>(true);
+            return compassHud != null;
+        }
+
         private static bool TryUnderHudCanvas(
             out Transform inventoryRoot,
             out Transform tabRoot,
