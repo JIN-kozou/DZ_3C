@@ -46764,8 +46764,8 @@ Transform:
   m_GameObject: {fileID: 4074588332603858442}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 53.2666, y: 6.3799987, z: -45.6491}
-  m_LocalScale: {x: 11.230802, y: 0.25, z: 21.260267}
+  m_LocalPosition: {x: 53.6562, y: 6.3799987, z: -45.6491}
+  m_LocalScale: {x: 12.010219, y: 0.25, z: 21.260267}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 9010940762789423472}
@@ -63406,8 +63406,8 @@ Transform:
   m_GameObject: {fileID: 5509566501353922314}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 61.875, y: 4.5, z: -34.805}
-  m_LocalScale: {x: 1.7500651, y: 3.000025, z: 1.2499626}
+  m_LocalPosition: {x: 61.875, y: 4.94, z: -34.805}
+  m_LocalScale: {x: 1.7500651, y: 4, z: 1.2499626}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7702677885699567019}
@@ -106952,6 +106952,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
         type: 3}
+      propertyPath: compassHud
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
       propertyPath: meshFilter
       value: 
       objectReference: {fileID: 886080754528512305}
@@ -106972,8 +106977,33 @@ PrefabInstance:
       objectReference: {fileID: 8558267090511793887}
     - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
         type: 3}
+      propertyPath: compassCompletedTint.a
+      value: 0.47058824
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
+      propertyPath: compassCompletedTint.b
+      value: 0.8018868
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
+      propertyPath: compassCompletedTint.g
+      value: 0.8018868
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
+      propertyPath: compassCompletedTint.r
+      value: 0.25342646
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
       propertyPath: requirements.Array.size
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
+      propertyPath: compassWorldTargetMarkerIndex
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
         type: 3}
@@ -114461,6 +114491,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
         type: 3}
+      propertyPath: compassHud
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
       propertyPath: meshFilter
       value: 
       objectReference: {fileID: 0}
@@ -114481,7 +114516,32 @@ PrefabInstance:
       objectReference: {fileID: 7904303937054166826}
     - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
         type: 3}
+      propertyPath: compassCompletedTint.a
+      value: 0.47058824
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
+      propertyPath: compassCompletedTint.b
+      value: 0.8018868
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
+      propertyPath: compassCompletedTint.g
+      value: 0.8018868
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
+      propertyPath: compassCompletedTint.r
+      value: 0.25342646
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
       propertyPath: requirements.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
+      propertyPath: compassWorldTargetMarkerIndex
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
@@ -114769,7 +114829,7 @@ PrefabInstance:
     - target: {fileID: 2718761877022617475, guid: 70e345662ce90e14681a628f6d629980,
         type: 3}
       propertyPath: m_Layer
-      value: 0
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -116538,6 +116598,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
         type: 3}
+      propertyPath: compassHud
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
       propertyPath: meshFilter
       value: 
       objectReference: {fileID: 0}
@@ -116558,8 +116623,33 @@ PrefabInstance:
       objectReference: {fileID: 6457949890746527621}
     - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
         type: 3}
+      propertyPath: compassCompletedTint.a
+      value: 0.47058824
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
+      propertyPath: compassCompletedTint.b
+      value: 0.8018868
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
+      propertyPath: compassCompletedTint.g
+      value: 0.8018868
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
+      propertyPath: compassCompletedTint.r
+      value: 0.25342646
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
       propertyPath: requirements.Array.size
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
+      propertyPath: compassWorldTargetMarkerIndex
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
         type: 3}
@@ -139616,6 +139706,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
         type: 3}
+      propertyPath: compassHud
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
       propertyPath: meshFilter
       value: 
       objectReference: {fileID: 0}
@@ -139636,7 +139731,32 @@ PrefabInstance:
       objectReference: {fileID: 33736308220475346}
     - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
         type: 3}
+      propertyPath: compassCompletedTint.a
+      value: 0.47058824
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
+      propertyPath: compassCompletedTint.b
+      value: 0.8018868
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
+      propertyPath: compassCompletedTint.g
+      value: 0.8018868
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
+      propertyPath: compassCompletedTint.r
+      value: 0.25342646
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
       propertyPath: requirements.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
+        type: 3}
+      propertyPath: compassWorldTargetMarkerIndex
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 6929503669919340220, guid: eb6ffc92d356a264197f01864626dcf0,
