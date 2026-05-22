@@ -24,6 +24,7 @@ namespace DZ_3C.UI.WorldInteraction
     [SerializeField] private string keyLabel = "E";
     [SerializeField] private WorldInteractionMode interactionMode = WorldInteractionMode.Tap;
     [SerializeField] private Transform anchorTransform;
+    [Tooltip("相对 Anchor Transform 的本地偏移（沿锚点自身 X/Y/Z 轴，经 TransformPoint 换算到世界坐标）。")]
     [SerializeField] private Vector3 worldOffset = new Vector3(0f, 1.4f, 0f);
 
     [Header("Marker")]
@@ -91,7 +92,7 @@ namespace DZ_3C.UI.WorldInteraction
       get
       {
         Transform t = anchorTransform != null ? anchorTransform : transform;
-        return t.position + worldOffset;
+        return t.TransformPoint(worldOffset);
       }
     }
 

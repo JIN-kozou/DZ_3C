@@ -75,6 +75,7 @@ public class PlayerClimbState : PlayerMovementState
     }
     public override void OnExit()
     {
+        RestoreLocomotionAfterClimb();
         base.OnExit();
         animancerState = null;
     }
@@ -139,13 +140,53 @@ public class PlayerClimbState : PlayerMovementState
     }
     private void ResetCC()
     {
-        Debug.Log("恢复CC");
-        player.disEnableGravity = false;
-        player.controller.enabled = true; 
-        player.applyFullRootMotion = false;
-        player.ClearHorizontalVelocity();
-        reusableData.currentInertialVelocity = Vector3.zero;
-        player.ChangeVerticalSpeed(-2f);
+        RestoreLocomotionAfterClimb();
+    }
+
+    /// <summary>
+    /// 攀爬结束或被打断（含 moveInterrupt 切 MoveStart）时必须恢复：否则 applyFullRootMotion 仍为 true，
+    /// 地面移动走 ApplyBuiltinRootMotion 且未乘 moveSpeedMult，动画 Speed 参数也会滞后，表现为慢动作直至跳跃等状态重置。
+    /// </summary>
+    private void RestoreLocomotionAfterClimb()
+    {
+        ResetClimbAnimancerPlaybackSpeed();
+
+        if (player.applyFullRootMotion || player.disEnableGravity ||
+            (player.controller != null && !player.controller.enabled))
+        {
+            Debug.Log("恢复CC");
+            player.disEnableGravity = false;
+            player.controller.enabled = true;
+            player.applyFullRootMotion = false;
+            player.ClearHorizontalVelocity();
+            reusableData.currentInertialVelocity = Vector3.zero;
+            player.ChangeVerticalSpeed(-2f);
+        }
+
+        player.animatorDeltaPositionOffset = Vector3.zero;
+        SnapLocomotionSpeedParameter();
+    }
+
+    private void ResetClimbAnimancerPlaybackSpeed()
+    {
+        if (animancerState == null)
+        {
+            return;
+        }
+
+        if (animancerState.Speed <= 0f)
+        {
+            animancerState.Speed = 1f;
+        }
+    }
+
+    private void SnapLocomotionSpeedParameter()
+    {
+        UpdateSpeed();
+        if (reusableData.speedValueParameter != null)
+        {
+            reusableData.speedValueParameter.CurrentValue = reusableData.speedValueParameter.TargetValue;
+        }
     }
 
     private void OnClimbAnimationEnd()
