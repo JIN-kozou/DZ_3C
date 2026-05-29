@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 411634}
   - component: {fileID: 3316792}
   - component: {fileID: 2341288}
+  - component: {fileID: -341570197824961508}
   m_Layer: 0
   m_Name: Lab_Light_Additional_Light_R
   m_TagString: Untagged
@@ -83,6 +84,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &-341570197824961508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 115496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &140798
 GameObject:
   m_ObjectHideFlags: 0
@@ -94,6 +111,7 @@ GameObject:
   - component: {fileID: 483488}
   - component: {fileID: 3376568}
   - component: {fileID: 2308540}
+  - component: {fileID: 5269490125619276122}
   m_Layer: 0
   m_Name: Lab_Light_Opertions_Frame
   m_TagString: Untagged
@@ -166,6 +184,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &5269490125619276122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 140798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &175932
 GameObject:
   m_ObjectHideFlags: 0
@@ -177,6 +211,7 @@ GameObject:
   - component: {fileID: 451036}
   - component: {fileID: 3309722}
   - component: {fileID: 2381810}
+  - component: {fileID: -8279910918889744885}
   m_Layer: 0
   m_Name: Lab_Light
   m_TagString: Untagged
@@ -252,6 +287,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &-8279910918889744885
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 175932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &193490
 GameObject:
   m_ObjectHideFlags: 0
@@ -263,6 +314,7 @@ GameObject:
   - component: {fileID: 448946}
   - component: {fileID: 3387188}
   - component: {fileID: 2362826}
+  - component: {fileID: -8063194820718758417}
   m_Layer: 0
   m_Name: Lab_Light_Additional_Light_L
   m_TagString: Untagged
@@ -336,3 +388,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &-8063194820718758417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 193490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2344174}
   - component: {fileID: 6592090}
   - component: {fileID: 6565670}
+  - component: {fileID: -217776331044557894}
   m_Layer: 0
   m_Name: Operation_Table_WDrawers
   m_TagString: Untagged
@@ -130,6 +131,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.51526123, y: 1.0586526, z: 0.53758156}
   m_Center: {x: 0, y: 0.52932644, z: 0.000000044703484}
+--- !u!114 &-217776331044557894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 119162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &180540
 GameObject:
   m_ObjectHideFlags: 0
@@ -142,6 +159,7 @@ GameObject:
   - component: {fileID: 3395676}
   - component: {fileID: 2364160}
   - component: {fileID: 6537060}
+  - component: {fileID: 7273892947065687436}
   m_Layer: 0
   m_Name: Operation_Table_Drawer_Bottom
   m_TagString: Untagged
@@ -235,6 +253,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.4098181, y: 0.37025473, z: 0.40293038}
   m_Center: {x: 0, y: 0.46343678, z: 0.026868038}
+--- !u!114 &7273892947065687436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 180540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &189518
 GameObject:
   m_ObjectHideFlags: 0
@@ -247,6 +281,7 @@ GameObject:
   - component: {fileID: 3318798}
   - component: {fileID: 2332802}
   - component: {fileID: 6557182}
+  - component: {fileID: 7570420027839747469}
   m_Layer: 0
   m_Name: Operation_Table_Drawer_Top 1
   m_TagString: Untagged
@@ -340,6 +375,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.4098181, y: 0.13314772, z: 0.4029303}
   m_Center: {x: 0, y: 0.87003744, z: 0.026868075}
+--- !u!114 &7570420027839747469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 189518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &193148
 GameObject:
   m_ObjectHideFlags: 0
@@ -352,6 +403,7 @@ GameObject:
   - component: {fileID: 3398572}
   - component: {fileID: 2365204}
   - component: {fileID: 6588618}
+  - component: {fileID: -8614993166266951201}
   m_Layer: 0
   m_Name: Operation_Table_Drawer_Top
   m_TagString: Untagged
@@ -445,3 +497,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.4098181, y: 0.13314772, z: 0.4029303}
   m_Center: {x: 0, y: 0.87003744, z: 0.026868075}
+--- !u!114 &-8614993166266951201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 193148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

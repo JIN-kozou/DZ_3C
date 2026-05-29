@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3347334}
   - component: {fileID: 2338504}
   - component: {fileID: 6489948}
+  - component: {fileID: 9167816227714473721}
   m_Layer: 0
   m_Name: Room_1_Doorway
   m_TagString: Untagged
@@ -108,6 +109,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: e1a0aecb39910bf4e964cdddae18231a, type: 3}
+--- !u!114 &9167816227714473721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 101432}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &166172
 GameObject:
   m_ObjectHideFlags: 0
@@ -120,6 +137,7 @@ GameObject:
   - component: {fileID: 3327744}
   - component: {fileID: 2368698}
   - component: {fileID: 6460678}
+  - component: {fileID: 3082845034979159067}
   m_Layer: 0
   m_Name: Room_3_Doorway
   m_TagString: Untagged
@@ -214,6 +232,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: d74da2a48d5eb8746bcfd3fe3add84c4, type: 3}
+--- !u!114 &3082845034979159067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 166172}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &198326
 GameObject:
   m_ObjectHideFlags: 0
@@ -225,6 +259,7 @@ GameObject:
   - component: {fileID: 472516}
   - component: {fileID: 3399822}
   - component: {fileID: 2339814}
+  - component: {fileID: 5178513262902997196}
   m_Layer: 0
   m_Name: Room_2_Doorway_Inside
   m_TagString: Untagged
@@ -297,3 +332,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &5178513262902997196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 198326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

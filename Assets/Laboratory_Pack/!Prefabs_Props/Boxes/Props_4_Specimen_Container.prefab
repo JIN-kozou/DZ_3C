@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3305960}
   - component: {fileID: 2361706}
   - component: {fileID: 6582356}
+  - component: {fileID: -2888932472652689188}
   m_Layer: 0
   m_Name: Props_4_Specimen_Container
   m_TagString: Untagged
@@ -106,6 +107,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.6848437, y: 0.8841259, z: 0.97385746}
   m_Center: {x: 0, y: 0.45797536, z: 0}
+--- !u!114 &-2888932472652689188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 189556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &199972
 GameObject:
   m_ObjectHideFlags: 0
@@ -118,6 +135,7 @@ GameObject:
   - component: {fileID: 3359598}
   - component: {fileID: 2340436}
   - component: {fileID: 6583748}
+  - component: {fileID: 2106606299543418388}
   m_Layer: 0
   m_Name: Props_4_Specimen_Container_Door
   m_TagString: Untagged
@@ -211,3 +229,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5678865, y: 0.76821226, z: 0.9454992}
   m_Center: {x: -0.000024944544, y: 0.4573985, z: 0.055544928}
+--- !u!114 &2106606299543418388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 199972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

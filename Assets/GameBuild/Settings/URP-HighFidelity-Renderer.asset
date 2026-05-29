@@ -202,7 +202,8 @@ MonoBehaviour:
   - {fileID: 2702335908634367243}
   - {fileID: 7686090704970260769}
   - {fileID: -7164420636252086191}
-  m_RendererFeatureMap: adc0de57c6d2eee51ed5f273d86b790c5e052bd57414b083b4c1b3c93b6bcf0b7825dea0d73e2d4013a43d608f96e1a28e7a3c481479a4269101946ec61e4031e5ec5bb97277a290240f5082b033e8e12ef080269b23b7161251decb5ec8701099a16ba29d3c07a053fd7f5f3fdb446a0a34ba7dccccb764c7d0e3a665efce3b40824717e8287c19595edb8b9d72474781e15a05ec20c8029f0d9a940ab93769baff891d30276da6bf30e551b7a92f93
+  - {fileID: 5680677558703684178}
+  m_RendererFeatureMap: adc0de57c6d2eee51ed5f273d86b790c5e052bd57414b083b4c1b3c93b6bcf0b7825dea0d73e2d4013a43d608f96e1a28e7a3c481479a4269101946ec61e4031e5ec5bb97277a290240f5082b033e8e12ef080269b23b7161251decb5ec8701099a16ba29d3c07a053fd7f5f3fdb446a0a34ba7dccccb764c7d0e3a665efce3b40824717e8287c19595edb8b9d72474781e15a05ec20c8029f0d9a940ab93769baff891d30276da652fa106224d2d54e
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -420,6 +421,19 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 487e1b4f790496d4d988a6d0cc86a71c, type: 3}
   m_Name: Silhouette
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &5680677558703684178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa3350c170c456246be40238747aebb4, type: 3}
+  m_Name: AppearRevealOpaqueRenderFeature
   m_EditorClassIdentifier: 
   m_Active: 1
 --- !u!114 &7257494503185593354

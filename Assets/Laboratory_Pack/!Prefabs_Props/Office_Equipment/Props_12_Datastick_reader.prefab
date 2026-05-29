@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3375392}
   - component: {fileID: 2345794}
   - component: {fileID: 6521304}
+  - component: {fileID: -2694645377422269611}
   m_Layer: 0
   m_Name: Props_12_Datastick_reader
   m_TagString: Untagged
@@ -105,3 +106,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.22952987, y: 0.27952176, z: 0.09392913}
   m_Center: {x: 0, y: 0.13976088, z: 0.0000000018626451}
+--- !u!114 &-2694645377422269611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

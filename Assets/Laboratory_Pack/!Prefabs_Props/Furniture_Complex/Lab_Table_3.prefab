@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3394672}
   - component: {fileID: 2312292}
   - component: {fileID: 6568738}
+  - component: {fileID: 8671758057141383727}
   m_Layer: 0
   m_Name: Lab_Tabble_3_Locker_2
   m_TagString: Untagged
@@ -105,6 +106,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.84065735, y: 0.45479697, z: 0.19058198}
   m_Center: {x: -0.4603244, y: 0.37735996, z: -0.55538166}
+--- !u!114 &8671758057141383727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 128266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &174314
 GameObject:
   m_ObjectHideFlags: 0
@@ -117,6 +134,7 @@ GameObject:
   - component: {fileID: 3398202}
   - component: {fileID: 2390294}
   - component: {fileID: 6487908}
+  - component: {fileID: -2794721339152962960}
   m_Layer: 0
   m_Name: Lab_Table_3
   m_TagString: Untagged
@@ -213,6 +231,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: e926d4a39d2f6784e87abee72335c900, type: 3}
+--- !u!114 &-2794721339152962960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 174314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &183530
 GameObject:
   m_ObjectHideFlags: 0
@@ -225,6 +259,7 @@ GameObject:
   - component: {fileID: 3363364}
   - component: {fileID: 2320356}
   - component: {fileID: 6506688}
+  - component: {fileID: 1078770645349829597}
   m_Layer: 0
   m_Name: Lab_Tabble_3_Locker_1
   m_TagString: Untagged
@@ -318,3 +353,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.84065735, y: 0.45479697, z: 0.19058195}
   m_Center: {x: 0.4572171, y: 0.37735996, z: -0.5553818}
+--- !u!114 &1078770645349829597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 183530}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

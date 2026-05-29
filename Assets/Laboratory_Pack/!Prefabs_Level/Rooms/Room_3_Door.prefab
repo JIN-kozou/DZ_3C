@@ -94,6 +94,7 @@ GameObject:
   - component: {fileID: 4000011600936142}
   - component: {fileID: 33000011341248000}
   - component: {fileID: 23000011822482454}
+  - component: {fileID: 7984186941418699756}
   m_Layer: 0
   m_Name: Room_3_Door_Lid
   m_TagString: Untagged
@@ -166,6 +167,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &7984186941418699756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000013206033468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &1000013213588258
 GameObject:
   m_ObjectHideFlags: 0
@@ -177,6 +194,7 @@ GameObject:
   - component: {fileID: 4000010871555950}
   - component: {fileID: 33000013994693456}
   - component: {fileID: 23000010393810270}
+  - component: {fileID: 5737745895335410193}
   m_Layer: 0
   m_Name: Room_3_Door
   m_TagString: Untagged
@@ -253,6 +271,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &5737745895335410193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000013213588258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &1000013481771900
 GameObject:
   m_ObjectHideFlags: 0
@@ -264,6 +298,7 @@ GameObject:
   - component: {fileID: 4000013975325870}
   - component: {fileID: 33000011030412686}
   - component: {fileID: 23000012993886238}
+  - component: {fileID: -2700016912863621941}
   m_Layer: 0
   m_Name: Room_3_Door (1)
   m_TagString: Untagged
@@ -336,6 +371,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &-2700016912863621941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000013481771900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &1000013946078672
 GameObject:
   m_ObjectHideFlags: 0

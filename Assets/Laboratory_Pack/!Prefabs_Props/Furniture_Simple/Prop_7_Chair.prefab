@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3366518}
   - component: {fileID: 2338332}
   - component: {fileID: 6413154}
+  - component: {fileID: -5615516936701659854}
   m_Layer: 0
   m_Name: Prop_7_Chair_1
   m_TagString: Untagged
@@ -107,6 +108,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 92caca4147efe9849836ca8998dbb7c5, type: 3}
+--- !u!114 &-5615516936701659854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 105534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &150488
 GameObject:
   m_ObjectHideFlags: 0
@@ -119,6 +136,7 @@ GameObject:
   - component: {fileID: 3354516}
   - component: {fileID: 2339782}
   - component: {fileID: 6569686}
+  - component: {fileID: 2117339817436135123}
   m_Layer: 0
   m_Name: Prop_7_Chair_Seat
   m_TagString: Untagged
@@ -212,6 +230,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.42923522, y: 0.11255176, z: 0.42923513}
   m_Center: {x: 0.00000029802322, y: -0.000000018626451, z: 4.8672177e-12}
+--- !u!114 &2117339817436135123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 150488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &171148
 GameObject:
   m_ObjectHideFlags: 0
@@ -224,6 +258,7 @@ GameObject:
   - component: {fileID: 3354484}
   - component: {fileID: 2357552}
   - component: {fileID: 6441892}
+  - component: {fileID: 6910670868756910637}
   m_Layer: 0
   m_Name: Prop_7_Chair_2
   m_TagString: Untagged
@@ -319,6 +354,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 4c0489f96fd02164789af1359e75e9eb, type: 3}
+--- !u!114 &6910670868756910637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 171148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &180980
 GameObject:
   m_ObjectHideFlags: 0
@@ -331,6 +382,7 @@ GameObject:
   - component: {fileID: 3314542}
   - component: {fileID: 2335440}
   - component: {fileID: 6536044}
+  - component: {fileID: -4952997728987897633}
   m_Layer: 0
   m_Name: Prop_7_Chair
   m_TagString: Untagged
@@ -425,3 +477,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.42463621, y: 0.08910465, z: 0.4246367}
   m_Center: {x: 0, y: 0.044552326, z: 0}
+--- !u!114 &-4952997728987897633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 180980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

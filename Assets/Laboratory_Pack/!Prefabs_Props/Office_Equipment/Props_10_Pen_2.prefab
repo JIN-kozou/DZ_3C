@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3380392}
   - component: {fileID: 2312498}
   - component: {fileID: 6546822}
+  - component: {fileID: -8892681153321017123}
   m_Layer: 0
   m_Name: Props_10_Pen_2
   m_TagString: Untagged
@@ -105,3 +106,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.014790039, y: 0.17015205, z: 0.0128091285}
   m_Center: {x: 0, y: 0.08507603, z: 0.0000000023283064}
+--- !u!114 &-8892681153321017123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 139364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

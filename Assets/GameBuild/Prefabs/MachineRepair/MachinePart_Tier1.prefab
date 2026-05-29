@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 834444919760936279}
   - component: {fileID: 5861996895367136971}
   - component: {fileID: 4230549362682138866}
+  - component: {fileID: -1837593671618250484}
   m_Layer: 6
   m_Name: Cylinder
   m_TagString: Untagged
@@ -106,6 +107,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 6665005967414273269, guid: 29eeae2bae07ce2419ae1cb1c8877601, type: 3}
+--- !u!114 &-1837593671618250484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 294039308374151294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &4521928893997949838
 GameObject:
   m_ObjectHideFlags: 0
@@ -121,6 +138,7 @@ GameObject:
   - component: {fileID: 2109948230473163492}
   - component: {fileID: 3774068906260846791}
   - component: {fileID: 2822620096347597689}
+  - component: {fileID: 296450416852440171}
   m_Layer: 0
   m_Name: MachinePart_Tier1
   m_TagString: Untagged
@@ -284,3 +302,19 @@ MonoBehaviour:
     type: 3}
   markerPrefab: {fileID: 1715352157345951450, guid: 4795fa11ac092ad4489b9020585cbd69,
     type: 3}
+--- !u!114 &296450416852440171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4521928893997949838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

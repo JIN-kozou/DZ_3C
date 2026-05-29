@@ -178,6 +178,7 @@ GameObject:
   - component: {fileID: 3300140}
   - component: {fileID: 2320292}
   - component: {fileID: 6584368}
+  - component: {fileID: -3515322793399362079}
   m_Layer: 0
   m_Name: Lab_Tabble_2_Screen_Frame
   m_TagString: Untagged
@@ -272,6 +273,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.4752246, y: 0.77621627, z: 0.051052243}
   m_Center: {x: -0.35810488, y: 0.36239862, z: 0.00015914906}
+--- !u!114 &-3515322793399362079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 142506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &155564
 GameObject:
   m_ObjectHideFlags: 0
@@ -284,6 +301,7 @@ GameObject:
   - component: {fileID: 3354376}
   - component: {fileID: 2358504}
   - component: {fileID: 6472056}
+  - component: {fileID: 8061333148824214209}
   m_Layer: 0
   m_Name: Lab_Table_2
   m_TagString: Untagged
@@ -381,6 +399,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: e16dfd9bf51d4a6449db9aa1a3e13466, type: 3}
+--- !u!114 &8061333148824214209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 155564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &173790
 GameObject:
   m_ObjectHideFlags: 0
@@ -476,6 +510,7 @@ GameObject:
   - component: {fileID: 3367958}
   - component: {fileID: 2330354}
   - component: {fileID: 6508268}
+  - component: {fileID: 3670838406528163430}
   m_Layer: 0
   m_Name: Lab_Tabble_2_Locker_Lid_2
   m_TagString: Untagged
@@ -570,6 +605,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.7214697, y: 0.78638494, z: 0.013956451}
   m_Center: {x: -0.36073485, y: -0.3931924, z: 0.0069780727}
+--- !u!114 &3670838406528163430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 176950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &188370
 GameObject:
   m_ObjectHideFlags: 0
@@ -582,6 +633,7 @@ GameObject:
   - component: {fileID: 3378872}
   - component: {fileID: 2350776}
   - component: {fileID: 6587424}
+  - component: {fileID: -2013076493467562864}
   m_Layer: 0
   m_Name: Lab_Tabble_2_Locker_Lid_1
   m_TagString: Untagged
@@ -676,3 +728,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.25095215, y: 0.6339289, z: 0.013956451}
   m_Center: {x: 0.125437, y: -0.3169645, z: 0.0069781276}
+--- !u!114 &-2013076493467562864
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 188370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3335646}
   - component: {fileID: 2391676}
   - component: {fileID: 6548890}
+  - component: {fileID: -2229608154512261298}
   m_Layer: 0
   m_Name: Room_2_Floor_Platform_Border
   m_TagString: Untagged
@@ -105,3 +106,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.0000005, y: 0.31693155, z: 2.0121415}
   m_Center: {x: 0.000000059604645, y: 0.15048206, z: -0.006070733}
+--- !u!114 &-2229608154512261298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 190148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3333936}
   - component: {fileID: 2384566}
   - component: {fileID: 6425086}
+  - component: {fileID: -5674511898593688400}
   m_Layer: 0
   m_Name: Corridor_2_Props 1
   m_TagString: Untagged
@@ -106,6 +107,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 8e80e4143ca4c9c4b837485a75d74ad8, type: 3}
+--- !u!114 &-5674511898593688400
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 103606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &106038
 GameObject:
   m_ObjectHideFlags: 0
@@ -118,6 +135,7 @@ GameObject:
   - component: {fileID: 3343474}
   - component: {fileID: 2373300}
   - component: {fileID: 6479658}
+  - component: {fileID: -4327287080777920780}
   m_Layer: 0
   m_Name: Corridor_LP_WCovers&Props&AreaLights
   m_TagString: Untagged
@@ -222,6 +240,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 07315b8fce7a7ea4cb1168c7f3742374, type: 3}
+--- !u!114 &-4327287080777920780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 106038}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &134306
 GameObject:
   m_ObjectHideFlags: 0
@@ -516,6 +550,7 @@ GameObject:
   - component: {fileID: 3302302}
   - component: {fileID: 2359742}
   - component: {fileID: 6487136}
+  - component: {fileID: -1261042715855767023}
   m_Layer: 0
   m_Name: Corridor_2_Props
   m_TagString: Untagged
@@ -610,6 +645,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 8e80e4143ca4c9c4b837485a75d74ad8, type: 3}
+--- !u!114 &-1261042715855767023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 159640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &168998
 GameObject:
   m_ObjectHideFlags: 0
@@ -716,6 +767,7 @@ GameObject:
   - component: {fileID: 3355914}
   - component: {fileID: 2372334}
   - component: {fileID: 6406546}
+  - component: {fileID: -3664950897034179746}
   m_Layer: 0
   m_Name: Corridor_2_Cover 1
   m_TagString: Untagged
@@ -810,6 +862,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 7b056baa514cd324db72f80c68665369, type: 3}
+--- !u!114 &-3664950897034179746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 169672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &172590
 GameObject:
   m_ObjectHideFlags: 0
@@ -822,6 +890,7 @@ GameObject:
   - component: {fileID: 3387690}
   - component: {fileID: 2317028}
   - component: {fileID: 6426108}
+  - component: {fileID: 2783752149439615841}
   m_Layer: 0
   m_Name: Corridor_2_Light 1
   m_TagString: Untagged
@@ -916,6 +985,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 27aa940781c213c4d9124bf56c0ee55a, type: 3}
+--- !u!114 &2783752149439615841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 172590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &187776
 GameObject:
   m_ObjectHideFlags: 0
@@ -928,6 +1013,7 @@ GameObject:
   - component: {fileID: 3390766}
   - component: {fileID: 2305220}
   - component: {fileID: 6401198}
+  - component: {fileID: -6504181518440438572}
   m_Layer: 0
   m_Name: Corridor_2_Light
   m_TagString: Untagged
@@ -1022,6 +1108,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 27aa940781c213c4d9124bf56c0ee55a, type: 3}
+--- !u!114 &-6504181518440438572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 187776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &199154
 GameObject:
   m_ObjectHideFlags: 0
@@ -1034,6 +1136,7 @@ GameObject:
   - component: {fileID: 3378378}
   - component: {fileID: 2319648}
   - component: {fileID: 6427306}
+  - component: {fileID: -6799238297004680818}
   m_Layer: 0
   m_Name: Corridor_2_Cover
   m_TagString: Untagged
@@ -1128,3 +1231,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 7b056baa514cd324db72f80c68665369, type: 3}
+--- !u!114 &-6799238297004680818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 199154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

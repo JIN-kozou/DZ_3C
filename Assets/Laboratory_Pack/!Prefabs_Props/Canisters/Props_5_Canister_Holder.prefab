@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3379094}
   - component: {fileID: 2397938}
   - component: {fileID: 6598324}
+  - component: {fileID: -6152618828842451442}
   m_Layer: 0
   m_Name: Props_5_Canister_Holder
   m_TagString: Untagged
@@ -105,3 +106,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.79861325, y: 0.15828516, z: 0.7986132}
   m_Center: {x: 0, y: 0.0719324, z: 0.000000029802322}
+--- !u!114 &-6152618828842451442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 142524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

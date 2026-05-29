@@ -23,21 +23,28 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8055247409639432809}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2277097177960711567}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &6549196064467791509
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 6454402703088373882}
     m_Modifications:
+    - target: {fileID: -4216859302048453862, guid: 0dfb6ef6efaeb7743801e610ecd73c79,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 0dfb6ef6efaeb7743801e610ecd73c79,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -55,6 +62,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 0dfb6ef6efaeb7743801e610ecd73c79,
         type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -4216859302048453862, guid: 0dfb6ef6efaeb7743801e610ecd73c79,
+        type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
@@ -67,16 +79,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -4216859302048453862, guid: 0dfb6ef6efaeb7743801e610ecd73c79,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -4216859302048453862, guid: 0dfb6ef6efaeb7743801e610ecd73c79,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 0dfb6ef6efaeb7743801e610ecd73c79,
         type: 3}
@@ -99,6 +101,25 @@ PrefabInstance:
       value: SM_SG02A
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 0dfb6ef6efaeb7743801e610ecd73c79,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5132426618739880139}
+    - targetCorrespondingSourceObject: {fileID: 681464918446434830, guid: 0dfb6ef6efaeb7743801e610ecd73c79,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -906365350704023203}
+    - targetCorrespondingSourceObject: {fileID: 446992210066817112, guid: 0dfb6ef6efaeb7743801e610ecd73c79,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -3390394715789447766}
+    - targetCorrespondingSourceObject: {fileID: -8524885184280909961, guid: 0dfb6ef6efaeb7743801e610ecd73c79,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -4847206356374913005}
   m_SourcePrefab: {fileID: 100100000, guid: 0dfb6ef6efaeb7743801e610ecd73c79, type: 3}
 --- !u!4 &2277097177960711567 stripped
 Transform:
@@ -106,3 +127,91 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 6549196064467791509}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &3009114876211787676 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: 0dfb6ef6efaeb7743801e610ecd73c79,
+    type: 3}
+  m_PrefabInstance: {fileID: 6549196064467791509}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5132426618739880139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3009114876211787676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
+--- !u!1 &6004121873683515874 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -8524885184280909961, guid: 0dfb6ef6efaeb7743801e610ecd73c79,
+    type: 3}
+  m_PrefabInstance: {fileID: 6549196064467791509}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &-4847206356374913005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6004121873683515874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
+--- !u!1 &6023115508077741211 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 681464918446434830, guid: 0dfb6ef6efaeb7743801e610ecd73c79,
+    type: 3}
+  m_PrefabInstance: {fileID: 6549196064467791509}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &-906365350704023203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6023115508077741211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
+--- !u!1 &6689923613289311949 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 446992210066817112, guid: 0dfb6ef6efaeb7743801e610ecd73c79,
+    type: 3}
+  m_PrefabInstance: {fileID: 6549196064467791509}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &-3390394715789447766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6689923613289311949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

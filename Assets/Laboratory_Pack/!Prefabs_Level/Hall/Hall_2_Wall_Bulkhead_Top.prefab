@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3370716}
   - component: {fileID: 2306874}
   - component: {fileID: 6457088}
+  - component: {fileID: -7769025734942297279}
   m_Layer: 0
   m_Name: Hall_2_Wall_Bulkhead_Top
   m_TagString: Untagged
@@ -106,3 +107,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: bd039bccb7b591843ace16ebd079ea39, type: 3}
+--- !u!114 &-7769025734942297279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

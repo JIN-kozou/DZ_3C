@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3339544}
   - component: {fileID: 2333432}
   - component: {fileID: 6507902}
+  - component: {fileID: 1095131744190218146}
   m_Layer: 0
   m_Name: Props_10_Trashbin_Closed
   m_TagString: Untagged
@@ -105,3 +106,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.30320677, y: 0.6097683, z: 0.44046804}
   m_Center: {x: 0, y: 0.30718142, z: 0}
+--- !u!114 &1095131744190218146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 145976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

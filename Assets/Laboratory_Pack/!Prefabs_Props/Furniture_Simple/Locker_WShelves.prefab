@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3308348}
   - component: {fileID: 2311836}
   - component: {fileID: 6574358}
+  - component: {fileID: -6693466204986304840}
   m_Layer: 0
   m_Name: Locker_Door
   m_TagString: Untagged
@@ -105,6 +106,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.6055786, y: 1.8055861, z: 0.071010664}
   m_Center: {x: 0.2783325, y: 0.03733805, z: 0.005658836}
+--- !u!114 &-6693466204986304840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 150946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &159350
 GameObject:
   m_ObjectHideFlags: 0
@@ -117,6 +134,7 @@ GameObject:
   - component: {fileID: 3333278}
   - component: {fileID: 2388466}
   - component: {fileID: 6556906}
+  - component: {fileID: 2467308821386188391}
   m_Layer: 0
   m_Name: Locker_WShelves
   m_TagString: Untagged
@@ -211,3 +229,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.72284913, y: 1.9448171, z: 0.75641096}
   m_Center: {x: 0, y: 0.972286, z: -0.016266659}
+--- !u!114 &2467308821386188391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 159350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

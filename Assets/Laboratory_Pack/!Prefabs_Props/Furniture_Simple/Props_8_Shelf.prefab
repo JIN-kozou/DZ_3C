@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3331866}
   - component: {fileID: 2318288}
   - component: {fileID: 6580070}
+  - component: {fileID: 2473758746063046157}
   m_Layer: 0
   m_Name: Props_8_Shelf
   m_TagString: Untagged
@@ -105,3 +106,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0.053235218, z: 0.42704588}
   m_Center: {x: 0, y: 0.000000015832484, z: 0}
+--- !u!114 &2473758746063046157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 154806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

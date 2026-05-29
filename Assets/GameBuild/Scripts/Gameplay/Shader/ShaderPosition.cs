@@ -10,6 +10,17 @@ public class ShaderPosition : MonoBehaviour
 
     private static readonly List<ShaderPosition> instances = new List<ShaderPosition>();
 
+    // AppearShader graph uses these names for sphere slots 10–13 (not _Position10..13).
+    private static readonly string[] GraphExtraPositionNames =
+    {
+        "_Position9_1", "_Position9_2", "_Position9_3", "_Position9_4"
+    };
+
+    private static readonly string[] GraphExtraRadiusNames =
+    {
+        "_Radius9_1", "_Radius9_2", "_Radius9_3", "_Radius9_4"
+    };
+
     private static bool updatedThisFrame;
 
     private void OnEnable()
@@ -63,14 +74,29 @@ public class ShaderPosition : MonoBehaviour
             if (i < instances.Count && instances[i] != null)
             {
                 Vector3 pos = instances[i].transform.position + instances[i].offset;
+                float rad = instances[i].radius;
 
                 Shader.SetGlobalVector("_Position" + i, pos);
-                Shader.SetGlobalFloat("_Radius" + i, instances[i].radius);
+                Shader.SetGlobalFloat("_Radius" + i, rad);
+
+                int graphExtra = i - 10;
+                if (graphExtra >= 0 && graphExtra < GraphExtraPositionNames.Length)
+                {
+                    Shader.SetGlobalVector(GraphExtraPositionNames[graphExtra], pos);
+                    Shader.SetGlobalFloat(GraphExtraRadiusNames[graphExtra], rad);
+                }
             }
             else
             {
                 Shader.SetGlobalVector("_Position" + i, Vector3.zero);
                 Shader.SetGlobalFloat("_Radius" + i, 0f);
+
+                int graphExtra = i - 10;
+                if (graphExtra >= 0 && graphExtra < GraphExtraPositionNames.Length)
+                {
+                    Shader.SetGlobalVector(GraphExtraPositionNames[graphExtra], Vector3.zero);
+                    Shader.SetGlobalFloat(GraphExtraRadiusNames[graphExtra], 0f);
+                }
             }
         }
     }

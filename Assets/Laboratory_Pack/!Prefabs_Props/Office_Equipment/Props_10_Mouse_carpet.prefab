@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3335030}
   - component: {fileID: 2399276}
   - component: {fileID: 6525718}
+  - component: {fileID: 1223134582130634387}
   m_Layer: 0
   m_Name: Props_10_Mouse_carpet
   m_TagString: Untagged
@@ -105,3 +106,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.4052356, y: 0.0043342924, z: 0.27197513}
   m_Center: {x: 0, y: 0.0021671462, z: 0}
+--- !u!114 &1223134582130634387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 189270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

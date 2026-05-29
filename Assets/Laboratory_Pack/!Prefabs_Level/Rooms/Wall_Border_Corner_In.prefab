@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3366916}
   - component: {fileID: 2358704}
   - component: {fileID: 6579790}
+  - component: {fileID: 8693554423226093772}
   m_Layer: 0
   m_Name: Wall_Border_Corner_In
   m_TagString: Untagged
@@ -105,3 +106,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.0000122, y: 1.005748, z: 1.9999819}
   m_Center: {x: 1.0000013, y: 3.497126, z: 0.999987}
+--- !u!114 &8693554423226093772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 156686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

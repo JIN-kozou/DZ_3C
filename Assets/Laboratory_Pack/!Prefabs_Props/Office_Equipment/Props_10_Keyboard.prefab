@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3316732}
   - component: {fileID: 2337928}
   - component: {fileID: 6526222}
+  - component: {fileID: 3497774165758113490}
   m_Layer: 0
   m_Name: Props_10_Keyboard
   m_TagString: Untagged
@@ -105,3 +106,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.6627819, y: 0.02547623, z: 0.22901763}
   m_Center: {x: 0, y: 0.015344442, z: 0}
+--- !u!114 &3497774165758113490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 139014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

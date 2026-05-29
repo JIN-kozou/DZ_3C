@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3330714}
   - component: {fileID: 2345712}
   - component: {fileID: 6593974}
+  - component: {fileID: 4272184251819455055}
   m_Layer: 0
   m_Name: Props_9_Lamp_2
   m_TagString: Untagged
@@ -105,3 +106,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.15944594, y: 0.6215466, z: 0.91895294}
   m_Center: {x: -0.000000078231096, y: 0.2932285, z: 0.000000014901161}
+--- !u!114 &4272184251819455055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 143888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

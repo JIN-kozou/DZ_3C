@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3349448}
   - component: {fileID: 2310894}
   - component: {fileID: 6519986}
+  - component: {fileID: -3976858727828052051}
   m_Layer: 0
   m_Name: Props_4_MedPack
   m_TagString: Untagged
@@ -105,3 +106,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5402781, y: 0.6740518, z: 0.24839035}
   m_Center: {x: 0.00000002980233, y: 0.3370259, z: -0.00000000372529}
+--- !u!114 &-3976858727828052051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 128760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

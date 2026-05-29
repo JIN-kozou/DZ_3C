@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3386916}
   - component: {fileID: 2339922}
   - component: {fileID: 6539504}
+  - component: {fileID: 2882952699175130599}
   m_Layer: 0
   m_Name: Props_6_Freezer_Door
   m_TagString: Untagged
@@ -106,6 +107,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.0017444, y: 1.6900737, z: 0.06797638}
   m_Center: {x: 0.5008319, y: 0.000000059604645, z: 0.03400219}
+--- !u!114 &2882952699175130599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 105658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &116952
 GameObject:
   m_ObjectHideFlags: 0
@@ -118,6 +135,7 @@ GameObject:
   - component: {fileID: 3374508}
   - component: {fileID: 2362338}
   - component: {fileID: 6565772}
+  - component: {fileID: -2241561400183817265}
   m_Layer: 0
   m_Name: Props_6_Freezer
   m_TagString: Untagged
@@ -212,6 +230,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.1996026, y: 2.1348813, z: 0.8526568}
   m_Center: {x: -0.00000029802322, y: 1.0671657, z: 0}
+--- !u!114 &-2241561400183817265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 116952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &182630
 GameObject:
   m_ObjectHideFlags: 0

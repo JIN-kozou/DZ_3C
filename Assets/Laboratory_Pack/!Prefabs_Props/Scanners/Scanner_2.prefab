@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3300350}
   - component: {fileID: 2367036}
   - component: {fileID: 6463322}
+  - component: {fileID: 6302854985776922126}
   m_Layer: 0
   m_Name: Props_2_Scanner_Small 1
   m_TagString: Untagged
@@ -106,6 +107,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 5f2c112c42a4b79479fe31a1fcdd9f26, type: 3}
+--- !u!114 &6302854985776922126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 121376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &123388
 GameObject:
   m_ObjectHideFlags: 0
@@ -201,6 +218,7 @@ GameObject:
   - component: {fileID: 3395050}
   - component: {fileID: 2359554}
   - component: {fileID: 6454334}
+  - component: {fileID: 3646740206249001187}
   m_Layer: 0
   m_Name: Scanner_2
   m_TagString: Untagged
@@ -296,6 +314,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 5cb1e3c9097044a47be42a4fc42be658, type: 3}
+--- !u!114 &3646740206249001187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 126458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &138644
 GameObject:
   m_ObjectHideFlags: 0
@@ -308,6 +342,7 @@ GameObject:
   - component: {fileID: 3324222}
   - component: {fileID: 2303842}
   - component: {fileID: 6489932}
+  - component: {fileID: -5789141176769980223}
   m_Layer: 0
   m_Name: Props_2_Arm_2
   m_TagString: Untagged
@@ -403,6 +438,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: edba58ed6079bd24486e0bca68d02cf2, type: 3}
+--- !u!114 &-5789141176769980223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 138644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &141300
 GameObject:
   m_ObjectHideFlags: 0
@@ -415,6 +466,7 @@ GameObject:
   - component: {fileID: 3332234}
   - component: {fileID: 2333682}
   - component: {fileID: 6528914}
+  - component: {fileID: 8100313238098800558}
   m_Layer: 0
   m_Name: Props_2_Bed_Frame
   m_TagString: Untagged
@@ -508,6 +560,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.5274715, y: 0.21317917, z: 1.1246977}
   m_Center: {x: 0, y: 0, z: 0.000000059604645}
+--- !u!114 &8100313238098800558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 141300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &153338
 GameObject:
   m_ObjectHideFlags: 0
@@ -520,6 +588,7 @@ GameObject:
   - component: {fileID: 3338704}
   - component: {fileID: 2350782}
   - component: {fileID: 6476016}
+  - component: {fileID: 2414581767550756163}
   m_Layer: 0
   m_Name: Props_2_Scanner_Small
   m_TagString: Untagged
@@ -614,6 +683,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 5f2c112c42a4b79479fe31a1fcdd9f26, type: 3}
+--- !u!114 &2414581767550756163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 153338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &161118
 GameObject:
   m_ObjectHideFlags: 0
@@ -626,6 +711,7 @@ GameObject:
   - component: {fileID: 3334886}
   - component: {fileID: 2354192}
   - component: {fileID: 6424148}
+  - component: {fileID: 8824047555098125872}
   m_Layer: 0
   m_Name: Props_2_Arm_3_Attachment
   m_TagString: Untagged
@@ -722,6 +808,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: f49ed53b93b6c0e4282ad54c667ce057, type: 3}
+--- !u!114 &8824047555098125872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &167298
 GameObject:
   m_ObjectHideFlags: 0
@@ -734,6 +836,7 @@ GameObject:
   - component: {fileID: 3347404}
   - component: {fileID: 2318016}
   - component: {fileID: 6503930}
+  - component: {fileID: -4655448092691978628}
   m_Layer: 0
   m_Name: Props_2_Bed
   m_TagString: Untagged
@@ -830,6 +933,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.7173836, y: 0.22823784, z: 0.9864961}
   m_Center: {x: 0.00000011920929, y: -0.03351902, z: 0.000000044703484}
+--- !u!114 &-4655448092691978628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 167298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &192640
 GameObject:
   m_ObjectHideFlags: 0
@@ -842,6 +961,7 @@ GameObject:
   - component: {fileID: 3396346}
   - component: {fileID: 2367614}
   - component: {fileID: 6404652}
+  - component: {fileID: -7765043474751808144}
   m_Layer: 0
   m_Name: Props_2_Arm_1
   m_TagString: Untagged
@@ -937,3 +1057,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 7cec4690b0671ae44b972cbccd9ae009, type: 3}
+--- !u!114 &-7765043474751808144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 192640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

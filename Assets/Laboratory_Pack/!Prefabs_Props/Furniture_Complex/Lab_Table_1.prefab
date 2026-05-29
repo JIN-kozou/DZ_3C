@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3307682}
   - component: {fileID: 2362858}
   - component: {fileID: 6470278}
+  - component: {fileID: 4415813590898649082}
   m_Layer: 0
   m_Name: Lab_Tabble_1_Cover
   m_TagString: Untagged
@@ -107,6 +108,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: d39f123f63441844fa5799e885decb95, type: 3}
+--- !u!114 &4415813590898649082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 108326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &138638
 GameObject:
   m_ObjectHideFlags: 0
@@ -119,6 +136,7 @@ GameObject:
   - component: {fileID: 3398418}
   - component: {fileID: 2362036}
   - component: {fileID: 6438008}
+  - component: {fileID: 756293772525370162}
   m_Layer: 0
   m_Name: Lab_Table_1
   m_TagString: Untagged
@@ -215,6 +233,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: d12175323ccbb5c4ea197032617646a7, type: 3}
+--- !u!114 &756293772525370162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 138638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &180006
 GameObject:
   m_ObjectHideFlags: 0

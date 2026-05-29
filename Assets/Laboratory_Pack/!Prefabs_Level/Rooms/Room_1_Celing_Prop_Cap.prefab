@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3384062}
   - component: {fileID: 2347984}
   - component: {fileID: 6505644}
+  - component: {fileID: 8490590943433643459}
   m_Layer: 0
   m_Name: Room_1_Celing_Prop_Cap
   m_TagString: Untagged
@@ -105,3 +106,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06296468, y: 0.8855594, z: 0.64922976}
   m_Center: {x: -1.0314825, y: 0.4427797, z: 0.000000044703484}
+--- !u!114 &8490590943433643459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 105700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

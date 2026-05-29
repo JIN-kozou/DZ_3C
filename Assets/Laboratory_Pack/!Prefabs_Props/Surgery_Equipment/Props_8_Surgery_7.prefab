@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3375882}
   - component: {fileID: 2394752}
   - component: {fileID: 6537584}
+  - component: {fileID: 1103693770407717847}
   m_Layer: 0
   m_Name: Props_8_Surgery_7
   m_TagString: Untagged
@@ -105,3 +106,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.04459633, y: 0.25077343, z: 0.36212075}
   m_Center: {x: 0.000000038184226, y: -0.10525139, z: -0.034819804}
+--- !u!114 &1103693770407717847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 113288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

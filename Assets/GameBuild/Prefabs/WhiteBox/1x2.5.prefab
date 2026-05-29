@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 323940904089282585}
   - component: {fileID: 8347994509130717294}
   - component: {fileID: 3142794143093801216}
+  - component: {fileID: -7799529900466558790}
   m_Layer: 6
   m_Name: 1x2.5
   m_TagString: Untagged
@@ -120,3 +121,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   height: 0
   isClimbable: 0
+--- !u!114 &-7799529900466558790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6649577135137455073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3346592}
   - component: {fileID: 2357378}
   - component: {fileID: 6538010}
+  - component: {fileID: -2291423657788167787}
   m_Layer: 0
   m_Name: Hall_3_Door_R
   m_TagString: Untagged
@@ -105,3 +106,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.1588416, y: 2.644501, z: 0.20708847}
   m_Center: {x: -0.000000059604645, y: 1.639094, z: -0.000000078231096}
+--- !u!114 &-2291423657788167787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 159744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

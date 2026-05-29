@@ -188,6 +188,55 @@ MonoBehaviour:
   useSceneColor:
     m_OverrideState: 1
     m_Value: 1
+--- !u!114 &-1423500526475540535
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bf9cb4c6d2bfb6418967442f16c5b43, type: 3}
+  m_Name: FancyOutlineSettings
+  m_EditorClassIdentifier: 
+  active: 0
+  renderPassEvent:
+    m_OverrideState: 1
+    m_Value: 550
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  outlineColor:
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  colorSensitivity:
+    m_OverrideState: 1
+    m_Value: 0.877
+  colorStrength:
+    m_OverrideState: 1
+    m_Value: 0.314
+  depthSensitivity:
+    m_OverrideState: 1
+    m_Value: 0.01
+  depthStrength:
+    m_OverrideState: 1
+    m_Value: 0.75
+  normalSensitivity:
+    m_OverrideState: 1
+    m_Value: 0.1
+  normalStrength:
+    m_OverrideState: 1
+    m_Value: 0.75
+  depthThreshold:
+    m_OverrideState: 1
+    m_Value: 0.99
+  backgroundColor:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 0}
+  useSceneColor:
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -212,6 +261,7 @@ MonoBehaviour:
   - {fileID: -6443786052090970598}
   - {fileID: -8045974056289856034}
   - {fileID: 2882086990940200957}
+  - {fileID: -1423500526475540535}
 --- !u!114 &2837537973815853588
 MonoBehaviour:
   m_ObjectHideFlags: 3

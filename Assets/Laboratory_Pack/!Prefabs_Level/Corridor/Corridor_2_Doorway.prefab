@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3357434}
   - component: {fileID: 2326596}
   - component: {fileID: 6498714}
+  - component: {fileID: -6791568906221255531}
   m_Layer: 0
   m_Name: Corridor_2_Doorway
   m_TagString: Untagged
@@ -106,3 +107,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 8fab7332dbe32a049be1de48cb9c439c, type: 3}
+--- !u!114 &-6791568906221255531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 164482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

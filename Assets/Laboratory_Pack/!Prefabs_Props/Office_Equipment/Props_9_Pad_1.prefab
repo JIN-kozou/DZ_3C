@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3307202}
   - component: {fileID: 2360980}
   - component: {fileID: 6500282}
+  - component: {fileID: 5949052404385552028}
   m_Layer: 0
   m_Name: Props_9_Pad_1
   m_TagString: Untagged
@@ -105,3 +106,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.17570496, y: 0.031771585, z: 0.24771911}
   m_Center: {x: 0, y: 0.018278923, z: 0}
+--- !u!114 &5949052404385552028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 114588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 478966}
   - component: {fileID: 3379780}
   - component: {fileID: 2328912}
+  - component: {fileID: -8325700011507761286}
   m_Layer: 0
   m_Name: Level_3_Signboard_Frame
   m_TagString: Untagged
@@ -83,6 +84,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &-8325700011507761286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 179060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &197250
 GameObject:
   m_ObjectHideFlags: 0
@@ -95,6 +112,7 @@ GameObject:
   - component: {fileID: 3352078}
   - component: {fileID: 2320258}
   - component: {fileID: 6502942}
+  - component: {fileID: 3017504786183172088}
   m_Layer: 0
   m_Name: Hall_3_Signboard
   m_TagString: Untagged
@@ -189,3 +207,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.2750888, y: 0.23775512, z: 0.1277359}
   m_Center: {x: 0, y: -0.054471742, z: 0}
+--- !u!114 &3017504786183172088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 197250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

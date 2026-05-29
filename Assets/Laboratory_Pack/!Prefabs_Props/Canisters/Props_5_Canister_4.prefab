@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3307480}
   - component: {fileID: 2390302}
   - component: {fileID: 13636424}
+  - component: {fileID: -6163251846019367877}
   m_Layer: 0
   m_Name: Props_5_Canister_4
   m_TagString: Untagged
@@ -107,3 +108,19 @@ CapsuleCollider:
   m_Height: 1.3857585
   m_Direction: 1
   m_Center: {x: 0.0000003054738, y: 0.69287926, z: 0.000000029802322}
+--- !u!114 &-6163251846019367877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 149934}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

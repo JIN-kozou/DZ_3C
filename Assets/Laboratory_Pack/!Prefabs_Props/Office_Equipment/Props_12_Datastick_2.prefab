@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3307668}
   - component: {fileID: 2386268}
   - component: {fileID: 6554628}
+  - component: {fileID: -3972650977951050876}
   m_Layer: 0
   m_Name: Props_12_Datastick_2
   m_TagString: Untagged
@@ -105,3 +106,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.10087555, y: 0.088445105, z: 0.03325802}
   m_Center: {x: 0.0000001527369, y: 0.0429301, z: 9.313226e-10}
+--- !u!114 &-3972650977951050876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 171212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

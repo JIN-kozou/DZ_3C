@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3767210487671225086}
   - component: {fileID: 3123304750902758570}
   - component: {fileID: 7373984684968507181}
+  - component: {fileID: 1726988141431593332}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -106,6 +107,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -1215533875317036940, guid: 0669f3d8f4b119f418a4bbe061cc198f, type: 3}
+--- !u!114 &1726988141431593332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2840483227561385241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &3522026073544513795
 GameObject:
   m_ObjectHideFlags: 0
@@ -120,6 +137,7 @@ GameObject:
   - component: {fileID: 1563891583590441110}
   - component: {fileID: 701746213498805699}
   - component: {fileID: 7767527850934035940}
+  - component: {fileID: 1963855686604186423}
   m_Layer: 0
   m_Name: MachinePart_Key
   m_TagString: Untagged
@@ -227,6 +245,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   definition: {fileID: 11400000, guid: b2c3d4e5f60718293a4b5c6d7e8f9012, type: 2}
+  promptAnchor: {fileID: 0}
+  pickupPromptText: "\u62FE\u53D6\u96F6\u4EF6"
   usePrefabMesh: 1
   meshFilter: {fileID: 7358586106439515666}
   meshRenderer: {fileID: 1293496989021106928}
@@ -257,3 +277,19 @@ MonoBehaviour:
   dropNoiseDuration: 0.2
   submitNoiseLoudness: 0.5
   submitNoiseDuration: 0.2
+--- !u!114 &1963855686604186423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3522026073544513795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

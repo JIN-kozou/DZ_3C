@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3381500}
   - component: {fileID: 2378902}
   - component: {fileID: 6506670}
+  - component: {fileID: 5832059418383754636}
   m_Layer: 0
   m_Name: Prop_7_Desk_2_Panel_L
   m_TagString: Untagged
@@ -105,6 +106,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.33550292, y: 0.022200013, z: 0.648613}
   m_Center: {x: 0.15355164, y: 0, z: 0}
+--- !u!114 &5832059418383754636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 106862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &121192
 GameObject:
   m_ObjectHideFlags: 0
@@ -117,6 +134,7 @@ GameObject:
   - component: {fileID: 3341766}
   - component: {fileID: 2343724}
   - component: {fileID: 6415778}
+  - component: {fileID: -8949005543285826406}
   m_Layer: 0
   m_Name: Prop_7_Desk_2
   m_TagString: Untagged
@@ -213,6 +231,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: f40ba517b6d41144da843b0231ca4e63, type: 3}
+--- !u!114 &-8949005543285826406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 121192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &167646
 GameObject:
   m_ObjectHideFlags: 0
@@ -225,6 +259,7 @@ GameObject:
   - component: {fileID: 3336452}
   - component: {fileID: 2392188}
   - component: {fileID: 6514892}
+  - component: {fileID: -3376131636856849785}
   m_Layer: 0
   m_Name: Prop_7_Desk_2_Panel_R
   m_TagString: Untagged
@@ -318,3 +353,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.33550292, y: 0.022200013, z: 0.648613}
   m_Center: {x: -0.15235168, y: 0, z: 0}
+--- !u!114 &-3376131636856849785
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 167646}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

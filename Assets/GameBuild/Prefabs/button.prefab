@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 9119627344838846007}
   - component: {fileID: 7769959794433799843}
   - component: {fileID: 2244956756075266763}
+  - component: {fileID: -4779074647429952957}
   m_Layer: 0
   m_Name: buttonTrigger
   m_TagString: Untagged
@@ -128,6 +129,22 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-4779074647429952957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3655636081861021727}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &5765640821585876708
 GameObject:
   m_ObjectHideFlags: 0
@@ -552,6 +569,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8169007792136375}
+    - targetCorrespondingSourceObject: {fileID: 7953606483559150473, guid: 44db6fcac73c6c149b40dea8227d9b04,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7169384269218592763}
     - targetCorrespondingSourceObject: {fileID: 1299510413217003831, guid: 44db6fcac73c6c149b40dea8227d9b04,
         type: 3}
       insertIndex: -1
@@ -560,10 +581,18 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4475365742481524361}
+    - targetCorrespondingSourceObject: {fileID: 1299510413217003831, guid: 44db6fcac73c6c149b40dea8227d9b04,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -1657863217664267164}
     - targetCorrespondingSourceObject: {fileID: 6124065017786250728, guid: 44db6fcac73c6c149b40dea8227d9b04,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 85973416184341317}
+    - targetCorrespondingSourceObject: {fileID: 6124065017786250728, guid: 44db6fcac73c6c149b40dea8227d9b04,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8439472022688774653}
   m_SourcePrefab: {fileID: 100100000, guid: 44db6fcac73c6c149b40dea8227d9b04, type: 3}
 --- !u!1 &2818502531318863268 stripped
 GameObject:
@@ -676,6 +705,22 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-1657863217664267164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4167225049733501378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!4 &4865423535804404292 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -1704251672702502223, guid: 44db6fcac73c6c149b40dea8227d9b04,
@@ -710,6 +755,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -1388485733357891733, guid: 44db6fcac73c6c149b40dea8227d9b04, type: 3}
+--- !u!114 &7169384269218592763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5025135631538887548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0
 --- !u!1 &9160656309065506077 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6124065017786250728, guid: 44db6fcac73c6c149b40dea8227d9b04,
@@ -738,3 +799,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -881489237479530657, guid: 44db6fcac73c6c149b40dea8227d9b04, type: 3}
+--- !u!114 &8439472022688774653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9160656309065506077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0931cce840009b24f85c3771982add85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  excludeMaterialNameContains:
+  - Glass
+  - glass
+  disableOpaquePass: 0

@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 692086328285080199}
   - component: {fileID: 1729074314731889512}
   - component: {fileID: 4863443488793930124}
+  - component: {fileID: 692088550281809488}
   m_Layer: 0
   m_Name: Projectile
   m_TagString: Untagged
@@ -185,6 +186,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   polygonProjectile: {fileID: 5954092402412558410}
+--- !u!114 &692088550281809488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fffac73102ed904c891f61841b6bd35, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  queueProfile: 1
+  testPoint: 1
+  useXZPlaneDistance: 1
+  respectAppearRevealGate: 1
+  minRevealAlongU: 0.999
+  renderers: []
+  revealedRenderQueueOverride: 0
+  ghostRenderQueueOverride: 0
 --- !u!1 &2000010
 GameObject:
   m_ObjectHideFlags: 0
