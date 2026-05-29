@@ -1,62 +1,72 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 
 public class ENDsequence : MonoBehaviour
 {
-    private float timer = 0;
+    private float timer;
     public PlayableDirector director;
 
-    [Header("±³¾°ÒôÀÖ")]
-    [Tooltip("½¥³ö±¶ÂÊ")]
+    [Header("Background music")]
+    [Tooltip("Fade-out multiplier")]
     public float VolumeDevay = 1f;
 
-    public AudioSource BGM;
-    public AudioClip BGM_Clip;
+    [SerializeField] private FMODSoundEvent timelineEndBgm;
 
-    private float bgmStartVolume;
+    private FMODLoopHandle bgmHandle;
+    private float bgmStartVolume = 1f;
 
     private void Awake()
     {
-        if (BGM != null && BGM_Clip != null)
-        {
-            BGM.clip = BGM_Clip;
-            BGM.loop = false;
-            BGM.Play();
+        GameAudio.EnsureBanksLoaded();
 
-            bgmStartVolume = BGM.volume;
+        if (timelineEndBgm != null)
+        {
+            bgmHandle = GameAudio.StartLoop2D(timelineEndBgm);
+            if (bgmHandle != null && bgmHandle.IsValid)
+            {
+                bgmStartVolume = 1f;
+                bgmHandle.SetVolume(bgmStartVolume);
+            }
         }
     }
 
     private void Update()
     {
         timer += Time.deltaTime;
-
-        FadeOutBGM();
+        FadeOutBgm();
         LoadGameScene();
     }
 
-    void FadeOutBGM()
+    private void OnDestroy()
     {
-        double fadeStartTime = director.duration - 3f;
-
-        if (timer >= fadeStartTime && BGM != null)
+        if (bgmHandle != null)
         {
-            float t = (float)((timer - fadeStartTime) / 3f);
-
-            BGM.volume = Mathf.Lerp(
-                bgmStartVolume,
-                0f,
-                t * VolumeDevay
-            );
+            GameAudio.Stop(bgmHandle);
+            bgmHandle = null;
         }
+    }
+
+    private void FadeOutBgm()
+    {
+        if (director == null || bgmHandle == null || !bgmHandle.IsValid)
+        {
+            return;
+        }
+
+        double fadeStartTime = director.duration - 3f;
+        if (timer < fadeStartTime)
+        {
+            return;
+        }
+
+        float t = (float)((timer - fadeStartTime) / 3f);
+        bgmHandle.SetVolume(Mathf.Lerp(bgmStartVolume, 0f, t * VolumeDevay));
     }
 
     public void LoadGameScene()
     {
-        if (timer >= director.duration)
+        if (director != null && timer >= director.duration)
         {
             SceneManager.LoadScene("MainMenu");
         }

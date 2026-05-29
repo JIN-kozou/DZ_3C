@@ -5,11 +5,11 @@ using UnityEngine;
 public class CharacterAudio : MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField] private GameObject[] footsteps;
-    [SerializeField] private GameObject breathing;
-    [SerializeField] private GameObject jumpExhale;
-    [SerializeField] private GameObject jumpWhoosh;
-    [SerializeField] private GameObject land;
+    [SerializeField] private FMODSoundEvent[] footstepVariants;
+    [SerializeField] private FMODSoundEvent breathing;
+    [SerializeField] private FMODSoundEvent jumpExhale;
+    [SerializeField] private FMODSoundEvent jumpWhoosh;
+    [SerializeField] private FMODSoundEvent land;
     [SerializeField, Min(0f)] private float landMinInterval = 0.3f;
 
     [Header("Breathing")]
@@ -34,16 +34,16 @@ public class CharacterAudio : MonoBehaviour
     [SerializeField, Min(0.05f)] private float crouchRunFootstepInterval = 0.42f;
 
     [Header("State")]
-    [SerializeField] private GameObject death;
-    [SerializeField] private GameObject respawn;
+    [SerializeField] private FMODSoundEvent death;
+    [SerializeField] private FMODSoundEvent respawn;
 
     [Header("Core")]
-    [SerializeField] private GameObject corePickup;
+    [SerializeField] private FMODSoundEvent corePickup;
     [SerializeField, Min(0f)] private float corePickupStartSeconds;
-    [SerializeField] private GameObject coreInstall;
+    [SerializeField] private FMODSoundEvent coreInstall;
     [SerializeField, Min(0f)] private float coreInstallStartSeconds;
-    [SerializeField] private GameObject coreCharge;
-    [SerializeField] private GameObject coreConsume;
+    [SerializeField] private FMODSoundEvent coreCharge;
+    [SerializeField] private FMODSoundEvent coreConsume;
 
     [Header("AI Noise")]
     [SerializeField] private AINoiseAudioBridge aiNoiseBridge;
@@ -58,7 +58,7 @@ public class CharacterAudio : MonoBehaviour
     [SerializeField, Min(0f)] private float respawnNoiseLoudness;
     [SerializeField, Min(0f)] private float respawnNoiseDuration = 0.2f;
 
-    private AudioSource breathingSource;
+    private FMODLoopHandle breathingHandle;
     private Player player;
     private bool hasGroundedSnapshot;
     private bool wasGrounded;
@@ -100,8 +100,12 @@ public class CharacterAudio : MonoBehaviour
 
     public void OnFootstep()
     {
-        GameObject footstep = GetRandomFootstep();
-        AudioPrefabPlayer.Play(footstep, transform.position, null, false, GetFootstepVolumeMultiplier());
+        FMODSoundEvent footstep = GetRandomFootstep();
+        if (footstep != null)
+        {
+            GameAudio.Play3D(footstep, transform.position, transform, GetFootstepVolumeMultiplier());
+        }
+
         if (!ShouldMuteFootstepNoiseForAI())
         {
             EmitAINoise(footstepNoiseLoudness, footstepNoiseDuration);
@@ -149,46 +153,46 @@ public class CharacterAudio : MonoBehaviour
 
     public void SetBreathingIntensity(float intensity01)
     {
-        if (breathingSource == null)
+        if (breathingHandle == null || !breathingHandle.IsValid)
         {
             return;
         }
 
         float multiplier = Mathf.Lerp(normalBreathingVolumeMultiplier, intenseBreathingVolumeMultiplier, Mathf.Clamp01(intensity01));
-        breathingSource.volume = Mathf.Clamp01(multiplier);
+        breathingHandle.SetVolume(Mathf.Clamp01(multiplier));
     }
 
     public void StartBreathing()
     {
-        if (breathingSource != null || breathing == null)
+        if ((breathingHandle != null && breathingHandle.IsPlaying) || breathing == null)
         {
             return;
         }
 
-        breathingSource = AudioPrefabPlayer.Play(breathing, transform.position, transform, true);
+        breathingHandle = GameAudio.StartLoop3D(breathing, transform.position, transform);
         SetBreathingIntensity(0f);
     }
 
     public void StopBreathing()
     {
-        AudioPrefabPlayer.Stop(breathingSource);
-        breathingSource = null;
+        if (breathingHandle != null)
+        {
+            GameAudio.Stop(breathingHandle);
+            breathingHandle = null;
+        }
     }
 
     private void TickBreathingFollow()
     {
-        if (breathingSource == null)
+        if (breathingHandle == null)
         {
             return;
         }
 
-        if (!breathingSource.isPlaying)
+        if (!breathingHandle.IsPlaying)
         {
-            breathingSource = null;
-            return;
+            breathingHandle = null;
         }
-
-        breathingSource.transform.position = transform.position;
     }
 
     private void TickAutoPlayerMovementAudio()
@@ -394,23 +398,27 @@ public class CharacterAudio : MonoBehaviour
         return stand.CurrentValue < crouchNoiseStandThreshold || stand.TargetValue < crouchNoiseStandThreshold;
     }
 
-    private GameObject GetRandomFootstep()
+    private FMODSoundEvent GetRandomFootstep()
     {
-        if (footsteps == null || footsteps.Length == 0)
+        if (footstepVariants == null || footstepVariants.Length == 0)
         {
             return null;
         }
 
-        return footsteps[Random.Range(0, footsteps.Length)];
+        return footstepVariants[Random.Range(0, footstepVariants.Length)];
     }
 
-    private void PlayAtSelf(GameObject soundPrefab, float startTimeSeconds = 0f)
+    private void PlayAtSelf(FMODSoundEvent sound, float startTimeSeconds = 0f)
     {
-        AudioPrefabPlayer.Play(
-            soundPrefab,
+        if (sound == null)
+        {
+            return;
+        }
+
+        GameAudio.Play3D(
+            sound,
             transform.position,
-            null,
-            false,
+            transform,
             1f,
             1f,
             Mathf.Max(0f, startTimeSeconds));

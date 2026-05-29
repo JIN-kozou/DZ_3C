@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class ItemAudio : MonoBehaviour
 {
-    [SerializeField] private GameObject pickupItem;
+    [SerializeField] private FMODSoundEvent pickupItem;
     [SerializeField, Min(0f)] private float pickupItemStartSeconds;
-    [SerializeField] private GameObject dropItem;
-    [SerializeField] private GameObject submitItem;
+    [SerializeField] private FMODSoundEvent dropItem;
+    [SerializeField] private FMODSoundEvent submitItem;
     [SerializeField, Min(0f)] private float submitItemStartSeconds;
 
     [Header("AI Noise")]
@@ -35,13 +35,17 @@ public class ItemAudio : MonoBehaviour
         EmitAINoise(submitNoiseLoudness, submitNoiseDuration);
     }
 
-    private void PlayAtSelf(GameObject soundPrefab, float startTimeSeconds = 0f)
+    private void PlayAtSelf(FMODSoundEvent sound, float startTimeSeconds = 0f)
     {
-        AudioPrefabPlayer.Play(
-            soundPrefab,
+        if (sound == null)
+        {
+            return;
+        }
+
+        GameAudio.Play3D(
+            sound,
             transform.position,
-            null,
-            false,
+            transform,
             1f,
             1f,
             Mathf.Max(0f, startTimeSeconds));

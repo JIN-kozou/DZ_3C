@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f6a0d4e3c1b5a8f0d2e4f6a8b0c2d4e, type: 3}
+  m_Name: FMODDefaultEvents
+  m_EditorClassIdentifier: 
+  gunShoot: {fileID: 11400000, guid: 0fb87facf8634094fbb49e05781a03ba, type: 2}
+  gunHit: {fileID: 0}
+  gunBulletFly: {fileID: 0}
+  enemyLaser: {fileID: 0}
+  enemyHitReaction: {fileID: 0}
+  enemySpawn: {fileID: 0}
+  enemyTargetHowl: {fileID: 0}
+  enemyPatrolSonar: {fileID: 0}
+  enemyPatrolBreathing: {fileID: 0}
+  reversePlace: {fileID: 0}
+  reverseStartup: {fileID: 0}
+  reverseRecall: {fileID: 0}
+  envVentGas: {fileID: 0}
+  envSpark: {fileID: 0}
+  envGateGas: {fileID: 0}
+  envMachineryLoop: {fileID: 0}
+  projectileSpawn: {fileID: 0}
+  projectileFlight: {fileID: 0}
+  projectileHit: {fileID: 0}
+  projectileDespawn: {fileID: 0}

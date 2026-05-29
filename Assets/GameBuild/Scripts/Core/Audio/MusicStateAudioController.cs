@@ -11,8 +11,8 @@ public class MusicStateAudioController : MonoBehaviour
         Combat
     }
 
-    [SerializeField] private GameObject explorationMusic;
-    [SerializeField] private GameObject combatMusic;
+    [SerializeField] private FMODSoundEvent explorationMusic;
+    [SerializeField] private FMODSoundEvent combatMusic;
     [SerializeField, Min(0f)] private float defaultFadeDuration = 1f;
     [SerializeField] private bool playExplorationOnStart;
     [SerializeField] private bool restartSameState;
@@ -21,13 +21,27 @@ public class MusicStateAudioController : MonoBehaviour
     [SerializeField, Min(0.1f)] private float combatScanIntervalSeconds = 0.5f;
 
     private MusicState currentState = MusicState.None;
-    private AudioSource currentMusicSource;
+    private FMODLoopHandle currentMusicHandle;
+    private float currentMusicTargetVolume = 1f;
     private Coroutine musicRoutine;
     private AIBlackboard[] cachedBlackboards;
     private float nextCombatScanTime;
     private float combatMusicUntil;
 
     public MusicState CurrentState => currentState;
+
+    private void Awake()
+    {
+        if (explorationMusic == null)
+        {
+            explorationMusic = Resources.Load<FMODSoundEvent>("Config/Audio/Events/Music_Exploration");
+        }
+
+        if (combatMusic == null)
+        {
+            combatMusic = Resources.Load<FMODSoundEvent>("Config/Audio/Events/Music_Combat");
+        }
+    }
 
     private void Start()
     {
@@ -61,7 +75,7 @@ public class MusicStateAudioController : MonoBehaviour
             return;
         }
 
-        GameObject music = GetMusicForState(state);
+        FMODSoundEvent music = GetMusicForState(state);
         if (music == null)
         {
             return;
@@ -91,11 +105,14 @@ public class MusicStateAudioController : MonoBehaviour
 
     private void OnDestroy()
     {
-        AudioPrefabPlayer.Stop(currentMusicSource);
-        currentMusicSource = null;
+        if (currentMusicHandle != null)
+        {
+            GameAudio.Stop(currentMusicHandle);
+            currentMusicHandle = null;
+        }
     }
 
-    private GameObject GetMusicForState(MusicState state)
+    private FMODSoundEvent GetMusicForState(MusicState state)
     {
         switch (state)
         {
@@ -161,32 +178,36 @@ public class MusicStateAudioController : MonoBehaviour
         return false;
     }
 
-    private IEnumerator PlayMusicRoutine(GameObject music, float fadeDuration)
+    private IEnumerator PlayMusicRoutine(FMODSoundEvent music, float fadeDuration)
     {
         float duration = Mathf.Max(0f, fadeDuration);
-        if (currentMusicSource != null)
+        if (currentMusicHandle != null && currentMusicHandle.IsValid)
         {
             if (duration > 0f)
             {
-                yield return FadeVolume(currentMusicSource, 0f, duration);
+                yield return GameAudio.FadeLoopVolume(currentMusicHandle, 0f, duration);
             }
 
-            AudioPrefabPlayer.Stop(currentMusicSource);
-            currentMusicSource = null;
+            GameAudio.Stop(currentMusicHandle);
+            currentMusicHandle = null;
         }
 
-        currentMusicSource = AudioPrefabPlayer.Play(music, transform.position, transform, true);
-        if (currentMusicSource == null)
+        currentMusicHandle = GameAudio.StartLoop2D(music);
+        if (currentMusicHandle == null || !currentMusicHandle.IsValid)
         {
             musicRoutine = null;
             yield break;
         }
 
-        float targetVolume = currentMusicSource.volume;
+        currentMusicTargetVolume = 1f;
         if (duration > 0f)
         {
-            currentMusicSource.volume = 0f;
-            yield return FadeVolume(currentMusicSource, targetVolume, duration);
+            currentMusicHandle.SetVolume(0f);
+            yield return GameAudio.FadeLoopVolume(currentMusicHandle, currentMusicTargetVolume, duration);
+        }
+        else
+        {
+            currentMusicHandle.SetVolume(currentMusicTargetVolume);
         }
 
         musicRoutine = null;
@@ -194,45 +215,22 @@ public class MusicStateAudioController : MonoBehaviour
 
     private IEnumerator StopMusicRoutine(float fadeDuration)
     {
-        AudioSource source = currentMusicSource;
-        if (source != null)
+        FMODLoopHandle handle = currentMusicHandle;
+        if (handle != null && handle.IsValid)
         {
             if (fadeDuration > 0f)
             {
-                yield return FadeVolume(source, 0f, fadeDuration);
+                yield return GameAudio.FadeLoopVolume(handle, 0f, fadeDuration);
             }
 
-            AudioPrefabPlayer.Stop(source);
+            GameAudio.Stop(handle);
         }
 
-        if (currentMusicSource == source)
+        if (currentMusicHandle == handle)
         {
-            currentMusicSource = null;
+            currentMusicHandle = null;
         }
 
         musicRoutine = null;
-    }
-
-    private static IEnumerator FadeVolume(AudioSource source, float targetVolume, float duration)
-    {
-        if (source == null)
-        {
-            yield break;
-        }
-
-        float startVolume = source.volume;
-        float elapsed = 0f;
-        while (source != null && elapsed < duration)
-        {
-            elapsed += Time.unscaledDeltaTime;
-            float t = Mathf.Clamp01(elapsed / Mathf.Max(0.0001f, duration));
-            source.volume = Mathf.Lerp(startVolume, targetVolume, t);
-            yield return null;
-        }
-
-        if (source != null)
-        {
-            source.volume = targetVolume;
-        }
     }
 }

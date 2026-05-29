@@ -69,3 +69,13 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+/_Downloads/
+
+# FMOD Studio cache (keep banks under StreamingAssets if desired)
+**/FMODStudioCache.asset
+**/fmodstudio_cache/
+**/FMOD/.cache/
+**/FMOD/.user/
+**/FMOD/.unsaved/
+**/FMOD/.restore/

@@ -1,19 +1,29 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Audio/AudioEvent")]
+[CreateAssetMenu(menuName = "Audio/Audio Event")]
 public class AudioEventSO : ScriptableObject
 {
-    [SerializeField] private GameObject soundPrefab;
+    [SerializeField] private FMODSoundEvent soundEvent;
 
-    public GameObject SoundPrefab => soundPrefab;
+    public FMODSoundEvent SoundEvent => soundEvent;
 
-    public AudioSource Play()
+    public bool Play()
     {
-        return AudioPrefabPlayer.Play(soundPrefab, Vector3.zero);
+        return soundEvent != null && GameAudio.Play2D(soundEvent);
     }
 
-    public AudioSource PlayAt(Vector3 position)
+    public bool PlayAt(Vector3 position)
     {
-        return AudioPrefabPlayer.Play(soundPrefab, position);
+        if (soundEvent == null)
+        {
+            return false;
+        }
+
+        if (soundEvent.Is3D)
+        {
+            return GameAudio.Play3D(soundEvent, position);
+        }
+
+        return GameAudio.Play2D(soundEvent);
     }
 }

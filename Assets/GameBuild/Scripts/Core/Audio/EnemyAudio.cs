@@ -7,16 +7,16 @@ public class EnemyAudio : MonoBehaviour
     [SerializeField] private AIBlackboard blackboard;
 
     [Header("One-Shot SFX")]
-    [SerializeField] private GameObject laserAttack;
-    [SerializeField] private GameObject hitReaction;
-    [SerializeField] private GameObject targetAcquisitionHowl;
-    [SerializeField] private GameObject movement;
-    [SerializeField] private GameObject spawn;
-    [SerializeField] private GameObject patrolSonar;
+    [SerializeField] private FMODSoundEvent laserAttack;
+    [SerializeField] private FMODSoundEvent hitReaction;
+    [SerializeField] private FMODSoundEvent targetAcquisitionHowl;
+    [SerializeField] private FMODSoundEvent movement;
+    [SerializeField] private FMODSoundEvent spawn;
+    [SerializeField] private FMODSoundEvent patrolSonar;
     [SerializeField, Min(0f)] private float laserAttackStartTimeSeconds = 1.5f;
 
     [Header("Looping SFX")]
-    [SerializeField] private GameObject patrolBreathingLoop;
+    [SerializeField] private FMODSoundEvent patrolBreathingLoop;
 
     [Header("AI Noise")]
     [SerializeField] private AINoiseAudioBridge aiNoiseBridge;
@@ -35,14 +35,14 @@ public class EnemyAudio : MonoBehaviour
     [SerializeField, Min(0f)] private float patrolBreathingNoiseLoudness = 0.3f;
     [SerializeField] private bool patrolBreathingEmitsContinuousNoise;
 
-    private AudioSource patrolBreathingSource;
+    private FMODLoopHandle patrolBreathingHandle;
     private bool patrolBreathingNoiseActive;
     private bool blackboardSubscribed;
 
     private void Awake()
     {
         ResolveReferences();
-        LoadDefaultPrefabsIfNeeded();
+        LoadDefaultEventsIfNeeded();
     }
 
     private void OnEnable()
@@ -77,7 +77,16 @@ public class EnemyAudio : MonoBehaviour
 
     public void StartPatrolBreathing()
     {
-        patrolBreathingSource = StartLoop(patrolBreathingLoop, patrolBreathingSource);
+        if (patrolBreathingHandle != null && patrolBreathingHandle.IsPlaying)
+        {
+            return;
+        }
+
+        if (patrolBreathingLoop != null)
+        {
+            patrolBreathingHandle = GameAudio.StartLoop3D(patrolBreathingLoop, transform.position, transform);
+        }
+
         if (patrolBreathingEmitsContinuousNoise)
         {
             patrolBreathingNoiseActive = true;
@@ -87,7 +96,12 @@ public class EnemyAudio : MonoBehaviour
 
     public void StopPatrolBreathing()
     {
-        StopLoop(ref patrolBreathingSource);
+        if (patrolBreathingHandle != null)
+        {
+            GameAudio.Stop(patrolBreathingHandle);
+            patrolBreathingHandle = null;
+        }
+
         if (patrolBreathingNoiseActive)
         {
             patrolBreathingNoiseActive = false;
@@ -154,25 +168,14 @@ public class EnemyAudio : MonoBehaviour
         StartPatrolBreathing();
     }
 
-    private void PlayOneShot(GameObject soundPrefab, float startTimeSeconds = 0f)
+    private void PlayOneShot(FMODSoundEvent sound, float startTimeSeconds = 0f)
     {
-        AudioPrefabPlayer.Play(soundPrefab, transform.position, null, false, 1f, 1f, startTimeSeconds);
-    }
-
-    private AudioSource StartLoop(GameObject soundPrefab, AudioSource currentSource)
-    {
-        if (currentSource != null && currentSource.isPlaying)
+        if (sound == null)
         {
-            return currentSource;
+            return;
         }
 
-        return AudioPrefabPlayer.Play(soundPrefab, transform.position, transform, true);
-    }
-
-    private void StopLoop(ref AudioSource source)
-    {
-        AudioPrefabPlayer.Stop(source);
-        source = null;
+        GameAudio.Play3D(sound, transform.position, transform, 1f, 1f, startTimeSeconds);
     }
 
     private void EmitAINoise(float loudness, float duration)
@@ -199,36 +202,19 @@ public class EnemyAudio : MonoBehaviour
         }
     }
 
-    private void LoadDefaultPrefabsIfNeeded()
+    private void LoadDefaultEventsIfNeeded()
     {
-        if (laserAttack == null)
+        FMODDefaultEventsSO defaults = FMODDefaultEventsSO.Instance;
+        if (defaults == null)
         {
-            laserAttack = AudioDefaultPrefabs.Load("Assets/GameBuild/Audio/Enemy/lazer.prefab");
+            return;
         }
 
-        if (hitReaction == null)
-        {
-            hitReaction = AudioDefaultPrefabs.Load("Assets/Polygon Arsenal/Sound/Prefabs/Explosions/PolyBulletExplosionSND.prefab");
-        }
-
-        if (spawn == null)
-        {
-            spawn = AudioDefaultPrefabs.Load("Assets/Polygon Arsenal/Sound/Prefabs/Explosions/PolyShadowExplosionSND.prefab");
-        }
-
-        if (targetAcquisitionHowl == null)
-        {
-            targetAcquisitionHowl = AudioDefaultPrefabs.Load("Assets/GameBuild/Audio/Enemy/targetAcquisitionHowl.prefab");
-        }
-
-        if (patrolSonar == null)
-        {
-            patrolSonar = AudioDefaultPrefabs.Load("Assets/GameBuild/Audio/Enemy/sonar.prefab");
-        }
-
-        if (patrolBreathingLoop == null)
-        {
-            patrolBreathingLoop = AudioDefaultPrefabs.Load("Assets/GameBuild/Audio/Enemy/enemypatrol.prefab");
-        }
+        if (laserAttack == null) laserAttack = defaults.enemyLaser;
+        if (hitReaction == null) hitReaction = defaults.enemyHitReaction;
+        if (spawn == null) spawn = defaults.enemySpawn;
+        if (targetAcquisitionHowl == null) targetAcquisitionHowl = defaults.enemyTargetHowl;
+        if (patrolSonar == null) patrolSonar = defaults.enemyPatrolSonar;
+        if (patrolBreathingLoop == null) patrolBreathingLoop = defaults.enemyPatrolBreathing;
     }
 }

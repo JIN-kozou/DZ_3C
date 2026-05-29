@@ -29,7 +29,7 @@ GameBuild/
 │   └── WorldInteraction/  # 世界交互 Prompt / Marker
 ├── Prefabs/             # 场景直接引用的 Prefab
 ├── Art/                 # 动画包、字体、模型资源
-├── Audio/               # 音频 Prefab
+├── Audio/               # 旧 AudioSource Prefab（保留作 FMOD 迁移参考）
 ├── Shaders/             # 项目 Shader / ShaderGraph
 ├── Timeline/            # Timeline 资源
 ├── Settings/            # URP、Animancer 等项目设置
@@ -57,6 +57,16 @@ GameBuild/
 - `Assets/Cuboom/CB Sci-Fi Pack/` — Timeline 场景道具
 - `Assets/TextMesh Pro/` — UI 文字
 - `Assets/Plugins/` — AllIn1 Sprite Shader、Excelsior 等
+
+## 音频（FMOD + Steam Audio）
+
+- FMOD 工程：仓库根目录 [`FMOD/DZ_3C.fspro`](../../FMOD/DZ_3C.fspro)
+- Bank 输出：`Assets/StreamingAssets/FMOD/Desktop/`
+- 运行时 API：[`Scripts/Core/Audio/GameAudio.cs`](Scripts/Core/Audio/GameAudio.cs)
+- 事件资产：`Resources/Config/Audio/Events/`（`FMODSoundEvent`）
+- 安装与验证：[`Assets/Plugins/Audio/INSTALL.md`](../Plugins/Audio/INSTALL.md)
+- Unity 菜单：**GameBuild → Audio → …**
+- AI 听觉仍使用 `AINoiseEmitter` / `HearingPerceptor`（与玩家听感分离）
 
 ## 维护说明
 

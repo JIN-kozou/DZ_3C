@@ -3,18 +3,18 @@ using UnityEngine;
 public class EnvironmentAudioEmitter : MonoBehaviour
 {
     [Header("One-Shot P0 Sounds")]
-    [SerializeField] private GameObject damagedVentGasSpray;
-    [SerializeField] private GameObject metalDeformationCreak;
-    [SerializeField] private GameObject electricWireSpark;
-    [SerializeField] private GameObject spaceshipAlarm;
-    [SerializeField] private GameObject safetyGateOpen;
-    [SerializeField] private GameObject safetyGateGasRelease;
+    [SerializeField] private FMODSoundEvent damagedVentGasSpray;
+    [SerializeField] private FMODSoundEvent metalDeformationCreak;
+    [SerializeField] private FMODSoundEvent electricWireSpark;
+    [SerializeField] private FMODSoundEvent spaceshipAlarm;
+    [SerializeField] private FMODSoundEvent safetyGateOpen;
+    [SerializeField] private FMODSoundEvent safetyGateGasRelease;
 
     [Header("Looping P0 / Ambient Sounds")]
-    [SerializeField] private GameObject shipMachineryLoop;
-    [SerializeField] private GameObject helmetRadiationNoiseLoop;
-    [SerializeField] private GameObject giantMonsterLowGrowlLoop;
-    [SerializeField] private GameObject tireRollingLoop;
+    [SerializeField] private FMODSoundEvent shipMachineryLoop;
+    [SerializeField] private FMODSoundEvent helmetRadiationNoiseLoop;
+    [SerializeField] private FMODSoundEvent giantMonsterLowGrowlLoop;
+    [SerializeField] private FMODSoundEvent tireRollingLoop;
     [SerializeField] private bool startAssignedLoopsOnEnable = true;
 
     [Header("AI Noise")]
@@ -36,10 +36,10 @@ public class EnvironmentAudioEmitter : MonoBehaviour
     [SerializeField, Min(0f)] private float tireRollingNoiseLoudness = 0.8f;
     [SerializeField] private bool tireRollingEmitsContinuousNoise;
 
-    private AudioSource shipMachinerySource;
-    private AudioSource helmetRadiationNoiseSource;
-    private AudioSource giantMonsterLowGrowlSource;
-    private AudioSource tireRollingSource;
+    private FMODLoopHandle shipMachineryHandle;
+    private FMODLoopHandle helmetRadiationNoiseHandle;
+    private FMODLoopHandle giantMonsterLowGrowlHandle;
+    private FMODLoopHandle tireRollingHandle;
     private bool machineryNoiseActive;
     private bool helmetRadiationNoiseActive;
     private bool monsterGrowlNoiseActive;
@@ -114,7 +114,7 @@ public class EnvironmentAudioEmitter : MonoBehaviour
 
     public void StartShipMachineryLoop()
     {
-        shipMachinerySource = StartLoop(shipMachineryLoop, shipMachinerySource);
+        shipMachineryHandle = StartLoop(shipMachineryLoop, shipMachineryHandle);
         if (machineryEmitsContinuousNoise)
         {
             machineryNoiseActive = true;
@@ -124,14 +124,14 @@ public class EnvironmentAudioEmitter : MonoBehaviour
 
     public void StopShipMachineryLoop()
     {
-        StopLoop(ref shipMachinerySource);
+        StopLoop(ref shipMachineryHandle);
         machineryNoiseActive = false;
         RefreshContinuousAINoise();
     }
 
     public void StartHelmetRadiationNoise()
     {
-        helmetRadiationNoiseSource = StartLoop(helmetRadiationNoiseLoop, helmetRadiationNoiseSource);
+        helmetRadiationNoiseHandle = StartLoop(helmetRadiationNoiseLoop, helmetRadiationNoiseHandle);
         if (helmetRadiationEmitsContinuousNoise)
         {
             helmetRadiationNoiseActive = true;
@@ -141,14 +141,14 @@ public class EnvironmentAudioEmitter : MonoBehaviour
 
     public void StopHelmetRadiationNoise()
     {
-        StopLoop(ref helmetRadiationNoiseSource);
+        StopLoop(ref helmetRadiationNoiseHandle);
         helmetRadiationNoiseActive = false;
         RefreshContinuousAINoise();
     }
 
     public void StartGiantMonsterLowGrowl()
     {
-        giantMonsterLowGrowlSource = StartLoop(giantMonsterLowGrowlLoop, giantMonsterLowGrowlSource);
+        giantMonsterLowGrowlHandle = StartLoop(giantMonsterLowGrowlLoop, giantMonsterLowGrowlHandle);
         if (monsterGrowlEmitsContinuousNoise)
         {
             monsterGrowlNoiseActive = true;
@@ -158,14 +158,14 @@ public class EnvironmentAudioEmitter : MonoBehaviour
 
     public void StopGiantMonsterLowGrowl()
     {
-        StopLoop(ref giantMonsterLowGrowlSource);
+        StopLoop(ref giantMonsterLowGrowlHandle);
         monsterGrowlNoiseActive = false;
         RefreshContinuousAINoise();
     }
 
     public void StartTireRolling()
     {
-        tireRollingSource = StartLoop(tireRollingLoop, tireRollingSource);
+        tireRollingHandle = StartLoop(tireRollingLoop, tireRollingHandle);
         if (tireRollingEmitsContinuousNoise)
         {
             tireRollingNoiseActive = true;
@@ -175,7 +175,7 @@ public class EnvironmentAudioEmitter : MonoBehaviour
 
     public void StopTireRolling()
     {
-        StopLoop(ref tireRollingSource);
+        StopLoop(ref tireRollingHandle);
         tireRollingNoiseActive = false;
         RefreshContinuousAINoise();
     }
@@ -198,29 +198,27 @@ public class EnvironmentAudioEmitter : MonoBehaviour
         StopAllLoops();
     }
 
-    private void PlayOneShot(GameObject soundPrefab)
+    private void PlayOneShot(FMODSoundEvent sound)
     {
-        if (soundPrefab == null)
+        if (sound != null)
         {
-            return;
+            GameAudio.Play3D(sound, transform.position, transform);
         }
-
-        AudioPrefabPlayer.Play(soundPrefab, transform.position);
     }
 
-    private AudioSource StartLoop(GameObject soundPrefab, AudioSource currentSource)
+    private FMODLoopHandle StartLoop(FMODSoundEvent sound, FMODLoopHandle current)
     {
-        if (currentSource != null && currentSource.isPlaying)
+        if (current != null && current.IsPlaying)
         {
-            return currentSource;
+            return current;
         }
 
-        if (soundPrefab == null)
+        if (sound == null)
         {
             return null;
         }
 
-        return AudioPrefabPlayer.Play(soundPrefab, transform.position, transform, false);
+        return GameAudio.StartLoop3D(sound, transform.position, transform);
     }
 
     private void EmitAINoise(float loudness, float duration)
@@ -271,38 +269,28 @@ public class EnvironmentAudioEmitter : MonoBehaviour
         }
     }
 
-    private void StopLoop(ref AudioSource source)
+    private void StopLoop(ref FMODLoopHandle handle)
     {
-        if (source == null)
+        if (handle == null)
         {
             return;
         }
 
-        AudioPrefabPlayer.Stop(source);
-
-        source = null;
+        GameAudio.Stop(handle);
+        handle = null;
     }
 
     private void LoadDefaultSoundsIfNeeded()
     {
-        if (damagedVentGasSpray == null)
+        FMODDefaultEventsSO defaults = FMODDefaultEventsSO.Instance;
+        if (defaults == null)
         {
-            damagedVentGasSpray = AudioDefaultPrefabs.Load("Assets/Polygon Arsenal/Sound/Prefabs/Explosions/PolySmokeGrenadeExplosionSND.prefab");
+            return;
         }
 
-        if (electricWireSpark == null)
-        {
-            electricWireSpark = AudioDefaultPrefabs.Load("Assets/Polygon Arsenal/Sound/Prefabs/Missile/PolyLightningMissileSND.prefab");
-        }
-
-        if (safetyGateGasRelease == null)
-        {
-            safetyGateGasRelease = AudioDefaultPrefabs.Load("Assets/Polygon Arsenal/Sound/Prefabs/Explosions/PolySmokeGrenadeExplosionSND.prefab");
-        }
-
-        if (shipMachineryLoop == null)
-        {
-            shipMachineryLoop = AudioDefaultPrefabs.Load("Assets/Polygon Arsenal/Sound/Prefabs/Missile/PolyLaserMissileSND.prefab");
-        }
+        if (damagedVentGasSpray == null) damagedVentGasSpray = defaults.envVentGas;
+        if (electricWireSpark == null) electricWireSpark = defaults.envSpark;
+        if (safetyGateGasRelease == null) safetyGateGasRelease = defaults.envGateGas;
+        if (shipMachineryLoop == null) shipMachineryLoop = defaults.envMachineryLoop;
     }
 }

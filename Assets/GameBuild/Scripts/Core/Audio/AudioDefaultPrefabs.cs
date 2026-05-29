@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[System.Obsolete("Use FMODDefaultEventsSO instead.")]
 public static class AudioDefaultPrefabs
 {
     public static GameObject Load(string assetPath)

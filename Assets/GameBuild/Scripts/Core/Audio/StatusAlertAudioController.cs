@@ -11,8 +11,8 @@ public class StatusAlertAudioController : MonoBehaviour
     }
 
     [Header("Status Beeps")]
-    [SerializeField] private GameObject lowStatusBeep;
-    [SerializeField] private GameObject dangerStatusBeep;
+    [SerializeField] private FMODSoundEvent lowStatusBeep;
+    [SerializeField] private FMODSoundEvent dangerStatusBeep;
     [SerializeField, Min(0.01f)] private float lowStatusInterval = 1.25f;
     [SerializeField, Min(0.01f)] private float dangerStatusInterval = 0.45f;
     [SerializeField] private bool useUnscaledTime;
@@ -86,7 +86,7 @@ public class StatusAlertAudioController : MonoBehaviour
     private void OnDisable() => StopAlert();
     private void OnDestroy() => StopAlert();
 
-    private IEnumerator AlertLoop(GameObject beep, float interval, float noiseLoudness, float noiseDuration)
+    private IEnumerator AlertLoop(FMODSoundEvent beep, float interval, float noiseLoudness, float noiseDuration)
     {
         float waitDuration = Mathf.Max(0.01f, interval);
         while (true)
@@ -107,9 +107,20 @@ public class StatusAlertAudioController : MonoBehaviour
         alertRoutine = null;
     }
 
-    private void PlayStatusBeep(GameObject beep, float noiseLoudness, float noiseDuration)
+    private void PlayStatusBeep(FMODSoundEvent beep, float noiseLoudness, float noiseDuration)
     {
-        AudioPrefabPlayer.Play(beep, playAtTransformPosition ? transform.position : Vector3.zero);
+        if (beep != null)
+        {
+            if (playAtTransformPosition)
+            {
+                GameAudio.Play3D(beep, transform.position, transform);
+            }
+            else
+            {
+                GameAudio.Play2D(beep);
+            }
+        }
+
         if (statusBeepEmitsAINoise && aiNoiseBridge != null)
         {
             aiNoiseBridge.EmitNoise(noiseLoudness, noiseDuration);

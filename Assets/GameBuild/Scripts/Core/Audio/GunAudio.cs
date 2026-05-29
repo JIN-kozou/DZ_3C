@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class GunAudio : MonoBehaviour
 {
-    [SerializeField] private GameObject draw;
-    [SerializeField] private GameObject holster;
-    [SerializeField] private GameObject shoot;
-    [SerializeField] private GameObject hit;
-    [SerializeField] private GameObject bulletFly;
+    [SerializeField] private FMODSoundEvent draw;
+    [SerializeField] private FMODSoundEvent holster;
+    [SerializeField] private FMODSoundEvent shoot;
+    [SerializeField] private FMODSoundEvent hit;
+    [SerializeField] private FMODSoundEvent bulletFly;
 
     [Header("AI Noise")]
     [SerializeField] private AINoiseAudioBridge aiNoiseBridge;
@@ -19,7 +19,7 @@ public class GunAudio : MonoBehaviour
 
     private void Awake()
     {
-        LoadDefaultPrefabsIfNeeded();
+        LoadDefaultEventsIfNeeded();
     }
 
     public void OnDraw()
@@ -43,12 +43,18 @@ public class GunAudio : MonoBehaviour
 
     public void OnHit(Vector3 hitPosition)
     {
-        AudioPrefabPlayer.Play(hit, hitPosition);
+        if (hit != null)
+        {
+            GameAudio.Play3D(hit, hitPosition);
+        }
     }
 
-    private void PlayAtSelf(GameObject soundPrefab)
+    private void PlayAtSelf(FMODSoundEvent sound)
     {
-        AudioPrefabPlayer.Play(soundPrefab, transform.position);
+        if (sound != null)
+        {
+            GameAudio.Play3D(sound, transform.position, transform);
+        }
     }
 
     private void EmitAINoise(float loudness, float duration)
@@ -59,21 +65,16 @@ public class GunAudio : MonoBehaviour
         }
     }
 
-    private void LoadDefaultPrefabsIfNeeded()
+    private void LoadDefaultEventsIfNeeded()
     {
-        if (shoot == null)
+        FMODDefaultEventsSO defaults = FMODDefaultEventsSO.Instance;
+        if (defaults == null)
         {
-            shoot = AudioDefaultPrefabs.Load("Assets/Polygon Arsenal/Sound/Prefabs/Missile/PolyBlackHoleMissileSND.prefab");
+            return;
         }
 
-        if (hit == null)
-        {
-            hit = AudioDefaultPrefabs.Load("Assets/Polygon Arsenal/Sound/Prefabs/Explosions/PolyBulletExplosionSND.prefab");
-        }
-
-        if (bulletFly == null)
-        {
-            bulletFly = AudioDefaultPrefabs.Load("Assets/Polygon Arsenal/Sound/Prefabs/Missile/PolyLaserMissileSND.prefab");
-        }
+        if (shoot == null) shoot = defaults.gunShoot;
+        if (hit == null) hit = defaults.gunHit;
+        if (bulletFly == null) bulletFly = defaults.gunBulletFly;
     }
 }

@@ -46,6 +46,19 @@ MonoBehaviour:
   m_Name: Sobel Neon
   m_EditorClassIdentifier: 
   m_Active: 1
+--- !u!114 &-7164420636252086191
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d60fdfc929a74345be5a78abf6da4cc, type: 3}
+  m_Name: Barrel Distortion
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &-6915492055071612519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,6 +146,19 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 3302065f671a8450b82c9ddf07426f3a, type: 3}
   - {fileID: 2800000, guid: 56a77a3e8d64f47b6afe9e3c95cb57d5, type: 3}
   m_Shader: {fileID: 4800000, guid: 0849e84e3d62649e8882e9d6f056a017, type: 3}
+--- !u!114 &-268572552020168731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 848cdb1153ebfd6489cd34268b50275a, type: 3}
+  m_Name: Basic Dither
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -172,7 +198,11 @@ MonoBehaviour:
   - {fileID: 7581731952795454879}
   - {fileID: -6454459603344556102}
   - {fileID: -7840861821410660161}
-  m_RendererFeatureMap: adc0de57c6d2eee51ed5f273d86b790c5e052bd57414b083b4c1b3c93b6bcf0b7825dea0d73e2d4013a43d608f96e1a28e7a3c481479a4269101946ec61e4031e5ec5bb97277a290240f5082b033e8e12ef080269b23b7161251decb5ec8701099a16ba29d3c07a053fd7f5f3fdb446a0a34ba7dccccb764c7d0e3a665efce3b40824717e8287c19595edb8b9d72474781e15a05ec20c8029f0d9a940ab93769baff891d30276da6
+  - {fileID: -268572552020168731}
+  - {fileID: 2702335908634367243}
+  - {fileID: 7686090704970260769}
+  - {fileID: -7164420636252086191}
+  m_RendererFeatureMap: adc0de57c6d2eee51ed5f273d86b790c5e052bd57414b083b4c1b3c93b6bcf0b7825dea0d73e2d4013a43d608f96e1a28e7a3c481479a4269101946ec61e4031e5ec5bb97277a290240f5082b033e8e12ef080269b23b7161251decb5ec8701099a16ba29d3c07a053fd7f5f3fdb446a0a34ba7dccccb764c7d0e3a665efce3b40824717e8287c19595edb8b9d72474781e15a05ec20c8029f0d9a940ab93769baff891d30276da6bf30e551b7a92f93
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -307,6 +337,19 @@ MonoBehaviour:
   m_Name: SNES
   m_EditorClassIdentifier: 
   m_Active: 1
+--- !u!114 &2702335908634367243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c003a7a0d755aa545bb11466551b062a, type: 3}
+  m_Name: Sharpen
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &2784483597640039054
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -416,5 +459,18 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e331a186ce4d6e549a5a00b88fc6b945, type: 3}
   m_Name: Invert
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &7686090704970260769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 056e8b976f09f5049b2140190ad8e263, type: 3}
+  m_Name: Scanlines
   m_EditorClassIdentifier: 
   m_Active: 1

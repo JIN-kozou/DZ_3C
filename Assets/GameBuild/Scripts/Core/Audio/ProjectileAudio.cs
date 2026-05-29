@@ -3,10 +3,10 @@ using UnityEngine;
 public class ProjectileAudio : MonoBehaviour
 {
     [Header("Projectile SFX")]
-    [SerializeField] private GameObject spawnSound;
-    [SerializeField] private GameObject flightLoop;
-    [SerializeField] private GameObject hitSound;
-    [SerializeField] private GameObject despawnSound;
+    [SerializeField] private FMODSoundEvent spawnSound;
+    [SerializeField] private FMODSoundEvent flightLoop;
+    [SerializeField] private FMODSoundEvent hitSound;
+    [SerializeField] private FMODSoundEvent despawnSound;
 
     [Header("Lifecycle")]
     [SerializeField] private bool playSpawnOnEnable;
@@ -23,30 +23,12 @@ public class ProjectileAudio : MonoBehaviour
     [SerializeField, Min(0f)] private float spawnNoiseLoudness;
     [SerializeField, Min(0f)] private float spawnNoiseDuration = 0.1f;
 
-    private AudioSource flightLoopSource;
+    private FMODLoopHandle flightLoopHandle;
     private bool flightNoiseActive;
 
     private void Awake()
     {
-        if (spawnSound == null)
-        {
-            spawnSound = AudioDefaultPrefabs.Load("Assets/Polygon Arsenal/Sound/Prefabs/Missile/PolyBlackHoleMissileSND.prefab");
-        }
-
-        if (flightLoop == null)
-        {
-            flightLoop = AudioDefaultPrefabs.Load("Assets/Polygon Arsenal/Sound/Prefabs/Missile/PolyLaserMissileSND.prefab");
-        }
-
-        if (hitSound == null)
-        {
-            hitSound = AudioDefaultPrefabs.Load("Assets/Polygon Arsenal/Sound/Prefabs/Explosions/PolyBulletExplosionSND.prefab");
-        }
-
-        if (despawnSound == null)
-        {
-            despawnSound = AudioDefaultPrefabs.Load("Assets/Polygon Arsenal/Sound/Prefabs/Explosions/PolySmokeGrenadeExplosionSND.prefab");
-        }
+        LoadDefaultEventsIfNeeded();
     }
 
     private void OnEnable()
@@ -60,23 +42,6 @@ public class ProjectileAudio : MonoBehaviour
         {
             StartFlightLoop();
         }
-    }
-
-    private void Update()
-    {
-        if (flightLoopSource == null)
-        {
-            return;
-        }
-
-        if (!flightLoopSource.isPlaying)
-        {
-            flightLoopSource = null;
-            StopFlightAINoiseIfActive();
-            return;
-        }
-
-        flightLoopSource.transform.position = transform.position;
     }
 
     private void OnDisable()
@@ -103,13 +68,17 @@ public class ProjectileAudio : MonoBehaviour
 
     public void StartFlightLoop()
     {
-        if (flightLoopSource != null && flightLoopSource.isPlaying)
+        if (flightLoopHandle != null && flightLoopHandle.IsPlaying)
         {
             return;
         }
 
-        flightLoopSource = AudioPrefabPlayer.Play(flightLoop, transform.position, transform, true);
-        if (flightLoopSource != null && flightLoopEmitsContinuousAINoise)
+        if (flightLoop != null)
+        {
+            flightLoopHandle = GameAudio.StartLoop3D(flightLoop, transform.position, transform);
+        }
+
+        if (flightLoopHandle != null && flightLoopHandle.IsValid && flightLoopEmitsContinuousAINoise)
         {
             StartFlightAINoise();
         }
@@ -117,8 +86,12 @@ public class ProjectileAudio : MonoBehaviour
 
     public void StopFlightLoop()
     {
-        AudioPrefabPlayer.Stop(flightLoopSource);
-        flightLoopSource = null;
+        if (flightLoopHandle != null)
+        {
+            GameAudio.Stop(flightLoopHandle);
+            flightLoopHandle = null;
+        }
+
         StopFlightAINoiseIfActive();
     }
 
@@ -136,7 +109,14 @@ public class ProjectileAudio : MonoBehaviour
     }
 
     public void StopAllLoops() => StopFlightLoop();
-    private void PlayOneShot(GameObject soundPrefab, Vector3 position) => AudioPrefabPlayer.Play(soundPrefab, position);
+
+    private void PlayOneShot(FMODSoundEvent sound, Vector3 position)
+    {
+        if (sound != null)
+        {
+            GameAudio.Play3D(sound, position);
+        }
+    }
 
     private void EmitAINoise(float loudness, float duration)
     {
@@ -169,5 +149,19 @@ public class ProjectileAudio : MonoBehaviour
         {
             aiNoiseBridge.StopContinuousNoise();
         }
+    }
+
+    private void LoadDefaultEventsIfNeeded()
+    {
+        FMODDefaultEventsSO defaults = FMODDefaultEventsSO.Instance;
+        if (defaults == null)
+        {
+            return;
+        }
+
+        if (spawnSound == null) spawnSound = defaults.projectileSpawn;
+        if (flightLoop == null) flightLoop = defaults.projectileFlight;
+        if (hitSound == null) hitSound = defaults.projectileHit;
+        if (despawnSound == null) despawnSound = defaults.projectileDespawn;
     }
 }

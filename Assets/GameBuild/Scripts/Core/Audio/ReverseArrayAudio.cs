@@ -3,14 +3,14 @@ using UnityEngine;
 public class ReverseArrayAudio : MonoBehaviour
 {
     [Header("One-Shot SFX")]
-    [SerializeField] private GameObject placeReverseArray;
-    [SerializeField] private GameObject startupEnergyActivation;
-    [SerializeField] private GameObject recallReverseArray;
-    [SerializeField] private GameObject coreDepleted;
+    [SerializeField] private FMODSoundEvent placeReverseArray;
+    [SerializeField] private FMODSoundEvent startupEnergyActivation;
+    [SerializeField] private FMODSoundEvent recallReverseArray;
+    [SerializeField] private FMODSoundEvent coreDepleted;
 
     [Header("Looping SFX")]
-    [SerializeField] private GameObject warningLoop;
-    [SerializeField] private GameObject coreChargeLoop;
+    [SerializeField] private FMODSoundEvent warningLoop;
+    [SerializeField] private FMODSoundEvent coreChargeLoop;
 
     [Header("AI Noise")]
     [SerializeField] private AINoiseAudioBridge aiNoiseBridge;
@@ -24,34 +24,21 @@ public class ReverseArrayAudio : MonoBehaviour
     [SerializeField] private bool warningEmitsContinuousNoise;
     [SerializeField, Min(0.05f)] private float warningPulseSeconds = 1.5f;
 
-    private AudioSource warningSource;
-    private AudioSource coreChargeSource;
+    private FMODLoopHandle warningHandle;
+    private FMODLoopHandle coreChargeHandle;
     private bool warningNoiseActive;
 
     private void Awake()
     {
-        if (placeReverseArray == null)
-        {
-            placeReverseArray = AudioDefaultPrefabs.Load("Assets/Polygon Arsenal/Sound/Prefabs/Missile/PolyBlackHoleMissileSND.prefab");
-        }
-
-        if (startupEnergyActivation == null)
-        {
-            startupEnergyActivation = AudioDefaultPrefabs.Load("Assets/Polygon Arsenal/Sound/Prefabs/Missile/PolyLightningMissileSND.prefab");
-        }
-
-        if (recallReverseArray == null)
-        {
-            recallReverseArray = AudioDefaultPrefabs.Load("Assets/Polygon Arsenal/Sound/Prefabs/Missile/PolyStormMissileSND.prefab");
-        }
+        LoadDefaultEventsIfNeeded();
     }
 
     public void PlayPlace() { PlayOneShot(placeReverseArray); EmitAINoise(placeNoiseLoudness, placeNoiseDuration); }
     public void PlayStartup() { PlayOneShot(startupEnergyActivation); EmitAINoise(startupNoiseLoudness, startupNoiseDuration); }
     public void PlayRecall() { PlayOneShot(recallReverseArray); EmitAINoise(recallNoiseLoudness, recallNoiseDuration); }
     public void PlayCoreDepleted() => PlayOneShot(coreDepleted);
-    public void StartCoreCharge() => coreChargeSource = StartLoop(coreChargeLoop, coreChargeSource);
-    public void StopCoreCharge() => StopLoop(ref coreChargeSource);
+    public void StartCoreCharge() => coreChargeHandle = StartLoop(coreChargeLoop, coreChargeHandle);
+    public void StopCoreCharge() => StopLoop(ref coreChargeHandle);
     public void PlayWarningPulse()
     {
         StartWarning();
@@ -61,7 +48,7 @@ public class ReverseArrayAudio : MonoBehaviour
 
     public void StartWarning()
     {
-        warningSource = StartLoop(warningLoop, warningSource);
+        warningHandle = StartLoop(warningLoop, warningHandle);
         if (warningEmitsContinuousNoise)
         {
             warningNoiseActive = true;
@@ -71,7 +58,7 @@ public class ReverseArrayAudio : MonoBehaviour
 
     public void StopWarning()
     {
-        StopLoop(ref warningSource);
+        StopLoop(ref warningHandle);
         if (warningNoiseActive)
         {
             warningNoiseActive = false;
@@ -87,19 +74,32 @@ public class ReverseArrayAudio : MonoBehaviour
 
     private void OnDisable() => StopAllLoops();
     private void OnDestroy() => StopAllLoops();
-    private void PlayOneShot(GameObject soundPrefab) => AudioPrefabPlayer.Play(soundPrefab, transform.position);
 
-    private AudioSource StartLoop(GameObject soundPrefab, AudioSource currentSource)
+    private void PlayOneShot(FMODSoundEvent sound)
     {
-        return currentSource != null && currentSource.isPlaying
-            ? currentSource
-            : AudioPrefabPlayer.Play(soundPrefab, transform.position, transform, true);
+        if (sound != null)
+        {
+            GameAudio.Play3D(sound, transform.position, transform);
+        }
     }
 
-    private void StopLoop(ref AudioSource source)
+    private FMODLoopHandle StartLoop(FMODSoundEvent sound, FMODLoopHandle current)
     {
-        AudioPrefabPlayer.Stop(source);
-        source = null;
+        if (current != null && current.IsPlaying)
+        {
+            return current;
+        }
+
+        return sound != null ? GameAudio.StartLoop3D(sound, transform.position, transform) : null;
+    }
+
+    private void StopLoop(ref FMODLoopHandle handle)
+    {
+        if (handle != null)
+        {
+            GameAudio.Stop(handle);
+            handle = null;
+        }
     }
 
     private void EmitAINoise(float loudness, float duration)
@@ -124,5 +124,18 @@ public class ReverseArrayAudio : MonoBehaviour
         {
             aiNoiseBridge.StopContinuousNoise();
         }
+    }
+
+    private void LoadDefaultEventsIfNeeded()
+    {
+        FMODDefaultEventsSO defaults = FMODDefaultEventsSO.Instance;
+        if (defaults == null)
+        {
+            return;
+        }
+
+        if (placeReverseArray == null) placeReverseArray = defaults.reversePlace;
+        if (startupEnergyActivation == null) startupEnergyActivation = defaults.reverseStartup;
+        if (recallReverseArray == null) recallReverseArray = defaults.reverseRecall;
     }
 }

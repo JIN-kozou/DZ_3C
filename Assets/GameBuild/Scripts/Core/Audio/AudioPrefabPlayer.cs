@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Obsolete("Use GameAudio with FMODSoundEvent assets instead.")]
 public static class AudioPrefabPlayer
 {
     private sealed class CoroutineHost : MonoBehaviour
@@ -23,7 +24,7 @@ public static class AudioPrefabPlayer
             return null;
         }
 
-        GameObject instance = Object.Instantiate(soundPrefab, position, Quaternion.identity);
+        GameObject instance = UnityEngine.Object.Instantiate(soundPrefab, position, Quaternion.identity);
         if (instance == null)
         {
             return null;
@@ -42,7 +43,7 @@ public static class AudioPrefabPlayer
 
         if (primarySource == null)
         {
-            Object.Destroy(instance);
+            UnityEngine.Object.Destroy(instance);
             return null;
         }
 
@@ -93,7 +94,7 @@ public static class AudioPrefabPlayer
         spawnedRoots.TryGetValue(source, out GameObject root);
         spawnedRoots.Remove(source);
         source.Stop();
-        Object.Destroy(root != null ? root : source.gameObject);
+        UnityEngine.Object.Destroy(root != null ? root : source.gameObject);
     }
 
     private static CoroutineHost EnsureHost()
@@ -104,7 +105,7 @@ public static class AudioPrefabPlayer
         }
 
         GameObject hostObject = new GameObject(nameof(AudioPrefabPlayer));
-        Object.DontDestroyOnLoad(hostObject);
+        UnityEngine.Object.DontDestroyOnLoad(hostObject);
         host = hostObject.AddComponent<CoroutineHost>();
         return host;
     }
@@ -123,7 +124,7 @@ public static class AudioPrefabPlayer
 
         if (root != null)
         {
-            Object.Destroy(root);
+            UnityEngine.Object.Destroy(root);
         }
     }
 }
